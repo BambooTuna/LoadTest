@@ -1,0 +1,18 @@
+version: "3.4"
+services:
+  db:
+    image: mysql:5.7.22
+    restart: always # OS起動時にコンテナを自動起動
+    ports:
+      - 3306:3306
+    volumes:
+      - ./tools/mysql:/docker-entrypoint-initdb.d
+      - ./volume/mysql/data:/var/lib/mysql
+    env_file: ./tools/mysql/.env # 環境変数に外部ファイルを指定
+  boot:
+    restart: always # OS起動時にコンテナを自動起動
+    ports:
+      - 8080:8080
+    build: .
+    depends_on:
+      - db
