@@ -82,6 +82,13 @@ object MySQL {
 
 object Kamon {
 
+//  val core = "io.kamon" %% "kamon-core" % "1.1.3"
+//  val akka = "io.kamon" %% "kamon-akka-2.5" % "1.1.2"
+//  val akkaHttp = "io.kamon" %% "kamon-akka-http-2.5" % "1.1.2"
+//  val datadog = "io.kamon" %% "kamon-datadog" % "1.0.0"
+//
+//  val all = Seq(core, akka, akkaHttp, datadog)
+
   val version = "0.6.7"
 
   val core = "io.kamon" %% "kamon-core" % version excludeAll (
@@ -134,5 +141,9 @@ object Kamon {
     ExclusionRule(organization = "org.scala-lang.modules")
   )
 
-  val all = Seq(core, autoweave, systemMetrics, scala, akka, akkaHttp, datadog, jmx)
+  val all = Seq(core, autoweave, systemMetrics, scala, akka, akkaHttp, datadog/*, jmx */)
+}
+
+object AspectjLib {
+  val aspectjweaver = "org.aspectj" % "aspectjweaver" % "1.8.10"
 }

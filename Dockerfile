@@ -4,4 +4,4 @@ ARG project_dir=/application
 WORKDIR $project_dir
 COPY ./ $project_dir
 
-CMD [ "sbt", "run/boot" ]
+CMD [ "sbt", "boot/run" ]

@@ -9,10 +9,23 @@ services:
       - ./tools/mysql:/docker-entrypoint-initdb.d
       - ./volume/mysql/data:/var/lib/mysql
     env_file: ./tools/mysql/.env # 環境変数に外部ファイルを指定
+  datadog:
+    image: datadog/agent:latest
+    restart: always # OS起動時にコンテナを自動起動
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+    env_file: ./tools/datadog/.env # 環境変数に外部ファイルを指定
+    links:
+      - boot
   boot:
     restart: always # OS起動時にコンテナを自動起動
-    ports:
-      - 8080:8080
     build: .
+    ports:
+      - 80:80
+    environment:
+      - DATADOG_HOSTNAME=datadog
+      - DATADOG_PORT=8125
     depends_on:
       - db
