@@ -14,8 +14,8 @@ object Routes extends KamonTraceDirectives {
   traceName("get:request") {
     get {
       extractUri { uri =>
-        logger.debug(uri.toString())
-        Kamon.metrics.counter("get2").increment(10L)
+        //logger.debug(uri.toString())
+        Kamon.metrics.counter("get").increment()
         complete(uri.toString())
       }
     }

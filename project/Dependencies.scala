@@ -12,6 +12,15 @@ object ScalaMock {
   val version = "org.scalamock" %% "scalamock" % "4.1.0"
 }
 
+object Gatling {
+  val version = "3.1.3"
+  
+  val charts = "io.gatling.highcharts" % "gatling-charts-highcharts" % version % "test,it"
+  val framework = "io.gatling" % "gatling-test-framework" % version % "test,it"
+  
+  val all = Seq(charts, framework)
+}
+
 object Akka {
   private val version     = "2.5.19"
   val actor: ModuleID     = "com.typesafe.akka" %% "akka-actor" % version

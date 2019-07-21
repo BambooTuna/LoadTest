@@ -46,10 +46,22 @@ lazy val boot = (project in file("boot"))
   .settings(
     name := "LoadTest-boot",
     libraryDependencies ++= Seq(
-    ) ++ Kamon.all
+    )
+      ++ Kamon.all
   )
   .dependsOn(interface, infrastructure)
 
+lazy val `gatling-test` = (project in file("tools/gatling-test"))
+  .settings(commonSettings)
+  .enablePlugins(GatlingPlugin)
+  .settings(
+    name := "LoadTest-gatling-test",
+    version := "0.1",
+    scalaVersion := "2.12.8",
+    libraryDependencies ++= Seq(
+    ) ++ Gatling.all
+  )
+
 lazy val root =
   (project in file("."))
-    .aggregate(boot)
+    .aggregate(boot, `gatling-test`)
