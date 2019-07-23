@@ -5,10 +5,10 @@ import io.gatling.http.Predef._
 
 import scala.concurrent.duration._
 
-class BasicSimulation extends Simulation {
+class PingSimulation extends Simulation {
 
   val request = 200 //   /s
-  val set     = 10  //   セット回数
+  val set     = 1   //   セット回数
 
   val httpConf = http
     .baseUrl("http://localhost")
@@ -18,12 +18,10 @@ class BasicSimulation extends Simulation {
     .acceptEncodingHeader("gzip, deflate")
     .userAgentHeader("Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0")
 
-  val scn = scenario("BasicSimulation")
+  val scn = scenario("PingSimulation")
     .exec(
-      http("json")
-        .post("/json")
-        .headers(Map("Content-Type" -> "application/json"))
-        .body(StringBody("""{"name":"bambootuna","age":20}"""))
+      http("ping")
+        .get("/ping")
     )
     .pause(100.milliseconds)
 

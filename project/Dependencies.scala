@@ -13,7 +13,7 @@ object ScalaMock {
 }
 
 object Gatling {
-  val version = "3.1.3"
+  private val version = "3.1.3"
   
   val charts = "io.gatling.highcharts" % "gatling-charts-highcharts" % version % "test,it"
   val framework = "io.gatling" % "gatling-test-framework" % version % "test,it"
@@ -31,6 +31,8 @@ object Akka {
   private val httpVersion = "10.1.7"
   val http                = "com.typesafe.akka" %% "akka-http" % httpVersion
   val httpTestKit         = "com.typesafe.akka" %% "akka-http-testkit" % httpVersion
+
+  val `akka-http-crice` = "de.heikoseeberger" %% "akka-http-circe" % "1.24.3"
 }
 
 object Circe {
@@ -56,7 +58,7 @@ object LogstashLogbackEncoder {
 }
 
 object ScalaLogging {
-  val version      = "3.5.0"
+  private val version      = "3.5.0"
   val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % version
 }
 
@@ -79,26 +81,18 @@ object Airframe {
 }
 
 object Slick {
-  val version            = "3.3.0"
+  private val version            = "3.3.0"
   val slick: ModuleID    = "com.typesafe.slick" %% "slick" % version
   val hikaricp: ModuleID = "com.typesafe.slick" %% "slick-hikaricp" % version
 }
 
 object MySQL {
-  val version            = "6.0.6"
+  private val version            = "6.0.6"
   val connector: ModuleID = "mysql" % "mysql-connector-java" % version
 }
 
 object Kamon {
-
-//  val core = "io.kamon" %% "kamon-core" % "1.1.3"
-//  val akka = "io.kamon" %% "kamon-akka-2.5" % "1.1.2"
-//  val akkaHttp = "io.kamon" %% "kamon-akka-http-2.5" % "1.1.2"
-//  val datadog = "io.kamon" %% "kamon-datadog" % "1.0.0"
-//
-//  val all = Seq(core, akka, akkaHttp, datadog)
-
-  val version = "0.6.7"
+  private val version = "0.6.7"
 
   val core = "io.kamon" %% "kamon-core" % version excludeAll (
     ExclusionRule(organization = "log4j"),
@@ -155,4 +149,14 @@ object Kamon {
 
 object AspectjLib {
   val aspectjweaver = "org.aspectj" % "aspectjweaver" % "1.8.10"
+}
+
+
+object DDDBase {
+  private val scalaDddBaseVersion = "1.0.27"
+  
+  val core = "com.github.j5ik2o" %% "scala-ddd-base-core" % scalaDddBaseVersion
+  val slick = "com.github.j5ik2o" %% "scala-ddd-base-slick" % scalaDddBaseVersion
+  val redis = "com.github.j5ik2o" %% "scala-ddd-base-redis" % scalaDddBaseVersion
+  val dynamo = "com.github.j5ik2o" %% "scala-ddd-base-dynamodb" % scalaDddBaseVersion
 }

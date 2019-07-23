@@ -36,7 +36,10 @@ lazy val interface = (project in file("interface"))
   .settings(commonSettings)
   .settings(
     name := "LoadTest-interface",
+    resolvers += "Sonatype OSS Release Repository" at "https://oss.sonatype.org/content/repositories/releases/", 
     libraryDependencies ++= Seq(
+      DDDBase.core,
+      DDDBase.slick
     )
   )
   .dependsOn(useCase, infrastructure)
@@ -46,6 +49,7 @@ lazy val boot = (project in file("boot"))
   .settings(
     name := "LoadTest-boot",
     libraryDependencies ++= Seq(
+      Akka.`akka-http-crice`
     )
       ++ Kamon.all
   )

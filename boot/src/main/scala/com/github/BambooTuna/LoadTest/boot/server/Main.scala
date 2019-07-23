@@ -23,15 +23,8 @@ object Main extends App {
 
   val serverConfig = ServerConfig(system.settings.config.getString("boot.server.host"),
                                   system.settings.config.getString("boot.server.port").toInt)
-  val route         = Routes.root
+  val route         = Routes.route
   val bindingFuture = Http().bindAndHandle(route, serverConfig.host, serverConfig.port)
-
-  val counter1 = Kamon.metrics.counter("counter2")
-  counter1.increment(5L)
-  counter1.increment()
-  counter1.increment()
-  counter1.increment()
-  counter1.increment()
 
   sys.addShutdownHook {
     Kamon.shutdown()
