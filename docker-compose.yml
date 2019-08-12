@@ -9,6 +9,13 @@ services:
       - ./tools/mysql:/docker-entrypoint-initdb.d
       - ./volume/mysql/data:/var/lib/mysql
     env_file: ./tools/mysql/.env # 環境変数に外部ファイルを指定
+  redis:
+    image: redis:latest
+    restart: always # OS起動時にコンテナを自動起動
+    ports:
+      - 6379:6379
+    volumes:
+      - ./volume/reis/data:/data
   datadog:
     image: datadog/agent:latest
     restart: always # OS起動時にコンテナを自動起動
@@ -29,3 +36,4 @@ services:
       - DATADOG_PORT=8125
     depends_on:
       - db
+      - redis

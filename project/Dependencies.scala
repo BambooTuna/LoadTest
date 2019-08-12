@@ -84,6 +84,8 @@ object Slick {
   private val version            = "3.3.0"
   val slick: ModuleID    = "com.typesafe.slick" %% "slick" % version
   val hikaricp: ModuleID = "com.typesafe.slick" %% "slick-hikaricp" % version
+  
+  val all = Seq(slick, hikaricp)
 }
 
 object MySQL {
@@ -159,4 +161,9 @@ object DDDBase {
   val slick = "com.github.j5ik2o" %% "scala-ddd-base-slick" % scalaDddBaseVersion
   val redis = "com.github.j5ik2o" %% "scala-ddd-base-redis" % scalaDddBaseVersion
   val dynamo = "com.github.j5ik2o" %% "scala-ddd-base-dynamodb" % scalaDddBaseVersion
+}
+
+object Monix {
+  val monixVersion = "3.0.0-RC2"
+  val core      = "io.monix" %% "monix" % monixVersion
 }
