@@ -3,10 +3,8 @@ package com.github.BambooTuna.LoadTest.boot.server
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
-import com.github.BambooTuna.LoadTest.adaptor.json.UserResponseJson
-import com.github.BambooTuna.adaptor.json.UserRequestJson
-import io.circe._
-import io.circe.syntax._
+import com.github.BambooTuna.LoadTest.adaptor.json.{UserRequestJson, UserResponseJson}
+
 import io.circe.generic.auto._
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import kamon.Kamon
