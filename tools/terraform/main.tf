@@ -75,7 +75,7 @@ resource "google_compute_global_address" "ip_address" {
 // Cloud Build
 resource "google_cloudbuild_trigger" "default" {
   trigger_template {
-    branch_name = "master"
+    branch_name = "develop"
     repo_name   = "github_bambootuna_loadtest"
   }
 

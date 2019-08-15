@@ -10,7 +10,7 @@ steps:
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'Edit Deployment Manifest'
     args:
-      - '/bin/sh'
+      - '/bin/bash'
       - '-c'
       - sed -i -e 's/COMMIT_SHA/${SHORT_SHA}/' k8s/deployment.yml
 
