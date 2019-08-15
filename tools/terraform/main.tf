@@ -76,7 +76,7 @@ resource "google_compute_global_address" "ip_address" {
 resource "google_cloudbuild_trigger" "default" {
   trigger_template {
     branch_name = "master"
-    repo_name   = "github_LoadTest_loadtest-249613"
+    repo_name   = "github_bambootuna_loadtest"
   }
 
   filename = "infrastructure/staging/cloudbuild.yml"
