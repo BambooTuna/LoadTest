@@ -1,18 +1,13 @@
-apiVersion: apps/v1beta2
+apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: loadtest
-  labels:
-    app: loadtest
 spec:
-  replicas: 2 # レプリケーションの増減数
-  selector:
-    matchLabels:
-      app: loadtest
+  replicas: 2
   template:
     metadata:
       labels:
-        app: loadtest
+        run: loadtest
     spec:
       containers:
         - name: loadtest
