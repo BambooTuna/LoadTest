@@ -1,4 +1,4 @@
-FROM hseeberger/scala-sbt:11.0.2_2.12.8_1.2.8
+FROM hseeberger/scala-sbt:8u212_1.2.8_2.12.8
 
 ARG project_dir=/application
 WORKDIR $project_dir
