@@ -6,3 +6,24 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Push to GCR'
     args: ['push', 'gcr.io/loadtest-249613/loadtest:$SHORT_SHA']
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'Edit Deployment Manifest'
+    args:
+      - '/bin/sh'
+      - '-c'
+      - sed -i -e 's/COMMIT_SHA/${SHORT_SHA}/' k8s/deployment.yml
+
+  - name: 'gcr.io/cloud-builders/kubectl'
+    id: 'Apply Deployment Manifest'
+    args: ['apply', '-f', 'k8s/deployment.yml']
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=asia-northeast1-a'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=loadtest-249613'
+
+  - name: 'gcr.io/cloud-builders/kubectl'
+    id: 'Apply Service Manifest'
+    args: ['apply', '-f', 'k8s/service.yml']
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=asia-northeast1-a'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=loadtest-249613'
