@@ -1,10 +1,8 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Build Image'
-    args: ['build', '-t', 'gcr.io/loadtest-249613/loadtest:$SHORT_SHA', '.', '-f', 'Dockerfile']
-    dir: '/'
+    args: ['build', '-t', 'gcr.io/loadtest-249613/loadtest:$SHORT_SHA', '.', '-f', './Dockerfile']
 
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Push to GCR'
     args: ['push', 'gcr.io/loadtest-249613/loadtest:$SHORT_SHA']
-    dir: '/'
