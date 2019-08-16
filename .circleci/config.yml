@@ -50,6 +50,8 @@ workflows:
   build-and-deploy:
     jobs:
       - deploy:
+          requires:
+            - build
           filters:
             branches:
               only: develop
