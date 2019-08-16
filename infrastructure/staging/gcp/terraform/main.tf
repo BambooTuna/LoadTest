@@ -89,5 +89,5 @@ resource "google_cloudbuild_trigger" "default" {
         _IMAGE_MANE = "${var.docker_image_name}"
     }
 
-    filename = "../cloudbuild.yml"
+    filename = "infrastructure/staging/gcp/cloudbuild.yml"
 }
