@@ -14,6 +14,12 @@ $ sbt clean gatling:test
 
 ## Staging
 ### GCP
+You now in ~/LoadTest directory.  
+```bash
+$ pwd
+/~~~/LoadTest
+```
+
 1. enable Compute Engine API  
 Go to [API & Service](https://console.cloud.google.com/apis/api/) and enable `Compute Engine API`.  
 
@@ -35,16 +41,13 @@ $ gcloud auth activate-service-account --key-file=infrastructure/staging/gcp/ter
 
 4. Enable some services   
 ```bash
-# GCB
+// GCB
 $ gcloud services enable cloudbuild.googleapis.com
-
-# GKE
+// GKE
 $ gcloud services enable container.googleapis.com
-
-# GCR
+// GCR
 $ gcloud services enable containerregistry.googleapis.com
-
-# GSR
+// GSR
 $ gcloud services enable sourcerepo.googleapis.com
 ```
 
