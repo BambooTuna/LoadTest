@@ -39,11 +39,11 @@ jobs:
       - setup_remote_docker
 
       - run:
-          command: docker build -t `echo "${CIRCLE_PROJECT_REPONAME}/${CIRCLE_PROJECT_USERNAME}:${CIRCLE_TAG}" | tr '[:upper:]' '[:lower:]'` .
+          command: docker build -t `echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}" | tr '[:upper:]' '[:lower:]'` .
       - run:
           command: docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
       - run:
-          command: docker push `echo "${CIRCLE_PROJECT_REPONAME}/${CIRCLE_PROJECT_USERNAME}:${CIRCLE_TAG}" | tr '[:upper:]' '[:lower:]'`
+          command: docker push `echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}" | tr '[:upper:]' '[:lower:]'`
 
 workflows:
   version: 2
