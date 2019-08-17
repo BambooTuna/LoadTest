@@ -63,7 +63,7 @@ $ cd infrastructure/staging/gcp/terraform
 ```
 
 6. Edit main.tf  
-The repo_name should replace to [repository name].
+The repo_name should be replaced to [repository name].
 ```tf
 variable "repo_name" {
     default = "[repository name]"
