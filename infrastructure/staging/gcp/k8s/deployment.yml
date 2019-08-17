@@ -1,0 +1,16 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: loadtest
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        run: loadtest
+    spec:
+      containers:
+        - name: loadtest
+          image: gcr.io/PROJECT_ID/IMAGE_MANE:COMMIT_SHA
+          ports:
+            - containerPort: 80
