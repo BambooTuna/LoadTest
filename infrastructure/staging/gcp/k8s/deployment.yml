@@ -11,6 +11,6 @@ spec:
     spec:
       containers:
         - name: loadtest
-          image: gcr.io/PROJECT_ID/IMAGE_MANE:COMMIT_SHA
+          image: $DOCKER_TAG
           ports:
             - containerPort: 80

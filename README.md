@@ -13,6 +13,11 @@ $ sbt clean gatling:test
 
 
 ## Staging
+### CircleCI->GKE
+1. Encode account json to 
+```sbtshell
+$ base64 -i .account.json -o output.txt
+```
 ### GCP
 You now in ~/LoadTest directory.  
 ```bash

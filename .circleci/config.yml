@@ -32,18 +32,36 @@ jobs:
       - run: cat /dev/null | sbt test:test
   deploy:
     docker:
-      - image: docker:17.07.0-ce-git
+      - image: google/cloud-sdk
+    environment:
+      DOCKER_TAG: echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}" | tr '[:upper:]' '[:lower:]'
+      DEPLOYMENT_YML: ./infrastructure/staging/gcp/k8s/deployment.yml
+      SERVICE_YML: ./infrastructure/staging/gcp/k8s/service.yml
+      GOOGLE_PROJECT_ID: loadtest-123
+      GOOGLE_COMPUTE_ZONE: asia-northeast1-a
+      GOOGLE_CLUSTER_NAME: loadtest-cluster
     steps:
       - checkout
 
       - setup_remote_docker
 
       - run:
-          command: docker build -t `echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}" | tr '[:upper:]' '[:lower:]'` .
+          name: Docker build and push
+          command: |
+            docker build -t $DOCKER_TAG .
+            docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+            docker push $DOCKER_TAG
       - run:
-          command: docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
-      - run:
-          command: docker push `echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}" | tr '[:upper:]' '[:lower:]'`
+          name: Deploy to GKE
+          command: |
+            apt-get install -qq -y gettext
+            echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
+            gcloud --quiet config set project $GOOGLE_PROJECT_ID
+            gcloud --quiet config set compute/zone $GOOGLE_COMPUTE_ZONE
+            gcloud --quiet container clusters get-credentials $GOOGLE_CLUSTER_NAME
+            envsubst < deployment.yml > $DEPLOYMENT_YML
+            kubectl apply -f $DEPLOYMENT_YML
+            kubectl apply -f $SERVICE_YML
 
 workflows:
   version: 2
@@ -58,6 +76,4 @@ workflows:
             - build
           filters:
             branches:
-              ignore: /.*/
-            tags:
-              only: /^v.*/
+              only: feature/auto-build-and-deploy
