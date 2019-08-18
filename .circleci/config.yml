@@ -51,11 +51,16 @@ jobs:
             docker build -t $DOCKER_TAG .
             docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
             docker push $DOCKER_TAG
+
+      - run:
+          name: create gcp credential
+          command: |
+            echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garbage > ${HOME}/gcloud-service-key.json
       - run:
           name: Deploy to GKE
           command: |
             apt-get install -qq -y gettext
-            echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
+            gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
             gcloud --quiet config set project $GOOGLE_PROJECT_ID
             gcloud --quiet config set compute/zone $GOOGLE_COMPUTE_ZONE
             gcloud --quiet container clusters get-credentials $GOOGLE_CLUSTER_NAME
