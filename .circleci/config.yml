@@ -34,7 +34,6 @@ jobs:
     docker:
       - image: google/cloud-sdk
     environment:
-      DOCKER_TAG: echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}" | tr '[:upper:]' '[:lower:]'
       DEPLOYMENT_YML: ./infrastructure/staging/gcp/k8s/deployment.yml
       SERVICE_YML: ./infrastructure/staging/gcp/k8s/service.yml
       GOOGLE_PROJECT_ID: loadtest-123
@@ -48,6 +47,7 @@ jobs:
       - run:
           name: Docker build and push
           command: |
+            export DOCKER_TAG=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}" | tr '[:upper:]' '[:lower:]'`
             docker build -t $DOCKER_TAG .
             docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
             docker push $DOCKER_TAG
