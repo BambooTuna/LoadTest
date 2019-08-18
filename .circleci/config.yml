@@ -47,7 +47,7 @@ jobs:
       - run:
           name: Docker build and push
           command: |
-            export DOCKER_TAG=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}" | tr '[:upper:]' '[:lower:]'`
+            export DOCKER_TAG=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}:latest" | tr '[:upper:]' '[:lower:]'`
             docker build -t $DOCKER_TAG .
             docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
             docker push $DOCKER_TAG
