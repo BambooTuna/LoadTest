@@ -4,15 +4,9 @@ variable "GOOGLE_COMPUTE_ZONE" {}
 variable "GOOGLE_CLUSTER_NAME" {}
 
 provider "google" {
-  credentials = "${file("/root/gcloud-service-key.json")}"
+  credentials = "${file(".gcloud-service-key.json")}"
   region      = "${var.GOOGLE_COMPUTE_REGION}"
   project     = "${var.GOOGLE_PROJECT_ID}"
-}
-
-terraform {
-  backend "gcs" {
-    prefix = "terraform.tfstate"
-  }
 }
 
 resource "google_storage_bucket" "terraform-state-store" {

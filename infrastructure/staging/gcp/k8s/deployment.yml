@@ -11,6 +11,6 @@ spec:
     spec:
       containers:
         - name: loadtest
-          image: $DOCKER_TAG
+          image: DOCKER_TAG
           ports:
             - containerPort: 80

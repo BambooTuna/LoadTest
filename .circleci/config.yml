@@ -30,49 +30,81 @@ jobs:
           key: v1-dependencies--{{ checksum "build.sbt" }}
 
       - run: cat /dev/null | sbt test:test
+
+  staging:
+    docker:
+      - image: hashicorp/terraform:0.12.6
+    steps:
+      - checkout
+      - setup_remote_docker
+
+      - run:
+          name: Create gcp credential
+          command: |
+            echo $GCLOUD_SERVICE_KEY | base64 -d > ${HOME}/gcloud-service-key.json
+      - run:
+          name: Setup terraform
+          command: |
+            pwd
+            ls
+            export DOCKER_TAG=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}:latest" | tr '[:upper:]' '[:lower:]'`
+            terraform -v
+            terraform init \
+            -var-file=env \
+            -backend=true \
+            -backend-config="bucket=${GOOGLE_PROJECT_ID}_calendar" \
+            -backend-config="credentials=${HOME}/gcloud-service-key.json"
+          working_directory: ~/project/infrastructure/staging/gcp/terraform
+      - run:
+          name: plan terraform
+          command: terraform plan -var-file=env
+          working_directory: ~/project/infrastructure/staging/gcp/terraform
+      - run:
+          name: apply terraform
+          command: terraform apply -refresh=true -auto-approve -var-file=env
+          working_directory: ~/project/infrastructure/staging/gcp/terraform
+
   deploy:
     docker:
       - image: google/cloud-sdk
     environment:
       DEPLOYMENT_YML: ./infrastructure/staging/gcp/k8s/deployment.yml
       SERVICE_YML: ./infrastructure/staging/gcp/k8s/service.yml
-      GOOGLE_PROJECT_ID: loadtest-123
-      GOOGLE_COMPUTE_ZONE: asia-northeast1-a
-      GOOGLE_CLUSTER_NAME: loadtest-cluster
     steps:
       - checkout
-
       - setup_remote_docker
-
       - run:
           name: Docker build and push
           command: |
             export DOCKER_TAG=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}:latest" | tr '[:upper:]' '[:lower:]'`
-            docker build -t $DOCKER_TAG .
+            docker build -t ${DOCKER_TAG} .
             docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
             docker push $DOCKER_TAG
-
-      - run:
-          name: create gcp credential
-          command: |
-            echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garbage > ${HOME}/gcloud-service-key.json
       - run:
           name: Deploy to GKE
           command: |
-            apt-get install -qq -y gettext
+            . ./env
+            sed -i -e 's/DOCKER_TAG/${DOCKER_TAG}/' $DEPLOYMENT_YML
+
             gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
             gcloud --quiet config set project $GOOGLE_PROJECT_ID
+            gcloud --quiet config set compute/region $GOOGLE_COMPUTE_REGION
             gcloud --quiet config set compute/zone $GOOGLE_COMPUTE_ZONE
             gcloud --quiet container clusters get-credentials $GOOGLE_CLUSTER_NAME
-            envsubst < deployment.yml > $DEPLOYMENT_YML
             kubectl apply -f $DEPLOYMENT_YML
             kubectl apply -f $SERVICE_YML
-
+          working_directory: ~/project/infrastructure/staging/gcp/terraform
 workflows:
   version: 2
   build-n-deploy:
     jobs:
+      - staging:
+          filters:
+            branches:
+              only: feature/auto-build-and-deploy
       - deploy:
+          requires:
+            - staging
           filters:
             branches:
               only: feature/auto-build-and-deploy

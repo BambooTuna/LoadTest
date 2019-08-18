@@ -17,7 +17,12 @@ $ sbt clean gatling:test
 1. Encode account json to 
 ```sbtshell
 $ base64 -i .account.json -o output.txt
+
+
+$ terraform plan -var-file=../env
+$ terraform apply -var-file=../env
 ```
+
 ### GCP
 You now in ~/LoadTest directory.  
 ```bash
