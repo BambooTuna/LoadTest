@@ -41,19 +41,17 @@ jobs:
       - run:
           name: Create gcp credential
           command: |
-            echo $GCLOUD_SERVICE_KEY | base64 -d > ${HOME}/gcloud-service-key.json
+            echo $GCLOUD_SERVICE_KEY | base64 -d > ${HOME}/account.json
       - run:
           name: Setup terraform
           command: |
-            pwd
-            ls
             export DOCKER_TAG=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}:latest" | tr '[:upper:]' '[:lower:]'`
             terraform -v
             terraform init \
             -var-file=env \
             -backend=true \
             -backend-config="bucket=${GOOGLE_PROJECT_ID}_calendar" \
-            -backend-config="credentials=${HOME}/gcloud-service-key.json"
+            -backend-config="credentials=${HOME}/account.json"
           working_directory: ~/project/infrastructure/staging/gcp/terraform
       - run:
           name: plan terraform
@@ -86,7 +84,7 @@ jobs:
             . ./env
             sed -i -e 's/DOCKER_TAG/${DOCKER_TAG}/' $DEPLOYMENT_YML
 
-            gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+            gcloud auth activate-service-account --key-file ${HOME}/account.json
             gcloud --quiet config set project $GOOGLE_PROJECT_ID
             gcloud --quiet config set compute/region $GOOGLE_COMPUTE_REGION
             gcloud --quiet config set compute/zone $GOOGLE_COMPUTE_ZONE
