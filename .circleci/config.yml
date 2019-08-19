@@ -37,16 +37,20 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-
       - run:
           name: Create gcp credential
           command: |
             echo $GCLOUD_SERVICE_KEY | base64 -d > ${HOME}/account.json
       - run:
-          name: Setup terraform
+          name: Setup env
           command: |
             export DOCKER_TAG=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}:latest" | tr '[:upper:]' '[:lower:]'`
+            . ./env
             terraform -v
+          working_directory: ~/project/infrastructure/staging/gcp/terraform
+      - run:
+          name: init terraform
+          command: |
             terraform init \
             -var-file=env \
             -backend=true \
