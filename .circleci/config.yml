@@ -42,15 +42,10 @@ jobs:
           command: |
             echo $GCLOUD_SERVICE_KEY | base64 -d > ${HOME}/account.json
       - run:
-          name: Setup env
-          command: |
-            export DOCKER_TAG=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}:latest" | tr '[:upper:]' '[:lower:]'`
-            . ./env
-            terraform -v
-          working_directory: ~/project/infrastructure/staging/gcp/terraform
-      - run:
           name: init terraform
           command: |
+            . ./env
+            terraform -v
             terraform init \
             -var-file=env \
             -backend=true \
