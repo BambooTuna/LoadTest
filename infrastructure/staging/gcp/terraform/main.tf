@@ -57,7 +57,7 @@ resource "google_container_cluster" "default" {
       "https://www.googleapis.com/auth/monitoring",
     ]
     preemptible  = true
-    machine_type = "g1-small"
+    machine_type = "n1-standard-1"
   }
 }
 
