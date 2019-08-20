@@ -17,5 +17,8 @@ spec:
       containers:
       - name: loadtest
         image: docker.io/DOCKER_TAG
+        resources:
+          requests:
+            memory: 512Mi
         ports:
         - containerPort: 80
