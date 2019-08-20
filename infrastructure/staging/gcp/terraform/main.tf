@@ -4,15 +4,14 @@ variable "GOOGLE_COMPUTE_ZONE" {}
 variable "GOOGLE_CLUSTER_NAME" {}
 
 provider "google" {
-  credentials = "${file("/root/account.json")}"
+  credentials = "${file("account.json")}"
   region      = "${var.GOOGLE_COMPUTE_REGION}"
   project     = "${var.GOOGLE_PROJECT_ID}"
 }
 
-terraform {
-  backend "gcs" {
-    prefix = "terraform.tfstate"
-  }
+resource "google_project" "my_project" {
+  name       = "loadtest"
+  project_id = "${var.GOOGLE_PROJECT_ID}"
 }
 
 // Network
@@ -65,28 +64,4 @@ resource "google_container_cluster" "default" {
 // Static IP
 resource "google_compute_global_address" "ip_address" {
   name = "${var.GOOGLE_PROJECT_ID}-static-ip"
-}
-
-resource "google_storage_bucket" "terraform-state-store" {
-  name          = "${var.GOOGLE_PROJECT_ID}_calendar"
-  location      = "${var.GOOGLE_COMPUTE_REGION}"
-  storage_class = "REGIONAL"
-
-  versioning {
-    enabled = true
-  }
-
-  lifecycle_rule {
-    action {
-      type = "Delete"
-    }
-    condition {
-      num_newer_versions = 5
-    }
-  }
-}
-
-resource "google_storage_bucket_acl" "local-acl" {
-  bucket = "${google_storage_bucket.terraform-state-store.name}"
-  predefined_acl = "private"
 }

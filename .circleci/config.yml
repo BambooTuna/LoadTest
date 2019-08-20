@@ -46,11 +46,13 @@ jobs:
           command: |
             . ./env
             terraform -v
-            terraform init \
-            -var-file=env \
-            -backend=true \
-            -backend-config="bucket=${GOOGLE_PROJECT_ID}_calendar" \
-            -backend-config="credentials=${HOME}/account.json"
+            terraform init
+            terraform import google_project.my_project ${GOOGLE_PROJECT_ID}
+            terraform import -var-file=env google_compute_network.default ${GOOGLE_PROJECT_ID}
+            terraform import -var-file=env google_compute_subnetwork.default ${GOOGLE_PROJECT_ID}
+            terraform import -var-file=env google_container_cluster.default ${GOOGLE_PROJECT_ID}/${GOOGLE_COMPUTE_ZONE}/${GOOGLE_CLUSTER_NAME}
+            terraform import -var-file=env google_compute_global_address.ip_address ${GOOGLE_PROJECT_ID}/${GOOGLE_PROJECT_ID}-static-ip
+#            terraform refresh -var-file=env
           working_directory: ~/project/infrastructure/staging/gcp/terraform
       - run:
           name: plan terraform
@@ -58,7 +60,7 @@ jobs:
           working_directory: ~/project/infrastructure/staging/gcp/terraform
       - run:
           name: apply terraform
-          command: terraform apply -refresh=true -auto-approve -var-file=env
+          command: terraform apply -auto-approve -var-file=env
           working_directory: ~/project/infrastructure/staging/gcp/terraform
 
   deploy:
