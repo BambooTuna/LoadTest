@@ -52,7 +52,7 @@ $ gcloud services enable cloudresourcemanager.googleapis.com
 
 1. Encode account json to string
 ```sbtshell
-$ base64 -i .account.json -o
+$ base64 -i .account.json
 1234567890asdfghjkl
 ```
 2. Set encoded text to CircleCI env.

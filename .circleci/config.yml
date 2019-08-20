@@ -44,31 +44,31 @@ jobs:
       - run:
           name: init terraform
           command: |
-            . ./env
+            . ../env
             terraform -v
             terraform init
             terraform import google_project.my_project ${GOOGLE_PROJECT_ID}
-            terraform import -var-file=env google_compute_network.default ${GOOGLE_PROJECT_ID}
-            terraform import -var-file=env google_compute_subnetwork.default ${GOOGLE_PROJECT_ID}
-            terraform import -var-file=env google_container_cluster.default ${GOOGLE_PROJECT_ID}/${GOOGLE_COMPUTE_ZONE}/${GOOGLE_CLUSTER_NAME}
-            terraform import -var-file=env google_compute_global_address.ip_address ${GOOGLE_PROJECT_ID}/${GOOGLE_PROJECT_ID}-static-ip
-#            terraform refresh -var-file=env
+            terraform import -var-file=../env google_compute_network.default ${GOOGLE_PROJECT_ID}
+            terraform import -var-file=../env google_compute_subnetwork.default ${GOOGLE_PROJECT_ID}
+            terraform import -var-file=../env google_container_cluster.default ${GOOGLE_PROJECT_ID}/${GOOGLE_COMPUTE_ZONE}/${GOOGLE_CLUSTER_NAME}
+            terraform import -var-file=../env google_compute_global_address.ip_address ${GOOGLE_PROJECT_ID}/${GOOGLE_PROJECT_ID}-static-ip
+#            terraform refresh -var-file=../env
           working_directory: ~/project/infrastructure/staging/gcp/terraform
       - run:
           name: plan terraform
-          command: terraform plan -var-file=env
+          command: terraform plan -var-file=../env
           working_directory: ~/project/infrastructure/staging/gcp/terraform
       - run:
           name: apply terraform
-          command: terraform apply -auto-approve -var-file=env
+          command: terraform apply -auto-approve -var-file=../env
           working_directory: ~/project/infrastructure/staging/gcp/terraform
 
   deploy:
     docker:
       - image: google/cloud-sdk
     environment:
-      DEPLOYMENT_YML: ./infrastructure/staging/gcp/k8s/deployment.yml
-      SERVICE_YML: ./infrastructure/staging/gcp/k8s/service.yml
+      DEPLOYMENT_YML: deployment.yml
+      SERVICE_YML: service.yml
     steps:
       - checkout
       - setup_remote_docker
@@ -80,10 +80,18 @@ jobs:
             docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
             docker push $DOCKER_TAG
       - run:
+          name: Create gcp credential
+          command: |
+            echo $GCLOUD_SERVICE_KEY | base64 -d > ${HOME}/account.json
+      - run:
           name: Deploy to GKE
           command: |
-            . ./env
-            sed -i -e 's/DOCKER_TAG/${DOCKER_TAG}/' $DEPLOYMENT_YML
+            . ../env
+            export DOCKER_TAG=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}:latest" | tr '[:upper:]' '[:lower:]'`
+            echo ${DOCKER_TAG}
+            sed -i -e 's!DOCKER_TAG!'${DOCKER_TAG}'!' $DEPLOYMENT_YML
+            ls
+            cat $DEPLOYMENT_YML
 
             gcloud auth activate-service-account --key-file ${HOME}/account.json
             gcloud --quiet config set project $GOOGLE_PROJECT_ID
@@ -92,7 +100,7 @@ jobs:
             gcloud --quiet container clusters get-credentials $GOOGLE_CLUSTER_NAME
             kubectl apply -f $DEPLOYMENT_YML
             kubectl apply -f $SERVICE_YML
-          working_directory: ~/project/infrastructure/staging/gcp/terraform
+          working_directory: ~/project/infrastructure/staging/gcp/k8s
 workflows:
   version: 2
   build-n-deploy:
