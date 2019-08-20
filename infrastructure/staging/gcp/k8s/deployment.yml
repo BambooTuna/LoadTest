@@ -1,16 +1,24 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: loadtest
+  name: loadtest-deployment
+  labels:
+    app: loadtest
 spec:
   replicas: 2
+  selector:
+    matchLabels:
+      app: loadtest
   template:
     metadata:
       labels:
-        run: loadtest
+        app: loadtest
     spec:
       containers:
-        - name: loadtest
-          image: gcr.io/PROJECT_ID/IMAGE_MANE:COMMIT_SHA
-          ports:
-            - containerPort: 80
+      - name: loadtest
+        image: docker.io/DOCKER_TAG
+        resources:
+          requests:
+            memory: 512Mi
+        ports:
+        - containerPort: 80

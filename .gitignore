@@ -31,3 +31,4 @@ credential.yml
 fly
 .vagrant/
 deployment/*/Chart.yaml
+account.json
