@@ -6,6 +6,8 @@ import akka.stream.ActorMaterializer
 import com.typesafe.config.{ Config, ConfigFactory }
 import kamon.Kamon
 import org.slf4j.LoggerFactory
+import slick.basic.DatabaseConfig
+import slick.jdbc.JdbcProfile
 
 import scala.concurrent.ExecutionContextExecutor
 
@@ -23,6 +25,9 @@ object Main extends App {
 
   val serverConfig = ServerConfig(system.settings.config.getString("boot.server.host"),
                                   system.settings.config.getString("boot.server.port").toInt)
+
+  val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig[JdbcProfile](path = "slick", rootConfig)
+
   val route         = Routes.createRouter.create
   val bindingFuture = Http().bindAndHandle(route, serverConfig.host, serverConfig.port)
 
