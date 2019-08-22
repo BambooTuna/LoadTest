@@ -3,6 +3,7 @@ package com.github.BambooTuna.LoadTest.boot.server
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.SlickProfile
 import com.typesafe.config.{ Config, ConfigFactory }
 import kamon.Kamon
 import org.slf4j.LoggerFactory
@@ -27,8 +28,12 @@ object Main extends App {
                                   system.settings.config.getString("boot.server.port").toInt)
 
   val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig[JdbcProfile](path = "slick", rootConfig)
+  val slickProfile = new SlickProfile {
+    override val profile = dbConfig.profile
+    override val db      = dbConfig.db
+  }
 
-  val route         = Routes.createRouter.create
+  val route         = Routes.createRouter(slickProfile).create
   val bindingFuture = Http().bindAndHandle(route, serverConfig.host, serverConfig.port)
 
   sys.addShutdownHook {
