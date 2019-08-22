@@ -1,45 +1,29 @@
 package com.github.BambooTuna.LoadTest.boot.server
 
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.server.Directives._
-import com.github.BambooTuna.LoadTest.adaptor.routes.json.{AddUserRequestJson, AddUserResponseJson}
-import io.circe.generic.auto._
-import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
-import kamon.Kamon
-import kamon.akka.http.KamonTraceDirectives
+import akka.http.scaladsl.model.HttpMethods.{ GET, POST, PUT }
+import akka.stream.ActorMaterializer
+import com.github.BambooTuna.LoadTest.adaptor.routes._
 import org.slf4j.LoggerFactory
+import akka.http.scaladsl.server.Directives._
 
-object Routes extends FailFastCirceSupport with KamonTraceDirectives {
+object Routes {
 
   val logger = LoggerFactory.getLogger(getClass)
 
-  val root =
-    pathSingleSlash {
-      get {
-        extractUri { uri =>
-          Kamon.metrics.counter("get").increment()
-          complete(uri.toString())
-        }
-      }
-    }
+  def createRouter(implicit materializer: ActorMaterializer): Router =
+    commonRouter + mainRouter
 
-  val ping =
-    path("ping") {
-      get {
-        complete("pong")
-      }
-    }
+  def commonRouter(implicit materializer: ActorMaterializer): Router =
+    Router(
+      route(GET, "", CommonRoute().top),
+      route(GET, "ping", CommonRoute().ping)
+    )
 
-  val `json-test` =
-    path("json") {
-      post {
-        entity(as[AddUserRequestJson]) { request =>
-          complete(StatusCodes.OK, AddUserResponseJson())
-        }
-      }
-    }
-
-  val route: Route = root ~ ping ~ `json-test`
+  def mainRouter(implicit materializer: ActorMaterializer): Router =
+    Router(
+      route(GET, "user" / "get", GetUserRoute().route),
+      route(POST, "user" / "add", AddUserRoute().route),
+      route(PUT, "user" / "update", EditUserRoute().route)
+    )
 
 }

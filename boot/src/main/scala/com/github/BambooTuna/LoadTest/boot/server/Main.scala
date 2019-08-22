@@ -23,7 +23,7 @@ object Main extends App {
 
   val serverConfig = ServerConfig(system.settings.config.getString("boot.server.host"),
                                   system.settings.config.getString("boot.server.port").toInt)
-  val route         = Routes.route
+  val route         = Routes.createRouter.create
   val bindingFuture = Http().bindAndHandle(route, serverConfig.host, serverConfig.port)
 
   sys.addShutdownHook {
