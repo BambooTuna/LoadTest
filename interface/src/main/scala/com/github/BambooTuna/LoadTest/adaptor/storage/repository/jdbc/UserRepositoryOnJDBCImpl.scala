@@ -2,11 +2,9 @@ package com.github.BambooTuna.LoadTest.adaptor.storage.repository.jdbc
 
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.jdbc.UserComponent
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.SlickProfile
-import com.github.BambooTuna.LoadTest.adaptor.storage.dao.RepositorySupport
-import com.github.BambooTuna.LoadTest.domain.model.user.{ User, UserId }
 import monix.eval.Task
 
-class UserRepositoryOnJDBC(val client: SlickProfile) extends RepositorySupport[Task, UserId, User] with UserComponent {
+class UserRepositoryOnJDBCImpl(val client: SlickProfile) extends UserRepositoryOnJDBC with UserComponent {
 
   import client.profile.api._
 

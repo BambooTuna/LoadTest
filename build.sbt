@@ -29,6 +29,7 @@ lazy val useCase = (project in file("useCase"))
       Akka.stream,
       Akka.slf4j,
     )
+      ++ Kamon.all
   )
   .dependsOn(domain, infrastructure)
 
