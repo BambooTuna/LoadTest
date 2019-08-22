@@ -10,12 +10,13 @@ curl -X POST -H "Content-Type: application/json" -d '{"name":"bambootuna","age":
 ```sbtshell
 $ sbt clean gatling:test
 ```
-
+## Dao実装の参考
+[scala-ddd-base](https://github.com/j5ik2o/scala-ddd-base)
 
 ## Staging目次
-- (CommonSetting)[#CommonSetting]
-- (CircleCI->DockerHub->GKE)[#CircleCI->DockerHub->GKE]
-- (GoogleCloudBuilder->GKE)[#GoogleCloudBuilder->GKE]
+- [CommonSetting](#CommonSetting)
+- [CircleCI->DockerHub->GKE](#CircleCI->DockerHub->GKE)
+- [GoogleCloudBuilder->GKE](#GoogleCloudBuilder->GKE)
 
 ### CommonSetting
 1. enable Compute Engine API  

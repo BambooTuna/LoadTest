@@ -151,6 +151,10 @@ object AspectjLib {
   val aspectjweaver = "org.aspectj" % "aspectjweaver" % "1.8.10"
 }
 
+object Monix {
+  val monixVersion = "3.0.0-RC2"
+  val version      = "io.monix" %% "monix" % monixVersion
+}
 
 object DDDBase {
   private val scalaDddBaseVersion = "1.0.27"
