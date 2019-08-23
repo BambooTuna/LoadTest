@@ -2,7 +2,8 @@
 ## LocalTest
 ### Setup local k8s
 ```bash
-$ docker build . -tag loadtest-local-k8s:latest
+$ docker build ./tools -t loadtest-local-db:latest
+$ docker build . -t loadtest-local-k8s:latest
 $ sh setup-local-k8s.sh
 ```
 

@@ -31,9 +31,7 @@ spec:
     spec:
       containers:
       - name: loadtest
-        image: loadtest-local-k8s:latest
-        #localのdocker imageを使用する際に必要
-        imagePullPolicy: Never
+        image: mysql:5.7.22
         env:
           - name: RDB_HOST
             value: "db"

@@ -18,13 +18,14 @@ metadata:
     type: local
 spec:
   storageClassName: manual
-  persistentVolumeReclaimPolicy: Retain
+  persistentVolumeReclaimPolicy: Recycle
+  #Set it to Delete when removing the volume to delete the files - so it triggers the docker-entrypoint
   capacity:
     storage: 5Gi
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/data/mysql"
+    path: "/mnt/mysql"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -54,24 +55,25 @@ spec:
         app: db
     spec:
       containers:
-        - image: mysql:5.7.22
+        - image: loadtest-local-db:latest
           name: db
+          imagePullPolicy: Never
           env:
-            - name: MYSQL_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: dbsecret
-                  key: root_password
-            - name: MYSQL_USER
-              valueFrom:
-                secretKeyRef:
-                  name: dbsecret
-                  key: user
-            - name: MYSQL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: dbsecret
-                  key: password
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: dbsecret
+                key: root_password
+          - name: MYSQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: dbsecret
+                key: user
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: dbsecret
+                key: password
           ports:
             - containerPort: 3306
               name: db
@@ -79,12 +81,12 @@ spec:
             - name: mysql-persistent-storage
               mountPath: /var/lib/mysql
             - name: mysql-host-path
-              mountPath: /docker-entrypoint-initdb.d/
+              mountPath: /#docker-entrypoint-initdb.d/
       volumes:
         - name: mysql-persistent-storage
           persistentVolumeClaim:
             claimName: db-claim
         - name: mysql-host-path
           hostPath:
-            path: ./tools/mysql/
+            path: /Users/cw-takeo/LoadTest/tools/mysql/
             type: Directory
