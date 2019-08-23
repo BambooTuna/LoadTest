@@ -91,6 +91,12 @@ object MySQL {
   val connector: ModuleID = "mysql" % "mysql-connector-java" % version
 }
 
+// これを追加しないと以下のエラーがでる
+//Failed to load class of driverClassName com.mysql.jdbc.Driver
+object MySQLConnectorJava {
+  val version = "mysql" % "mysql-connector-java" % "5.1.42"
+}
+
 object Kamon {
   private val version = "0.6.7"
 

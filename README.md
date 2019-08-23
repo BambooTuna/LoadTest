@@ -9,7 +9,7 @@ $ sh setup.sh
 ## API動作確認
 ```sbtshell
 curl localhost/ping
-curl -X POST -H "Content-Type: application/json" -d '{"name":"bambootuna","age":20}' localhost/json
+curl -X POST -H "Content-Type: application/json" -d '{"name":"bambootuna","age":20}' localhost/user/add
 ```
 
 ## Gatlingテスト実行
