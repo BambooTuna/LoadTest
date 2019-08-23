@@ -1,4 +1,10 @@
 高負荷に耐えるためにはどうしたらいいかを調べていく
+## LocalTest
+### Setup
+```bash
+$ sh setup.sh
+```
+
 
 ## API動作確認
 ```sbtshell
