@@ -1,3 +1,4 @@
 pwd
-cd ./tools/mysql
-cp .env_sample .env
+cd ./tools
+cp ./mysql/.env_sample ./mysql/.env
+cp ./datadog/.env_sample ./datadog/.env
