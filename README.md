@@ -1,8 +1,9 @@
 高負荷に耐えるためにはどうしたらいいかを調べていく
 ## LocalTest
-### Setup
+### Setup local k8s
 ```bash
-$ sh setup.sh
+$ docker build . -tag loadtest-local-k8s:latest
+$ sh setup-local-k8s.sh
 ```
 
 
