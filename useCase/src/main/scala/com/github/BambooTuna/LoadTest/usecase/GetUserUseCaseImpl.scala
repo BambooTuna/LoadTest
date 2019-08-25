@@ -16,10 +16,9 @@ class GetUserUseCaseImpl(userRepository: UserRepositoryOnJDBC) {
 
   def run(arg: GetUserCommandRequest): Task[GetUserCommandResponse] = {
 
-    val id = Random.nextLong()
     (for {
       aggregate <- Task.pure(
-        UserId(id)
+        arg.id
       )
       r <- userRepository.get(aggregate)
     } yield r)

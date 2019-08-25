@@ -1,17 +1,29 @@
 高負荷に耐えるためにはどうしたらいいかを調べていく
 ## LocalTest
-### Setup local k8s
+
+### Setup
+
+#### k8s
 ```bash
-$ docker build ./tools -t loadtest-local-db:latest
-$ docker build . -t loadtest-local-k8s:latest
 $ sh setup-local-k8s.sh
+...
+```
+#### docker-compose
+```bash
+$ docker-compose up -d --build
+...
 ```
 
+### Testing
+```bash
+$ curl localhost/ping
+{"message":"pong","error_messages":[]}
 
-## API動作確認
-```sbtshell
-curl localhost/ping
-curl -X POST -H "Content-Type: application/json" -d '{"name":"bambootuna","age":20}' localhost/user/add
+$ curl -X POST -H "Content-Type: application/json" -d '{"name":"bambootuna","age":20}' localhost/user/add
+{"id":{"user_id":-4934742503425198802},"error_messages":[]}
+
+$ curl -X GET -H "Content-Type: application/json" -d '{"user_id":1}' localhost/user/get
+{"user":{"user_id":6795494702222648856,"name":"bambootuna","age":20},"error_messages":[]}
 ```
 
 ## Gatlingテスト実行

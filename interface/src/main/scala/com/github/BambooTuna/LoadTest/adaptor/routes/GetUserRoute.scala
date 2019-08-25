@@ -10,13 +10,12 @@ import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import com.github.BambooTuna.LoadTest.adaptor.routes.json.{AddUserResponseJson, GetUserRequestJson, GetUserResponseJson, UserJson}
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.SlickProfile
 import com.github.BambooTuna.LoadTest.adaptor.storage.repository.jdbc.UserRepositoryOnJDBCImpl
-import com.github.BambooTuna.LoadTest.domain.model.user.{Age, Name, UserId}
+import com.github.BambooTuna.LoadTest.domain.model.user.UserId
 import com.github.BambooTuna.LoadTest.usecase.GetUserUseCaseImpl
 import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol._
 import monix.execution.Scheduler.Implicits.global
 import akka.http.scaladsl.server.Directives._
 
-import scala.concurrent.Future
 
 case class GetUserRoute(client: SlickProfile)(implicit materializer: ActorMaterializer) extends FailFastCirceSupport {
 
@@ -39,7 +38,6 @@ case class GetUserRoute(client: SlickProfile)(implicit materializer: ActorMateri
             val entity = HttpEntity(MediaTypes.`application/json`, result.asJson.noSpaces)
             complete(StatusCodes.OK, entity)
           case GetUserCommandFailed(error_message) =>
-            //TODO error時のResponseをどうするか
             val result = GetUserResponseJson(None, Seq(error_message))
             val entity = HttpEntity(MediaTypes.`application/json`, result.asJson.noSpaces)
             complete(StatusCodes.BadRequest, entity)
