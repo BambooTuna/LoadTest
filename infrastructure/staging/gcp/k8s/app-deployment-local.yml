@@ -31,7 +31,9 @@ spec:
     spec:
       containers:
       - name: loadtest
-        image: mysql:5.7.22
+        image: loadtest-local-k8s:latest
+        #localのdocker imageを使用する際に必要
+        imagePullPolicy: Never
         env:
           - name: RDB_HOST
             value: "db"
@@ -48,9 +50,12 @@ spec:
                 name: dbsecret
                 key: password
           - name: RDB_DATABASE
-            value: "loadtest"
+            valueFrom:
+              secretKeyRef:
+                name: dbsecret
+                key: databese_name
         resources:
           requests:
-            memory: 512Mi
+            memory: 1Gi
         ports:
         - containerPort: 80
