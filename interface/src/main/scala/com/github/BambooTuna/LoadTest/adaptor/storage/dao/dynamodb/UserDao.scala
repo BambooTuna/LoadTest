@@ -1,11 +1,11 @@
 package com.github.BambooTuna.LoadTest.adaptor.storage.dao.dynamodb
 
-import com.github.BambooTuna.LoadTest.adaptor.storage.dao.DaoOnSlick
-import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.SlickProfile
-import com.github.BambooTuna.LoadTest.domain.model.user.{ User, UserId }
-import monix.eval.Task
-
-import com.github.j5ik2o.dddbase.slick.SlickDaoSupport
+//import com.github.BambooTuna.LoadTest.adaptor.storage.dao.DaoOnSlick
+//import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.SlickProfile
+//import com.github.BambooTuna.LoadTest.domain.model.user.{ User, UserId }
+//import monix.eval.Task
+//
+//import com.github.j5ik2o.dddbase.slick.SlickDaoSupport
 //class UserDao(val client: SlickProfile) extends DaoOnSlick[Task, UserId, User] {
 //
 //  val tableName = "loadtest-user"

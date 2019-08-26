@@ -22,7 +22,7 @@ object Routes {
 
   def mainRouter(client: SlickProfile)(implicit materializer: ActorMaterializer): Router =
     Router(
-      route(GET, "user" / "get", GetUserRoute().route),
+      route(GET, "user" / "get", GetUserRoute(client).route),
       route(POST, "user" / "add", AddUserRoute(client).route),
       route(PUT, "user" / "update", EditUserRoute().route)
     )
