@@ -29,7 +29,6 @@ lazy val useCase = (project in file("useCase"))
       Akka.stream,
       Akka.slf4j,
     )
-      ++ Kamon.all
   )
   .dependsOn(domain, infrastructure)
 
@@ -39,7 +38,6 @@ lazy val interface = (project in file("interface"))
     name := "LoadTest-interface",
     resolvers += "Sonatype OSS Release Repository" at "https://oss.sonatype.org/content/repositories/releases/", 
     libraryDependencies ++= Seq(
-      Akka.`akka-http-crice`,
       DDDBase.core,
       DDDBase.slick
     )

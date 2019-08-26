@@ -1,42 +1,21 @@
 高負荷に耐えるためにはどうしたらいいかを調べていく
-## LocalTest
 
-### Setup
-
-#### k8s
-```bash
-$ sh setup-local-k8s.sh
-...
-```
-#### docker-compose
-```bash
-$ docker-compose up -d --build
-...
+## API動作確認
+```sbtshell
+curl localhost/ping
+curl -X POST -H "Content-Type: application/json" -d '{"name":"bambootuna","age":20}' localhost/json
 ```
 
-### Testing
-```bash
-$ curl localhost/ping
-{"message":"pong","error_messages":[]}
-
-$ curl -X POST -H "Content-Type: application/json" -d '{"name":"bambootuna","age":20}' localhost/user/add
-{"id":{"user_id":-4934742503425198802},"error_messages":[]}
-
-$ curl -X GET -H "Content-Type: application/json" -d '{"user_id":1}' localhost/user/get
-{"user":{"user_id":6795494702222648856,"name":"bambootuna","age":20},"error_messages":[]}
-```
-
-## Gatling Test
+## Gatlingテスト実行
 ```sbtshell
 $ sbt clean gatling:test
 ```
-## Dao実装の参考
-[scala-ddd-base](https://github.com/j5ik2o/scala-ddd-base)
+
 
 ## Staging目次
-- [CommonSetting](#CommonSetting)
-- [CircleCI->DockerHub->GKE](#CircleCI->DockerHub->GKE)
-- [GoogleCloudBuilder->GKE](#GoogleCloudBuilder->GKE)
+- (CommonSetting)[#CommonSetting]
+- (CircleCI->DockerHub->GKE)[#CircleCI->DockerHub->GKE]
+- (GoogleCloudBuilder->GKE)[#GoogleCloudBuilder->GKE]
 
 ### CommonSetting
 1. enable Compute Engine API  
@@ -135,49 +114,3 @@ $ terraform apply
 After pushed, see next page.  
 [GCB](https://console.cloud.google.com/cloud-build/builds)  
 Cloud builder should e moving.  
-
-
-
-
-## caサーバーサイド祭り
-東京ー大阪→5ms
-
-- テックリードの仕事
-システムアーキテクチャの設計やその実装
-- awsの構成
-- クリーンアーキテクチャ
-- Jest テストツール
-- 新しい関数型プログラミング
-
-
-
-### last
-あべま→１００％プロコンテンツ＝テレビCM
-
-性別推定モデル
-年代推定モデル
-
-
-
-KE
-Go+Scala
-
-OpenRTB/PMP
-
-ローカルキャッシュ
-key-valueで処理→Redis
-
-検討から実装までの日時１月→３月
-スピード＝＞　redis : dynamo = 1 : 10
-カナリアサーバーにプレリリース＝カナリアリリース
-
-
-
-
-
-
-
-
-
-
-

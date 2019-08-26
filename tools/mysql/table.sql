@@ -1,14 +1,11 @@
-DROP SCHEMA IF EXISTS loadtest;
-CREATE SCHEMA loadtest;
-USE loadtest;
+DROP SCHEMA IF EXISTS tunacurl;
+CREATE SCHEMA tunacurl;
+USE tunacurl;
 
-DROP TABLE IF EXISTS user;
-CREATE TABLE user
+DROP TABLE IF EXISTS test_table;
+CREATE TABLE test_table
 (
-  `user_id`     bigint(20) NOT NULL,
-  `user_name`   VARCHAR(255) NOT NULL,
-  `user_age`    bigint(20) NOT NULL,
-  `created_at`  datetime(6) NOT NULL,
-  `updated_at`  datetime(6) NOT NULL,
-  PRIMARY KEY  `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  id mediumint(9) NOT NULL AUTO_INCREMENT,
+  text VARCHAR(255) DEFAULT 'Nothing' NOT NULL,
+  PRIMARY KEY  id (id)
+);

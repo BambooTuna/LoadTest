@@ -1,30 +1,46 @@
 package com.github.BambooTuna.LoadTest.boot.server
 
-import akka.http.scaladsl.model.HttpMethods.{ GET, POST, PUT }
-import akka.stream.ActorMaterializer
-import com.github.BambooTuna.LoadTest.adaptor.routes._
-import org.slf4j.LoggerFactory
+import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
-import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.SlickProfile
+import com.github.BambooTuna.LoadTest.adaptor.json.{UserRequestJson, UserResponseJson}
 
-object Routes {
+import io.circe.generic.auto._
+import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
+import kamon.Kamon
+import kamon.akka.http.KamonTraceDirectives
+import org.slf4j.LoggerFactory
+
+object Routes extends FailFastCirceSupport with KamonTraceDirectives {
 
   val logger = LoggerFactory.getLogger(getClass)
 
-  def createRouter(client: SlickProfile)(implicit materializer: ActorMaterializer): Router =
-    commonRouter + mainRouter(client)
+  val root =
+    pathSingleSlash {
+      get {
+        extractUri { uri =>
+          Kamon.metrics.counter("get").increment()
+          complete(uri.toString())
+        }
+      }
+    }
 
-  def commonRouter(implicit materializer: ActorMaterializer): Router =
-    Router(
-      route(GET, "", CommonRoute().top),
-      route(GET, "ping", CommonRoute().ping)
-    )
+  val ping =
+    path("ping") {
+      get {
+        complete("pong")
+      }
+    }
 
-  def mainRouter(client: SlickProfile)(implicit materializer: ActorMaterializer): Router =
-    Router(
-      route(GET, "user" / "get", GetUserRoute(client).route),
-      route(POST, "user" / "add", AddUserRoute(client).route),
-      route(PUT, "user" / "update", EditUserRoute().route)
-    )
+  val `json-test` =
+    path("json") {
+      post {
+        entity(as[UserRequestJson]) { request =>
+          complete(StatusCodes.OK, UserResponseJson())
+        }
+      }
+    }
+
+  val route: Route = root ~ ping ~ `json-test`
 
 }

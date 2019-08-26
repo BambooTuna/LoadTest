@@ -14,9 +14,7 @@ object Settings {
       Logback.classic,
       LogstashLogbackEncoder.encoder,
       Config.core,
-      Airframe.di,
-      Monix.version,
-      MySQLConnectorJava.version,
+      Airframe.di
     ),
     scalafmtOnCompile in Compile := true,
     scalafmtTestOnCompile in Compile := true

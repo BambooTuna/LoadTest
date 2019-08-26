@@ -5,7 +5,7 @@ import io.gatling.http.Predef._
 
 import scala.concurrent.duration._
 
-class AddUserSimulation extends Simulation {
+class BasicSimulation extends Simulation {
 
   val request = 200 //   /s
   val set     = 10  //   セット回数
@@ -18,10 +18,10 @@ class AddUserSimulation extends Simulation {
     .acceptEncodingHeader("gzip, deflate")
     .userAgentHeader("Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0")
 
-  val scn = scenario("AddUserSimulation")
+  val scn = scenario("BasicSimulation")
     .exec(
-      http("add user")
-        .post("/user/add")
+      http("json")
+        .post("/json")
         .headers(Map("Content-Type" -> "application/json"))
         .body(StringBody("""{"name":"bambootuna","age":20}"""))
     )
