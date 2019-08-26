@@ -1,4 +1,4 @@
-package com.github.BambooTuna.LoadTest.adaptor.json
+package com.github.BambooTuna.LoadTest.adaptor.routes.json
 
 trait ResponseJson {
   val error_messages: Seq[String]
