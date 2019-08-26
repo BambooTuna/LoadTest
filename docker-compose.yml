@@ -24,8 +24,6 @@ services:
     build: .
     ports:
       - 80:80
-    environment:
-      - DATADOG_HOSTNAME=datadog
-      - DATADOG_PORT=8125
+      - 8999:8999
     depends_on:
       - db

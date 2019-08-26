@@ -47,6 +47,7 @@ lazy val interface = (project in file("interface"))
   .dependsOn(useCase, infrastructure)
 
 lazy val boot = (project in file("boot"))
+  .enablePlugins(JavaAppPackaging)
   .settings(commonSettings)
   .settings(
     name := "LoadTest-boot",
@@ -54,6 +55,33 @@ lazy val boot = (project in file("boot"))
       Akka.`akka-http-crice`
     )
       ++ Kamon.all
+  )
+  .settings(
+    javaOptions in Universal ++= Seq(
+      "-server",
+      "-Djava.rmi.server.hostname=127.0.0.1",
+      s"-Dcom.sun.management.jmxremote.rmi.port=${sys.env.getOrElse("JMX_PORT", "8999")}",
+      "-Dcom.sun.management.jmxremote.ssl=false",
+      "-Dcom.sun.management.jmxremote.local.only=false",
+      "-Dcom.sun.management.jmxremote.authenticate=false",
+      "-Dcom.sun.management.jmxremote",
+      s"-Dcom.sun.management.jmxremote.port=${sys.env.getOrElse("JMX_PORT", "8999")}"
+    ),
+    fork in run := true,
+    bashScriptExtraDefines ++= Seq(
+      {
+        val revision =
+          libraryDependencies.value.find(m => m.organization == "org.aspectj" && m.name == "aspectjweaver").get.revision
+        s"""addJava "-javaagent:$${lib_dir}/org.aspectj.aspectjweaver-$revision.jar""""
+      },
+      s"""addJava "-Xms${sys.env.getOrElse("JVM_HEAP_MIN", "${JVM_HEAP_MIN:-256m}")}"""",
+      s"""addJava "-Xmx${sys.env.getOrElse("JVM_HEAP_MAX", "${JVM_HEAP_MAX:-256m}")}"""",
+      s"""addJava "-XX:MaxMetaspaceSize=${sys.env.getOrElse("JVM_META_MAX", "${JVM_META_MAX:-128m}")}"""",
+      s"""addJava "${sys.env.getOrElse("JVM_GC_OPTIONS", "${JVM_GC_OPTIONS:--XX:+UseG1GC}")}""""
+    ),
+    mainClass in (Compile, bashScriptDefines) := Some("com.github.BambooTuna.boot.Main"),
+    packageName in Docker := name.value,
+    dockerExposedPorts := Seq(8999)
   )
   .dependsOn(interface, infrastructure)
 

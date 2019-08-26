@@ -1,18 +1,22 @@
 package com.github.BambooTuna.LoadTest.adaptor.routes
 
-import akka.http.scaladsl.model.{HttpEntity, MediaTypes, StatusCodes}
-import akka.http.scaladsl.server.Directives.{as, entity, extractActorSystem, extractRequestContext, onSuccess}
-import akka.http.scaladsl.server.{Route, RouteResult}
+import akka.http.scaladsl.model.{ HttpEntity, MediaTypes, StatusCodes }
+import akka.http.scaladsl.server.Directives.{ as, entity, extractActorSystem, extractRequestContext, onSuccess }
+import akka.http.scaladsl.server.{ Route, RouteResult }
 import akka.stream.ActorMaterializer
 import io.circe.syntax._
 import io.circe.generic.auto._
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
-import com.github.BambooTuna.LoadTest.adaptor.routes.json.{AddUserRequestJson, AddUserResponseJson, UserIdJson}
+import com.github.BambooTuna.LoadTest.adaptor.routes.json.{ AddUserRequestJson, AddUserResponseJson, UserIdJson }
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.SlickProfile
 import com.github.BambooTuna.LoadTest.adaptor.storage.repository.jdbc.UserRepositoryOnJDBCImpl
-import com.github.BambooTuna.LoadTest.domain.model.user.{Age, Name}
+import com.github.BambooTuna.LoadTest.domain.model.user.{ Age, Name }
 import com.github.BambooTuna.LoadTest.usecase.AddUserUseCaseImpl
-import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol.{AddUserCommandFailed, AddUserCommandRequest, AddUserCommandSucceeded}
+import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol.{
+  AddUserCommandFailed,
+  AddUserCommandRequest,
+  AddUserCommandSucceeded
+}
 import monix.execution.Scheduler.Implicits.global
 import akka.http.scaladsl.server.Directives._
 
@@ -31,7 +35,7 @@ case class AddUserRoute(client: SlickProfile)(implicit materializer: ActorMateri
             .runToFuture
         onSuccess(f) {
           case AddUserCommandSucceeded(id) =>
-            val result                 = AddUserResponseJson(
+            val result = AddUserResponseJson(
               Some(
                 UserIdJson(
                   id.value
