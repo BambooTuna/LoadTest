@@ -8,7 +8,7 @@ import scala.concurrent.duration._
 class GetUserSimulation extends Simulation {
 
   val request = 200 //   /s
-  val set     = 1  //   セット回数
+  val set     = 1   //   セット回数
 
   val httpConf = http
     .baseUrl("http://localhost")

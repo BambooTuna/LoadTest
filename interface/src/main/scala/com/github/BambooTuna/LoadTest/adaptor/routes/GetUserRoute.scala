@@ -20,11 +20,15 @@ import com.github.BambooTuna.LoadTest.usecase.GetUserUseCaseImpl
 import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol._
 import monix.execution.Scheduler.Implicits.global
 import akka.http.scaladsl.server.Directives._
+import kamon.Kamon
 
 case class GetUserRoute(client: SlickProfile)(implicit materializer: ActorMaterializer) extends FailFastCirceSupport {
 
+  val counter = Kamon.metrics.counter(this.getClass.getName)
+
   def route: Route = extractActorSystem { implicit system =>
     extractRequestContext { ctx =>
+      counter.increment()
       entity(as[GetUserRequestJson]) { json =>
         //TODO ここの変換は切り出す
         val getUserUseCase = new GetUserUseCaseImpl(new UserRepositoryOnJDBCImpl(client))

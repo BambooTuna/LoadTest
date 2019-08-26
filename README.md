@@ -26,6 +26,11 @@ $ curl -X GET -H "Content-Type: application/json" -d '{"user_id":1}' localhost/u
 {"user":{"user_id":6795494702222648856,"name":"bambootuna","age":20},"error_messages":[]}
 ```
 
+- うまく行かないのでdatadogにjmxメトリックスを送って監視するか。。。
+```bash
+$ jconsole service:jmx:rmi:///jndi/rmi://localhost:8999/jmxrmi
+```
+
 ## Gatling Test
 ```sbtshell
 $ sbt clean gatling:test

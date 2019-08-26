@@ -50,7 +50,7 @@ lazy val boot = (project in file("boot"))
   .enablePlugins(JavaAppPackaging)
   .settings(commonSettings)
   .settings(
-    name := "LoadTest-boot",
+    name := "loadtest-boot",
     libraryDependencies ++= Seq(
       Akka.`akka-http-crice`
     )
@@ -79,7 +79,7 @@ lazy val boot = (project in file("boot"))
       s"""addJava "-XX:MaxMetaspaceSize=${sys.env.getOrElse("JVM_META_MAX", "${JVM_META_MAX:-128m}")}"""",
       s"""addJava "${sys.env.getOrElse("JVM_GC_OPTIONS", "${JVM_GC_OPTIONS:--XX:+UseG1GC}")}""""
     ),
-    mainClass in (Compile, bashScriptDefines) := Some("com.github.BambooTuna.boot.Main"),
+    mainClass in (Compile, bashScriptDefines) := Some("com.github.BambooTuna.boot.server.Main"),
     packageName in Docker := name.value,
     dockerExposedPorts := Seq(8999)
   )

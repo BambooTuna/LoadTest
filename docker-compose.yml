@@ -10,7 +10,7 @@ services:
       - ./volume/mysql/data:/var/lib/mysql
     env_file: ./tools/mysql/.env # 環境変数に外部ファイルを指定
   datadog:
-    image: datadog/agent:latest
+    image: datadog/agent:latest-jmx
     restart: always # OS起動時にコンテナを自動起動
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
