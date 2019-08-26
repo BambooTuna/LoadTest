@@ -86,20 +86,7 @@ jobs:
       - run:
           name: Deploy to GKE
           command: |
-            . ../env
-            export DOCKER_TAG=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}:latest" | tr '[:upper:]' '[:lower:]'`
-            echo ${DOCKER_TAG}
-            sed -i -e 's!DOCKER_TAG!'${DOCKER_TAG}'!' $DEPLOYMENT_YML
-            ls
-            cat $DEPLOYMENT_YML
-
-            gcloud auth activate-service-account --key-file ${HOME}/account.json
-            gcloud --quiet config set project $GOOGLE_PROJECT_ID
-            gcloud --quiet config set compute/region $GOOGLE_COMPUTE_REGION
-            gcloud --quiet config set compute/zone $GOOGLE_COMPUTE_ZONE
-            gcloud --quiet container clusters get-credentials $GOOGLE_CLUSTER_NAME
-            kubectl apply -f $DEPLOYMENT_YML
-            kubectl apply -f $SERVICE_YML
+            sh setup-k8s.sh
           working_directory: ~/project/infrastructure/staging/gcp/k8s
 workflows:
   version: 2
