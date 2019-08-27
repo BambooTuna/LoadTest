@@ -27,9 +27,9 @@ services:
       - 8080:8080
       - 8999:8999
     environment:
-      - JVM_HEAP_MIN=2048M
-      - JVM_HEAP_MAX=1536M
-      - JVM_META_MAX=1024M
+      - JVM_HEAP_MIN=1g
+      - JVM_HEAP_MAX=1g
+      - JVM_META_MAX=512m
       - JMX_PORT=8999
       - DATADOG_HOSTNAME=datadog
       - DATADOG_PORT=8125

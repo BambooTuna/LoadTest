@@ -16,6 +16,7 @@ jobs:
 
     steps:
       - checkout
+      - setup_remote_docker
 
       - restore_cache:
           keys:
@@ -30,6 +31,8 @@ jobs:
           key: v1-dependencies--{{ checksum "build.sbt" }}
 
       - run: cat /dev/null | sbt test:test
+
+      - run: sbt docker:publishLocal
 
   staging:
     docker:

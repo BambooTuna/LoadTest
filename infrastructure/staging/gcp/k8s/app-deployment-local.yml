@@ -8,8 +8,8 @@ spec:
   type: LoadBalancer
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 80
+      port: 8080
+      targetPort: 8080
   selector:
     app: loadtest
 ---
@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
       - name: loadtest
-        image: loadtest-local-k8s:latest
+        image: bambootuna/loadtest-server:latest
         #localのdocker imageを使用する際に必要
         imagePullPolicy: Never
         env:
@@ -56,6 +56,6 @@ spec:
                 key: databese_name
         resources:
           requests:
-            memory: 1Gi
+            memory: 2Gi
         ports:
-        - containerPort: 80
+        - containerPort: 8080
