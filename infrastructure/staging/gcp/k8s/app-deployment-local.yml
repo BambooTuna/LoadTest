@@ -36,7 +36,7 @@ spec:
         imagePullPolicy: Never
         env:
           - name: RDB_HOST
-            value: "db"
+            value: "db-service"
           - name: RDB_PORT
             value: "3306"
           - name: LOADTEST_RDB_USER
@@ -54,8 +54,9 @@ spec:
               secretKeyRef:
                 name: dbsecret
                 key: databese_name
-        resources:
-          requests:
-            memory: 2Gi
+          - name: DATADOG_HOSTNAME
+            value: "datadog-service"
+          - name: DATADOG_PORT
+            value: "8125"
         ports:
         - containerPort: 8080

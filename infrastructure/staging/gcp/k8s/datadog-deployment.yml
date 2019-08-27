@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: datadog-service
+spec:
+  ports:
+  - port: 8125
+    nodePort: 38125
+  selector:
+    app: datadog
+  type: NodePort
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: datadog-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  persistentVolumeReclaimPolicy: Delete
+  #Set it to Delete when removing the volume to delete the files - so it triggers the docker-entrypoint
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/datadog"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: datadog-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: datadog
+spec:
+  selector:
+    matchLabels:
+      app: datadog
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: datadog
+    spec:
+      containers:
+        - image: datadog/agent:latest-jmx
+          name: datadog
+          env:
+          - name: DD_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: datadogsecret
+                key: datadog_api
+          - name: DD_DOGSTATSD_NON_LOCAL_TRAFFIC
+            value: true
+          ports:
+            - containerPort: 8125
+              name: datadog
+          volumeMounts:
+            - name: datadog-persistent-storage
+              mountPath: /var/run/docker.sock
+            - name: datadog-persistent-storage
+              mountPath: /host/proc/
+            - name: datadog-persistent-storage
+              mountPath: /host/sys/fs/cgroup
+      volumes:
+        - name: datadog-persistent-storage
+          persistentVolumeClaim:
+            claimName: datadog-claim

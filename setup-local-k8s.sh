@@ -4,4 +4,5 @@ echo $INIT_MYSQL_SQL_PATH
 sed -i -e 's!INIT_MYSQL_SQL_PATH!'${INIT_MYSQL_SQL_PATH}'!' ./infrastructure/staging/gcp/k8s/db-deployment.yml
 kubectl apply -f ./infrastructure/staging/gcp/k8s/db-secret.yml
 kubectl apply -f ./infrastructure/staging/gcp/k8s/db-deployment.yml
+kubectl apply -f ./infrastructure/staging/gcp/k8s/datadog-deployment.yml
 kubectl apply -f ./infrastructure/staging/gcp/k8s/app-deployment-local.yml
