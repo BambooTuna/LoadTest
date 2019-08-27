@@ -6,6 +6,7 @@ import com.typesafe.sbt.packager.archetypes.scripts.BashStartScriptPlugin.autoIm
 import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport._
 
 object Settings {
+  
   lazy val commonSettings = Seq(
     organization := "com.github.BambooTuna",
     scalaVersion := "2.12.8",
@@ -24,11 +25,12 @@ object Settings {
     scalafmtOnCompile in Compile := true,
     scalafmtTestOnCompile in Compile := true
   )
+  
   lazy val dockerSettings = Seq(
     fork := true,
     name := "loadtest-server",
     version := "latest",
-    dockerBaseImage := "adoptopenjdk/openjdk8:x86_64-alpine-jdk8u191-b12",
+    dockerBaseImage := "adoptopenjdk/openjdk8:x86_64-alpine-jdk8u212-b03-slim",
     maintainer in Docker := "BambooTuna <bambootuna@gmail.com>",
     dockerUpdateLatest := true,
     dockerUsername := Some("bambootuna"),

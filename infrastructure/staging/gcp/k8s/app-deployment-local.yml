@@ -55,7 +55,9 @@ spec:
                 name: dbsecret
                 key: databese_name
           - name: DATADOG_HOSTNAME
-            value: "datadog-service"
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
           - name: DATADOG_PORT
             value: "8125"
         ports:
