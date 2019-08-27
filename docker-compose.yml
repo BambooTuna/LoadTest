@@ -20,10 +20,18 @@ services:
     links:
       - boot
   boot:
+    image: bambootuna/loadtest-server:latest
     restart: always # OS起動時にコンテナを自動起動
-    build: .
+#    build: .
     ports:
-      - 80:80
+      - 8080:8080
       - 8999:8999
+    environment:
+      - JVM_HEAP_MIN=2048M
+      - JVM_HEAP_MAX=1536M
+      - JVM_META_MAX=1024M
+      - JMX_PORT=8999
+      - DATADOG_HOSTNAME=datadog
+      - DATADOG_PORT=8125
     depends_on:
       - db

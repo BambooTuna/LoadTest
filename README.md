@@ -1,8 +1,13 @@
 高負荷に耐えるためにはどうしたらいいかを調べていく
 ## LocalTest
 
-### Setup
+### Build
+Use `sbt-native-packager` to build docker image.
+```bash
+$ sbt docker:publishLocal
+```
 
+### Setup
 #### k8s
 ```bash
 $ sh setup-local-k8s.sh
@@ -25,12 +30,10 @@ $ curl -X POST -H "Content-Type: application/json" -d '{"name":"bambootuna","age
 $ curl -X GET -H "Content-Type: application/json" -d '{"user_id":1}' localhost/user/get
 {"user":{"user_id":6795494702222648856,"name":"bambootuna","age":20},"error_messages":[]}
 ```
-
-- うまく行かないのでdatadogにjmxメトリックスを送って監視するか。。。
+### See JMX Metrics
 ```bash
 $ jconsole service:jmx:rmi:///jndi/rmi://localhost:8999/jmxrmi
 ```
-
 ## Gatling Test
 ```sbtshell
 $ sbt clean gatling:test
