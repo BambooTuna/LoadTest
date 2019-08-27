@@ -5,9 +5,9 @@ sed -i -e 's!INIT_MYSQL_SQL_PATH!'${INIT_MYSQL_SQL_PATH}'!' ./infrastructure/sta
 kubectl apply -f ./infrastructure/staging/gcp/k8s/db-secret.yml
 kubectl apply -f ./infrastructure/staging/gcp/k8s/db-deployment.yml
 
-kubectl create -f "https://raw.githubusercontent.com/DataDog/datadog-agent/master/Dockerfiles/manifests/rbac/clusterrole.yaml"
-kubectl create -f "https://raw.githubusercontent.com/DataDog/datadog-agent/master/Dockerfiles/manifests/rbac/serviceaccount.yaml"
-kubectl create -f "https://raw.githubusercontent.com/DataDog/datadog-agent/master/Dockerfiles/manifests/rbac/clusterrolebinding.yaml"
+kubectl apply -f "https://raw.githubusercontent.com/DataDog/datadog-agent/master/Dockerfiles/manifests/rbac/clusterrole.yaml"
+kubectl apply -f "https://raw.githubusercontent.com/DataDog/datadog-agent/master/Dockerfiles/manifests/rbac/serviceaccount.yaml"
+kubectl apply -f "https://raw.githubusercontent.com/DataDog/datadog-agent/master/Dockerfiles/manifests/rbac/clusterrolebinding.yaml"
 kubectl apply -f ./infrastructure/staging/gcp/k8s/datadog-secret.yml
 kubectl apply -f ./infrastructure/staging/gcp/k8s/datadog-deployment.yml
 

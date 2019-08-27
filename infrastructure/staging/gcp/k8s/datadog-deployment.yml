@@ -11,36 +11,26 @@ spec:
     spec:
       serviceAccountName: datadog-agent
       containers:
-        - image: datadog/agent:latest-jmx
+        - image: datadog/agent:latest
           imagePullPolicy: Always
           name: datadog-agent
           ports:
             - containerPort: 8125
-              ## Custom metrics via DogStatsD - uncomment this section to enable custom metrics collection
-              ## Set DD_DOGSTATSD_NON_LOCAL_TRAFFIC to true to collect StatsD metrics from other containers.
+              # Custom metrics via DogStatsD - uncomment this section to enable custom metrics collection
               hostPort: 8125
               name: dogstatsdport
               protocol: UDP
             - containerPort: 8126
-              ## Trace Collection (APM) - uncomment this section to enable APM
+              # Trace Collection (APM) - uncomment this section to enable APM
               # hostPort: 8126
               name: traceport
               protocol: TCP
           env:
             - name: DD_API_KEY
-              ## Kubernetes Secrets - uncomment this section to supply API Key with secrets
               valueFrom:
                 secretKeyRef:
-                  name: datadogsecret
-                  key: datadog_api
-
-            ## Set DD_SITE to datadoghq.eu to send your Agent data to the Datadog EU site
-            - name: DD_SITE
-              value: "datadoghq.com"
-
-            ## Set DD_DOGSTATSD_NON_LOCAL_TRAFFIC to true to allow StatsD collection.
-            - name: DD_DOGSTATSD_NON_LOCAL_TRAFFIC
-              value: "true"
+                  name: datadog-secret
+                  key: api-key
             - name: DD_COLLECT_KUBERNETES_EVENTS
               value: "true"
             - name: DD_LEADER_ELECTION
@@ -53,14 +43,6 @@ spec:
                   fieldPath: status.hostIP
             - name: DD_APM_ENABLED
               value: "true"
-
-          ## enable collect logs
-            - name: DD_LOGS_ENABLED
-              value: "true"
-            - name: DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL
-              value: "true"
-
-          ## Note these are the minimum suggested values for requests and limits. The amount of resources required by the Agent varies depending on the number of checks, integrations, and features enabled.
           resources:
             requests:
               memory: "256Mi"
@@ -71,11 +53,6 @@ spec:
           volumeMounts:
             - name: dockersocket
               mountPath: /var/run/docker.sock
-            - name: logpodpath
-              mountPath: /var/log/pods
-            ## Docker runtime directory, replace this path with your container runtime logs directory, or remove this configuration if `/var/log/pods` is not a symlink to any other directory.
-            - name: logcontainerpath
-              mountPath: /var/lib/docker/containers
             - name: procdir
               mountPath: /host/proc
               readOnly: true
@@ -95,13 +72,6 @@ spec:
         - hostPath:
             path: /proc
           name: procdir
-        - hostPath:
-            path: /var/log/pods
-          name: logpodpath
-        ## Docker runtime directory, replace this path with your container runtime logs directory, or remove this configuration if `/var/log/pods` is not a symlink to any other directory.
-        - hostPath:
-            path: /var/lib/docker/containers
-          name: logcontainerpath
         - hostPath:
             path: /sys/fs/cgroup
           name: cgroups
