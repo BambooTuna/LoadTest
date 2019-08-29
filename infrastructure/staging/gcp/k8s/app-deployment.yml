@@ -31,12 +31,12 @@ spec:
     spec:
       containers:
       - name: loadtest
-        image: docker.io/DOCKER_TAG
+        image: IMAGE_NAME
         #localのdocker imageを使用する際に必要
         #imagePullPolicy: Never
         env:
           - name: RDB_HOST
-            value: "db"
+            value: "db-service"
           - name: RDB_PORT
             value: "3306"
           - name: LOADTEST_RDB_USER

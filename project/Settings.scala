@@ -28,7 +28,7 @@ object Settings {
   
   lazy val dockerSettings = Seq(
     fork := true,
-    name := "loadtest-server",
+    name := "loadtest",
     version := "latest",
     dockerBaseImage := "adoptopenjdk/openjdk8:x86_64-alpine-jdk8u212-b03-slim",
     maintainer in Docker := "BambooTuna <bambootuna@gmail.com>",

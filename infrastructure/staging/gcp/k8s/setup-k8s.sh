@@ -1,13 +1,20 @@
-. ../env
-export DOCKER_TAG=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}:latest" | tr '[:upper:]' '[:lower:]'`
-sed -i -e 's!DOCKER_TAG!'${DOCKER_TAG}'!' ./app-deployment.yml
+# replace env
+sed -i -e 's!IMAGE_NAME!'${IMAGE_NAME}'!' ./app-deployment.yml
+sed -i -e 's!DB_IMAGE!'${DB_IMAGE}'!' ./db-deployment.yml
 
-gcloud auth activate-service-account --key-file ${HOME}/account.json
-gcloud --quiet config set project $GOOGLE_PROJECT_ID
-gcloud --quiet config set compute/region $GOOGLE_COMPUTE_REGION
-gcloud --quiet config set compute/zone $GOOGLE_COMPUTE_ZONE
-gcloud --quiet container clusters get-credentials $GOOGLE_CLUSTER_NAME
+kubectl create serviceaccount --namespace kube-system tiller
+kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
 
+# setup datadog
+helm init --service-account tiller
+helm upgrade --install dd-agent --set datadog.apiKey=${DD_API_KEY} -f ./helm/datadog-values.yaml stable/datadog
+
+# setup db
 kubectl apply -f ./db-secret.yml
 kubectl apply -f ./db-deployment.yml
+
+# setup app
 kubectl apply -f ./app-deployment.yml
+
+# view logs
+kubectl get svc,pod,rc

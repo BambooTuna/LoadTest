@@ -7,8 +7,8 @@ import scala.concurrent.duration._
 
 class PingSimulation extends Simulation {
 
-  val request = 200 //   /s
-  val set     = 1   //   セット回数
+  val request = 2000 //   /s
+  val set     = 1    //   セット回数
 
   val httpConf = http
     .baseUrl("http://localhost:8080")

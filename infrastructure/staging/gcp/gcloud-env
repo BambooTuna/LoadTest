@@ -1,4 +1,4 @@
-GOOGLE_PROJECT_ID="loadtest-20"
+GOOGLE_PROJECT_ID="loadtest-40"
 GOOGLE_COMPUTE_REGION="asia-northeast1"
 GOOGLE_COMPUTE_ZONE="asia-northeast1-a"
 GOOGLE_CLUSTER_NAME="loadtest-cluster"

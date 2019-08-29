@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
       - name: loadtest
-        image: bambootuna/loadtest-server:latest
+        image: bambootuna/loadtest:latest
         #localのdocker imageを使用する際に必要
         imagePullPolicy: Never
         env:

@@ -18,14 +18,14 @@ metadata:
     type: local
 spec:
   storageClassName: manual
-  persistentVolumeReclaimPolicy: Delete
+  persistentVolumeReclaimPolicy: Retain
   #Set it to Delete when removing the volume to delete the files - so it triggers the docker-entrypoint
   capacity:
     storage: 5Gi
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/mnt/mysql"
+    path: "/"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -55,7 +55,7 @@ spec:
         app: db
     spec:
       containers:
-        - image: mysql:5.7.22
+        - image: gcr.io/loadtest-40/mysql:latest
           name: db
           env:
           - name: MYSQL_ROOT_PASSWORD
@@ -84,13 +84,7 @@ spec:
           volumeMounts:
             - name: mysql-persistent-storage
               mountPath: /var/lib/mysql
-            - name: mysql-host-path
-              mountPath: /docker-entrypoint-initdb.d/
       volumes:
         - name: mysql-persistent-storage
           persistentVolumeClaim:
             claimName: db-claim
-        - name: mysql-host-path
-          hostPath:
-            path: INIT_MYSQL_SQL_PATH
-            type: Directory
