@@ -13,14 +13,14 @@ spec:
   selector:
     app: loadtest
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: loadtest-deployment
   labels:
     app: loadtest
 spec:
-  replicas: 4
+  replicas: 20
   selector:
     matchLabels:
       app: loadtest
@@ -35,8 +35,16 @@ spec:
         #localのdocker imageを使用する際に必要
         #imagePullPolicy: Never
         env:
+          - name: DATADOG_PORT
+            value: "8125"
+          - name: JVM_HEAP_MIN
+            value: "524M"
+          - name: JVM_HEAP_MAX
+            value: "1024M"
+          - name: JVM_META_MAX
+            value: "512M"
           - name: RDB_HOST
-            value: "db-service"
+            value: "db-service-mysql"
           - name: RDB_PORT
             value: "3306"
           - name: LOADTEST_RDB_USER
@@ -58,10 +66,12 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: status.hostIP
-          - name: DATADOG_PORT
-            value: "8125"
         resources:
           requests:
-            memory: 2Gi
+            memory: "512Mi"
+            cpu: "360m"
+          limits:
+            memory: "512Mi"
+            cpu: "360m"
         ports:
         - containerPort: 8080

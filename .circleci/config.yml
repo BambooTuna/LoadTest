@@ -42,13 +42,7 @@ jobs:
       - run:
           name: init terraform
           command: |
-            . ../gcloud-env
-            terraform -v
-            terraform init
-            terraform import -var-file=../gcloud-env google_compute_network.default ${GOOGLE_PROJECT_ID}
-            terraform import -var-file=../gcloud-env google_compute_subnetwork.default ${GOOGLE_PROJECT_ID}
-            terraform import -var-file=../gcloud-env google_container_cluster.default ${GOOGLE_PROJECT_ID}/${GOOGLE_COMPUTE_ZONE}/${GOOGLE_CLUSTER_NAME}
-            terraform import -var-file=../gcloud-env google_compute_global_address.ip_address ${GOOGLE_PROJECT_ID}/${GOOGLE_PROJECT_ID}-static-ip
+            sh ./import.sh
           working_directory: ~/project/infrastructure/staging/gcp/terraform
       - run:
           name: plan terraform
@@ -108,7 +102,9 @@ jobs:
 
             export DOCKER_TAG=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}:latest" | tr '[:upper:]' '[:lower:]'`
             export IMAGE_NAME=gcr.io/${GOOGLE_PROJECT_ID}/${DOCKER_TAG}
-            export DB_IMAGE=gcr.io/${GOOGLE_PROJECT_ID}/mysql:latest
+
+            export DB_IMAGE=gcr.io/${GOOGLE_PROJECT_ID}/mysql
+            export DB_TAG=latest
 
             echo $GCLOUD_SERVICE_KEY | base64 -d > ${HOME}/account.json
             gcloud auth activate-service-account --key-file ${HOME}/account.json

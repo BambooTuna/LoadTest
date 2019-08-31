@@ -30,7 +30,7 @@ object Settings {
     fork := true,
     name := "loadtest",
     version := "latest",
-    dockerBaseImage := "adoptopenjdk/openjdk8:x86_64-alpine-jdk8u212-b03-slim",
+  dockerBaseImage := "adoptopenjdk/openjdk11:x86_64-alpine-jdk-11.0.4_11-slim",
     maintainer in Docker := "BambooTuna <bambootuna@gmail.com>",
     dockerUpdateLatest := true,
     dockerUsername := Some("bambootuna"),
@@ -43,9 +43,9 @@ object Settings {
           libraryDependencies.value.find(m => m.organization == "org.aspectj" && m.name == "aspectjweaver").get.revision
         s"""addJava "-javaagent:$${lib_dir}/org.aspectj.aspectjweaver-$revision.jar""""
       },
-      s"""addJava "-Xms${sys.env.getOrElse("JVM_HEAP_MIN", "${JVM_HEAP_MIN:-1024m}")}"""",
-      s"""addJava "-Xmx${sys.env.getOrElse("JVM_HEAP_MAX", "${JVM_HEAP_MAX:-1024m}")}"""",
-      s"""addJava "-XX:MaxMetaspaceSize=${sys.env.getOrElse("JVM_META_MAX", "${JVM_META_MAX:-512m}")}"""",
+//      s"""addJava "-Xms${sys.env.getOrElse("JVM_HEAP_MIN", "${JVM_HEAP_MIN:-1024m}")}"""",
+//      s"""addJava "-Xmx${sys.env.getOrElse("JVM_HEAP_MAX", "${JVM_HEAP_MAX:-1024m}")}"""",
+//      s"""addJava "-XX:MaxMetaspaceSize=${sys.env.getOrElse("JVM_META_MAX", "${JVM_META_MAX:-512m}")}"""",
       s"""addJava "${sys.env.getOrElse("JVM_GC_OPTIONS", "${JVM_GC_OPTIONS:--XX:+UseG1GC}")}""""
     ),
 //    dockerCommands ++= Seq(
