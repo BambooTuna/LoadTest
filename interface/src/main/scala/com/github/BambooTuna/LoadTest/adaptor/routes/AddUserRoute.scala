@@ -23,7 +23,7 @@ import kamon.Kamon
 
 case class AddUserRoute(client: SlickProfile)(implicit materializer: ActorMaterializer) extends FailFastCirceSupport {
 
-  val counter = Kamon.metrics.counter(this.getClass.getName)
+  val counter      = Kamon.metrics.counter(this.getClass.getName)
   val responseTime = Kamon.metrics.histogram(this.getClass.getName + "-top")
 
   def route: Route = extractActorSystem { implicit system =>

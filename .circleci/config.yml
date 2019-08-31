@@ -122,23 +122,29 @@ workflows:
     jobs:
       - build:
           filters:
-            branches:
-              only: feature/docker-tuning
+            tags:
+              only: /.*/
       - staging:
           requires:
             - build
           filters:
             branches:
-              only: feature/docker-tuning
+              ignore: /.*/
+            tags:
+              only: /^v.*/
       - push:
           requires:
             - staging
           filters:
             branches:
-              only: feature/docker-tuning
+              ignore: /.*/
+            tags:
+              only: /^v.*/
       - deploy:
           requires:
-            - push
+            - pushk
           filters:
             branches:
-              only: feature/docker-tuning
+              ignore: /.*/
+            tags:
+              only: /^v.*/
