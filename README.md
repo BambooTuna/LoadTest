@@ -41,6 +41,7 @@ $ sbt clean gatling:test
 $ cd tools/locust
 $ LOCUST_FILE_PATH="main.py" LOCUST_HOST=http://localhost:8080 sh setup.sh
 ```
+Access `localhost:8089` and run the test.
 
 ### Other
 - See JMX Metrics
