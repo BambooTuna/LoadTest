@@ -46,11 +46,11 @@ jobs:
           working_directory: ~/project/infrastructure/staging/gcp/terraform
       - run:
           name: plan terraform
-          command: terraform plan -var-file=../gcloud-env
+          command: terraform plan -destroy -var-file=../gcloud-env
           working_directory: ~/project/infrastructure/staging/gcp/terraform
       - run:
           name: apply terraform
-          command: terraform apply -auto-approve -var-file=../gcloud-env
+          command: terraform destroy -auto-approve -var-file=../gcloud-env
           working_directory: ~/project/infrastructure/staging/gcp/terraform
 
 workflows:
