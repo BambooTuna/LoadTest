@@ -36,11 +36,31 @@ $ curl -X GET -H "Content-Type: application/json" -d '{"user_id":1}' localhost/u
 $ sbt clean gatling:test
 ```
 
+### Locust Test
+```sbtshell
+$ cd tools/locust
+$ LOCUST_FILE_PATH="main.py" LOCUST_HOST=http://localhost:8080 sh setup.sh
+```
+
 ### Other
 - See JMX Metrics
 ```bash
 $ jconsole service:jmx:rmi:///jndi/rmi://localhost:8999/jmxrmi
 ```
+
+- Too many connections error(mysql)
+    - Check max connections
+        `show variables like "%max_connections%";`
+    - set max connections
+        `set global max_connections = 1000;`
+    - Check connection process
+        `show processlist;`
+        
+    - Change my.cnf and apply
+        `service mysqld restart`
+        or
+        `systemctl restart mysqld`
+
 
 ## Staging
 - [CommonSetting](#CommonSetting)

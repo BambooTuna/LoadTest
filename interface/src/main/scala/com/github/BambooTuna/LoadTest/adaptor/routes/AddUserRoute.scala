@@ -24,9 +24,11 @@ import kamon.Kamon
 case class AddUserRoute(client: SlickProfile)(implicit materializer: ActorMaterializer) extends FailFastCirceSupport {
 
   val counter = Kamon.metrics.counter(this.getClass.getName)
+  val responseTime = Kamon.metrics.histogram(this.getClass.getName + "-top")
 
   def route: Route = extractActorSystem { implicit system =>
-    extractRequestContext { ctx =>
+    extractRequestContext { _ =>
+      val time = java.time.Instant.now().getEpochSecond
       counter.increment()
       entity(as[AddUserRequestJson]) { json =>
         //TODO ここの変換は切り出す
@@ -45,15 +47,18 @@ case class AddUserRoute(client: SlickProfile)(implicit materializer: ActorMateri
               )
             )
             val entity = HttpEntity(MediaTypes.`application/json`, result.asJson.noSpaces)
+            responseTime.record(java.time.Instant.now().getEpochSecond - time)
             complete(StatusCodes.OK, entity)
           case AddUserCommandFailed(error_message) =>
             //TODO error時のResponseをどうするか
             val result = AddUserResponseJson(None, Seq(error_message))
             val entity = HttpEntity(MediaTypes.`application/json`, result.asJson.noSpaces)
+            responseTime.record(java.time.Instant.now().getEpochSecond - time)
             complete(StatusCodes.BadRequest, entity)
           case _ =>
             val result = AddUserResponseJson(None, Seq("unknown error"))
             val entity = HttpEntity(MediaTypes.`application/json`, result.asJson.noSpaces)
+            responseTime.record(java.time.Instant.now().getEpochSecond - time)
             complete(StatusCodes.BadRequest, entity)
         }
       }
