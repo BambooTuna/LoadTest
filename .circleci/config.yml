@@ -16,19 +16,16 @@ jobs:
 
     steps:
       - checkout
-
+      - setup_remote_docker
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "build.sbt" }}
             - v1-dependencies-
-
       - run: cat /dev/null | sbt test:compile
-
       - save_cache:
           paths:
             - ~/.m2
           key: v1-dependencies--{{ checksum "build.sbt" }}
-
       - run: cat /dev/null | sbt test:test
 
   staging:
@@ -40,54 +37,85 @@ jobs:
       - run:
           name: Create gcp credential
           command: |
-            echo $GCLOUD_SERVICE_KEY | base64 -d > ${HOME}/account.json
+            echo $GCLOUD_SERVICE_KEY | base64 -d > ./account.json
+          working_directory: ~/project/infrastructure/staging/gcp/terraform
       - run:
           name: init terraform
           command: |
-            . ../env
-            terraform -v
-            terraform init
-            terraform import google_project.my_project ${GOOGLE_PROJECT_ID}
-            terraform import -var-file=../env google_compute_network.default ${GOOGLE_PROJECT_ID}
-            terraform import -var-file=../env google_compute_subnetwork.default ${GOOGLE_PROJECT_ID}
-            terraform import -var-file=../env google_container_cluster.default ${GOOGLE_PROJECT_ID}/${GOOGLE_COMPUTE_ZONE}/${GOOGLE_CLUSTER_NAME}
-            terraform import -var-file=../env google_compute_global_address.ip_address ${GOOGLE_PROJECT_ID}/${GOOGLE_PROJECT_ID}-static-ip
-#            terraform refresh -var-file=../env
+            sh ./import.sh
           working_directory: ~/project/infrastructure/staging/gcp/terraform
       - run:
           name: plan terraform
-          command: terraform plan -var-file=../env
+          command: terraform plan -var-file=../gcloud-env
           working_directory: ~/project/infrastructure/staging/gcp/terraform
       - run:
           name: apply terraform
-          command: terraform apply -auto-approve -var-file=../env
+          command: terraform apply -auto-approve -var-file=../gcloud-env
           working_directory: ~/project/infrastructure/staging/gcp/terraform
 
-  deploy:
+  push:
     docker:
-      - image: google/cloud-sdk
+      - image: circleci/openjdk:8-jdk
     environment:
-      DEPLOYMENT_YML: deployment.yml
-      SERVICE_YML: service.yml
+      SBT_VERSION: 1.2.8
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
     steps:
       - checkout
       - setup_remote_docker
-      - run:
-          name: Docker build and push
-          command: |
-            export DOCKER_TAG=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}:latest" | tr '[:upper:]' '[:lower:]'`
-            docker build -t ${DOCKER_TAG} .
-            docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
-            docker push $DOCKER_TAG
       - run:
           name: Create gcp credential
           command: |
             echo $GCLOUD_SERVICE_KEY | base64 -d > ${HOME}/account.json
       - run:
+          name: Login docker
+          command: |
+            cat ${HOME}/account.json | docker login -u _json_key --password-stdin https://gcr.io
+      - run:
+          name: Docker build and push
+          command: |
+            . ~/project/infrastructure/staging/gcp/gcloud-env
+            export DOCKER_TAG=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}:latest" | tr '[:upper:]' '[:lower:]'`
+            export IMAGE_NAME=gcr.io/${GOOGLE_PROJECT_ID}/${DOCKER_TAG}
+            sbt docker:publishLocal
+            docker tag ${DOCKER_TAG} ${IMAGE_NAME}
+            docker push ${IMAGE_NAME}
+            cd tools/mysql
+            docker build . -t gcr.io/${GOOGLE_PROJECT_ID}/mysql:latest
+            docker push gcr.io/${GOOGLE_PROJECT_ID}/mysql:latest
+
+  deploy:
+    docker:
+      - image: google/cloud-sdk
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Install helm
+          command: |
+            curl https://storage.googleapis.com/kubernetes-helm/helm-v2.12.3-linux-amd64.tar.gz | tar zx linux-amd64/helm
+            mv linux-amd64/helm /usr/local/bin/helm; rm -rf linux-amd64
+      - run:
           name: Deploy to GKE
           command: |
-            sh setup-k8s.sh
-          working_directory: ~/project/infrastructure/staging/gcp/k8s
+            . ~/project/infrastructure/staging/gcp/gcloud-env
+
+            export DOCKER_TAG=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}:latest" | tr '[:upper:]' '[:lower:]'`
+            export IMAGE_NAME=gcr.io/${GOOGLE_PROJECT_ID}/${DOCKER_TAG}
+
+            export DB_IMAGE=gcr.io/${GOOGLE_PROJECT_ID}/mysql
+            export DB_TAG=latest
+
+            echo $GCLOUD_SERVICE_KEY | base64 -d > ${HOME}/account.json
+            gcloud auth activate-service-account --key-file ${HOME}/account.json
+            gcloud --quiet config set project $GOOGLE_PROJECT_ID
+            gcloud --quiet config set compute/region $GOOGLE_COMPUTE_REGION
+            gcloud --quiet config set compute/zone $GOOGLE_COMPUTE_ZONE
+            gcloud --quiet container clusters get-credentials $GOOGLE_CLUSTER_NAME
+
+            cd ~/project/infrastructure/staging/gcp/k8s
+            sh ./setup-k8s.sh
+
 workflows:
   version: 2
   build-n-deploy:
@@ -104,9 +132,17 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v.*/
-      - deploy:
+      - push:
           requires:
             - staging
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - deploy:
+          requires:
+            - push
           filters:
             branches:
               ignore: /.*/

@@ -10,7 +10,7 @@ services:
       - ./volume/mysql/data:/var/lib/mysql
     env_file: ./tools/mysql/.env # 環境変数に外部ファイルを指定
   datadog:
-    image: datadog/agent:latest
+    image: datadog/agent:latest-jmx
     restart: always # OS起動時にコンテナを自動起動
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -20,11 +20,17 @@ services:
     links:
       - boot
   boot:
+    image: bambootuna/loadtest-server:latest
     restart: always # OS起動時にコンテナを自動起動
-    build: .
+#    build: .
     ports:
-      - 80:80
+      - 8080:8080
+      - 8999:8999
     environment:
+      - JVM_HEAP_MIN=1g
+      - JVM_HEAP_MAX=1g
+      - JVM_META_MAX=512m
+      - JMX_PORT=8999
       - DATADOG_HOSTNAME=datadog
       - DATADOG_PORT=8125
     depends_on:
