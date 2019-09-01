@@ -1,13 +1,13 @@
-package com.github.BambooTuna.LoadTest.adaptor.storage.dao
+package com.github.BambooTuna.LoadTest.adaptor.storage.dao.jdbc
 
 import java.time.{ Instant, ZoneId, ZonedDateTime }
 
-import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.SlickProfile
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.OnSlickClient
 
 trait DaoOnSlick {
 
   protected val tableName: String
-  protected val client: SlickProfile
+  protected val client: OnSlickClient
 
   import client.profile.api._
 

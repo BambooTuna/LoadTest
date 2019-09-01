@@ -21,6 +21,7 @@ object Settings {
       Airframe.di,
       Monix.version,
       MySQLConnectorJava.version,
+      Redis.client
     ),
     scalafmtOnCompile in Compile := true,
     scalafmtTestOnCompile in Compile := true

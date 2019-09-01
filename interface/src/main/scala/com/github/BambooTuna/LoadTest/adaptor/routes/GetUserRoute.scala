@@ -7,22 +7,16 @@ import akka.stream.ActorMaterializer
 import io.circe.syntax._
 import io.circe.generic.auto._
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
-import com.github.BambooTuna.LoadTest.adaptor.routes.json.{
-  AddUserResponseJson,
-  GetUserRequestJson,
-  GetUserResponseJson,
-  UserJson
-}
-import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.SlickProfile
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.jdbc.UserRepositoryOnJDBCImpl
+import com.github.BambooTuna.LoadTest.adaptor.routes.json.{ GetUserRequestJson, GetUserResponseJson, UserJson }
 import com.github.BambooTuna.LoadTest.domain.model.user.UserId
-import com.github.BambooTuna.LoadTest.usecase.GetUserUseCaseImpl
+import com.github.BambooTuna.LoadTest.usecase.GetUserUseCase
 import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol._
 import monix.execution.Scheduler.Implicits.global
 import akka.http.scaladsl.server.Directives._
 import kamon.Kamon
 
-case class GetUserRoute(client: SlickProfile)(implicit materializer: ActorMaterializer) extends FailFastCirceSupport {
+case class GetUserRoute(getUserUseCase: GetUserUseCase)(implicit materializer: ActorMaterializer)
+    extends FailFastCirceSupport {
 
   val counter = Kamon.metrics.counter(this.getClass.getName)
 
@@ -31,7 +25,6 @@ case class GetUserRoute(client: SlickProfile)(implicit materializer: ActorMateri
       counter.increment()
       entity(as[GetUserRequestJson]) { json =>
         //TODO ここの変換は切り出す
-        val getUserUseCase = new GetUserUseCaseImpl(new UserRepositoryOnJDBCImpl(client))
         val f =
           getUserUseCase
             .run(GetUserCommandRequest(UserId(json.user_id)))

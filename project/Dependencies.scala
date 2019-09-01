@@ -170,3 +170,8 @@ object DDDBase {
   val redis = "com.github.j5ik2o" %% "scala-ddd-base-redis" % scalaDddBaseVersion
   val dynamo = "com.github.j5ik2o" %% "scala-ddd-base-dynamodb" % scalaDddBaseVersion
 }
+
+object Redis {
+  val client   = "com.github.etaty" %% "rediscala"     % "1.8.0"
+  val embRedis = "com.chatwork"     % "embedded-redis" % "0.7"
+}
