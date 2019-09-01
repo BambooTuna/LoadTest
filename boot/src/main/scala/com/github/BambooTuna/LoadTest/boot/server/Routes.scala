@@ -32,22 +32,22 @@ object Routes {
       route(GET, "ping", CommonRoute().ping)
     )
 
-  def mysqlRouter(client: OnSlickClient)(implicit materializer: ActorMaterializer): Router =
+  def mysqlRouter(client: OnSlickClient)(implicit materializer: ActorMaterializer): Router = {
+    val repository = new UserRepositoryOnJDBCImpl(client)
     Router(
-      route(GET, "user" / "get", GetUserRoute(GetUserUseCaseImpl(new UserRepositoryOnJDBCImpl(client))).route),
-      route(POST, "user" / "add", AddUserRoute(AddUserUseCaseImpl(new UserRepositoryOnJDBCImpl(client))).route),
+      route(GET, "user" / "get", GetUserRoute(GetUserUseCaseImpl(repository)).route),
+      route(POST, "user" / "add", AddUserRoute(AddUserUseCaseImpl(repository)).route),
       route(PUT, "user" / "update", EditUserRoute().route)
     )
+  }
 
-  def redisRouter(client: OnRedisClient)(implicit materializer: ActorMaterializer): Router =
+  def redisRouter(client: OnRedisClient)(implicit materializer: ActorMaterializer): Router = {
+    val repository = new UserRepositoryOnRedisImpl(client)
     Router(
-      route(GET,
-            "user" / "get",
-            GetUserRoute(GetUserUseCaseImpl(new UserRepositoryOnRedisImpl(client, Some(10)))).route),
-      route(POST,
-            "user" / "add",
-            AddUserRoute(AddUserUseCaseImpl(new UserRepositoryOnRedisImpl(client, Some(10)))).route),
-      route(PUT, "user" / "update", EditUserRoute().route)
+      route(GET, "redis" / "user" / "get", GetUserRoute(GetUserUseCaseImpl(repository)).route),
+      route(POST, "redis" / "user" / "add", AddUserRoute(AddUserUseCaseImpl(repository)).route),
+      route(PUT, "redis" / "user" / "update", EditUserRoute().route)
     )
+  }
 
 }

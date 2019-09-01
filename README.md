@@ -20,14 +20,24 @@ $ docker-compose up -d --build
 ```
 
 ### Curl test
+- Mysql
 ```bash
-$ curl localhost/ping
+$ curl localhost:8080/ping
 {"message":"pong","error_messages":[]}
 
-$ curl -X POST -H "Content-Type: application/json" -d '{"name":"bambootuna","age":20}' localhost/user/add
+$ curl -X POST -H "Content-Type: application/json" -d '{"name":"bambootuna","age":20}' localhost:8080/user/add
 {"id":{"user_id":-4934742503425198802},"error_messages":[]}
 
-$ curl -X GET -H "Content-Type: application/json" -d '{"user_id":1}' localhost/user/get
+$ curl -X GET -H "Content-Type: application/json" -d '{"user_id":1}' localhost:8080/user/get
+{"user":{"user_id":6795494702222648856,"name":"bambootuna","age":20},"error_messages":[]}
+```
+
+- Redis
+```bash
+$ curl -X POST -H "Content-Type: application/json" -d '{"name":"bambootuna","age":20}' localhost:8080/redis/user/add
+{"id":{"user_id":-4934742503425198802},"error_messages":[]}
+
+$ curl -X GET -H "Content-Type: application/json" -d '{"user_id":1}' localhost:8080/redis/user/get
 {"user":{"user_id":6795494702222648856,"name":"bambootuna","age":20},"error_messages":[]}
 ```
 

@@ -6,9 +6,7 @@ import monix.eval.Task
 
 import scala.concurrent.ExecutionContext
 
-class UserRepositoryOnRedisImpl(client: OnRedisClient, expireSeconds: Option[Long])
-    extends UserRepositoryOnRedis
-    with UserComponentOnRedis {
+class UserRepositoryOnRedisImpl(client: OnRedisClient) extends UserRepositoryOnRedis with UserComponentOnRedis {
 
   import com.github.BambooTuna.LoadTest.adaptor.storage.dao.redis.JsonCodecToByteStringSerdesConversion._
   import io.circe.generic.auto._
@@ -27,8 +25,8 @@ class UserRepositoryOnRedisImpl(client: OnRedisClient, expireSeconds: Option[Lon
     Task
       .deferFutureAction { implicit ec =>
         client.db
-          .set[RecordJson](generateKey(record.userId), json, expireSeconds)
-          .map(_ => 1L)
+          .set[RecordJson](generateKey(record.userId), json, exSeconds = None)
+          .map(r => if (r) 1L else 0L)
       }
   }
   override def putMulti(records: Seq[Record]): Task[Long] = ???

@@ -1,28 +1,29 @@
 version: "3.4"
 services:
   db:
-    image: mysql:5.7.22
     restart: always # OS起動時にコンテナを自動起動
+    build: ./tools/mysql
     ports:
       - 3306:3306
-    volumes:
-      - ./tools/mysql:/docker-entrypoint-initdb.d
-      - ./volume/mysql/data:/var/lib/mysql
     env_file: ./tools/mysql/.env # 環境変数に外部ファイルを指定
-  datadog:
-    image: datadog/agent:latest-jmx
+  redis:
+    image: redis:3.2.4-alpine
     restart: always # OS起動時にコンテナを自動起動
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /proc/:/host/proc/:ro
-      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
-    env_file: ./tools/datadog/.env # 環境変数に外部ファイルを指定
-    links:
-      - boot
+    ports:
+      - "6379:6379"
+#  datadog:
+#    image: datadog/agent:latest-jmx
+#    restart: always # OS起動時にコンテナを自動起動
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock:ro
+#      - /proc/:/host/proc/:ro
+#      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+#    env_file: ./tools/datadog/.env # 環境変数に外部ファイルを指定
+#    links:
+#      - boot
   boot:
-    image: bambootuna/loadtest-server:latest
+    image: bambootuna/loadtest:latest
     restart: always # OS起動時にコンテナを自動起動
-#    build: .
     ports:
       - 8080:8080
       - 8999:8999
@@ -31,7 +32,9 @@ services:
       - JVM_HEAP_MAX=1g
       - JVM_META_MAX=512m
       - JMX_PORT=8999
-      - DATADOG_HOSTNAME=datadog
-      - DATADOG_PORT=8125
+#      - DATADOG_HOSTNAME=datadog
+#      - DATADOG_PORT=8125
+      - LOADTEST_REDIS_HOST=redis
     depends_on:
       - db
+      - redis

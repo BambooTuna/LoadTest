@@ -18,7 +18,6 @@ case class AddUserUseCaseImpl(userRepository: UserRepository) extends AddUserUse
 
     val id = Random.nextLong()
     (for {
-
       aggregate <- Task.pure(
         User(
           UserId(id),
@@ -27,8 +26,7 @@ case class AddUserUseCaseImpl(userRepository: UserRepository) extends AddUserUse
         )
       )
       _ <- userRepository.put(aggregate)
-    } yield aggregate.userId)
-      .map { result =>
+    } yield aggregate.userId).map { result =>
         AddUserCommandSucceeded(result)
       }.onErrorHandle { ex =>
         AddUserCommandFailed(ex.getMessage)
