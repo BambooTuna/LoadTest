@@ -41,6 +41,16 @@ $ curl -X GET -H "Content-Type: application/json" -d '{"user_id":1}' localhost:8
 {"user":{"user_id":6795494702222648856,"name":"bambootuna","age":20},"error_messages":[]}
 ```
 
+**コンテナに入ってデータの確認をする**
+`SELECT 1`でデータベースを指定している所に注意！
+```bash
+$ docker exec -it [Container name] sh
+$ redis-cli
+127.0.0.1:6379> SELECT 1
+127.0.0.1:6379[1]> SET [Key name] [Value]
+127.0.0.1:6379[1]> GET [Key name]
+```
+
 ### Gatling Test
 ```sbtshell
 $ sbt clean gatling:test
