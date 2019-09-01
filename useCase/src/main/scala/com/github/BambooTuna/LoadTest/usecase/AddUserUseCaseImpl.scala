@@ -1,6 +1,6 @@
 package com.github.BambooTuna.LoadTest.usecase
 
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.jdbc.UserRepositoryOnJDBC
+import com.github.BambooTuna.LoadTest.adaptor.storage.repository.UserRepository
 import com.github.BambooTuna.LoadTest.domain.model.user.{ User, UserId }
 import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol.{
   AddUserCommandFailed,
@@ -12,9 +12,9 @@ import monix.eval.Task
 
 import scala.util.Random
 
-class AddUserUseCaseImpl(userRepository: UserRepositoryOnJDBC) {
+case class AddUserUseCaseImpl(userRepository: UserRepository) extends AddUserUseCase {
 
-  def run(arg: AddUserCommandRequest): Task[AddUserCommandResponse] = {
+  override def run(arg: AddUserCommandRequest): Task[AddUserCommandResponse] = {
 
     val id = Random.nextLong()
     (for {

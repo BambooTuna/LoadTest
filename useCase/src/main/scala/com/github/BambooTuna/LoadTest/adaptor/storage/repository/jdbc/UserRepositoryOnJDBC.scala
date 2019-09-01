@@ -1,7 +1,5 @@
 package com.github.BambooTuna.LoadTest.adaptor.storage.repository.jdbc
 
-import com.github.BambooTuna.LoadTest.adaptor.storage.dao.RepositorySupport
-import com.github.BambooTuna.LoadTest.domain.model.user.{ User, UserId }
-import monix.eval.Task
+import com.github.BambooTuna.LoadTest.adaptor.storage.repository.UserRepository
 
-trait UserRepositoryOnJDBC extends RepositorySupport[Task, UserId, User]
+trait UserRepositoryOnJDBC extends UserRepository
