@@ -1,7 +1,6 @@
 package com.github.BambooTuna.LoadTest.adaptor.routes
 
 import akka.http.scaladsl.model.HttpMethod
-import akka.http.scaladsl.model.HttpMethods.GET
 import akka.http.scaladsl.server.{ PathMatcher, Route }
 import akka.http.scaladsl.server.Directives._
 
@@ -14,7 +13,7 @@ object Router {
 class Router(val routes: Seq[Route]) {
 
   def create: Route =
-    routes.foldLeft(route(GET, "", complete("Default top page view. You have to change this.")))(_ ~ _)
+    routes.reduce(_ ~ _)
 
   def +(router: Router): Router =
     new Router(this.routes ++ router.routes)

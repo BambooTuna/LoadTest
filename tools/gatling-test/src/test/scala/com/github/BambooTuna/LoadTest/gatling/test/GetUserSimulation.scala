@@ -5,7 +5,7 @@
 //
 //import scala.concurrent.duration._
 //
-//class AddUserSimulation extends Simulation {
+//class GetUserSimulation extends Simulation {
 //
 //  val request = 200 //   /s
 //  val set     = 0   //   セット回数
@@ -20,10 +20,10 @@
 //
 //  val scn = scenario("AddUserSimulation")
 //    .exec(
-//      http("add user")
-//        .post("/user/add")
+//      http("get user")
+//        .get("/user/get")
 //        .headers(Map("Content-Type" -> "application/json"))
-//        .body(StringBody("""{"name":"bambootuna","age":20}"""))
+//        .body(StringBody("""{"user_id":1}"""))
 //    )
 //    .pause(100.milliseconds)
 //
