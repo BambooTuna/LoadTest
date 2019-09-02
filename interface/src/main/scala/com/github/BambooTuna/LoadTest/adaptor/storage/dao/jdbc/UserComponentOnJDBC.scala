@@ -2,11 +2,10 @@ package com.github.BambooTuna.LoadTest.adaptor.storage.dao.jdbc
 
 import java.time.ZonedDateTime
 
-import com.github.BambooTuna.LoadTest.adaptor.storage.dao.DaoOnSlick
 import com.github.BambooTuna.LoadTest.domain.model.user.{ Age, Name, User, UserId }
 import slick.jdbc.MySQLProfile.api._
 
-trait UserComponent extends DaoOnSlick {
+trait UserComponentOnJDBC extends DaoOnSlick {
 
   val tableName = "loadtest-user"
 

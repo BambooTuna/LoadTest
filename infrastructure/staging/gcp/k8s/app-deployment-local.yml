@@ -8,8 +8,8 @@ spec:
   type: LoadBalancer
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 80
+      port: 8080
+      targetPort: 8080
   selector:
     app: loadtest
 ---
@@ -20,7 +20,7 @@ metadata:
   labels:
     app: loadtest
 spec:
-  replicas: 2
+  replicas: 4
   selector:
     matchLabels:
       app: loadtest
@@ -31,12 +31,12 @@ spec:
     spec:
       containers:
       - name: loadtest
-        image: loadtest-local-k8s:latest
+        image: bambootuna/loadtest:latest
         #localのdocker imageを使用する際に必要
         imagePullPolicy: Never
         env:
           - name: RDB_HOST
-            value: "db"
+            value: "db-service-mysql"
           - name: RDB_PORT
             value: "3306"
           - name: LOADTEST_RDB_USER
@@ -54,8 +54,24 @@ spec:
               secretKeyRef:
                 name: dbsecret
                 key: databese_name
+          - name: DATADOG_HOSTNAME
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+          - name: DATADOG_PORT
+            value: "8125"
+          - name: JVM_HEAP_MIN
+            value: "3072M"
+          - name: JVM_HEAP_MAX
+            value: "3072M"
+          - name: JVM_META_MAX
+              value: "1024M"
         resources:
           requests:
-            memory: 1Gi
+            memory: "3072Mi"
+            cpu: "1000m"
+          limits:
+            memory: "3072MMi"
+            cpu: "1000m"
         ports:
-        - containerPort: 80
+        - containerPort: 8080
