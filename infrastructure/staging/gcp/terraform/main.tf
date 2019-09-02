@@ -53,7 +53,7 @@ resource "google_container_cluster" "default" {
     ]
     preemptible  = true
     machine_type = "n1-standard-2"
-    disk_size_gb = 5
+    disk_size_gb = 10
   }
 }
 
