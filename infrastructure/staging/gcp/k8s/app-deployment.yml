@@ -62,6 +62,8 @@ spec:
               secretKeyRef:
                 name: dbsecret
                 key: databese_name
+          - name: LOADTEST_REDIS_HOST
+            value: "redis-service-master"
           - name: DATADOG_HOSTNAME
             valueFrom:
               fieldRef:
