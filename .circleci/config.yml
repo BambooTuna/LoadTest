@@ -141,4 +141,4 @@ workflows:
             - push
           filters:
             branches:
-              only: developk
+              only: develop
