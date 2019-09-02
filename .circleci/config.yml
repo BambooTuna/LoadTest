@@ -129,16 +129,22 @@ workflows:
             - build
           filters:
             branches:
-              only: develop
+              only:
+                - develop
+                - feature/develop/.+
       - push:
           requires:
             - staging
           filters:
             branches:
-              only: develop
+              only:
+                - develop
+                - feature/develop/.+
       - deploy:
           requires:
             - push
           filters:
             branches:
-              only: develop
+              only:
+                - develop
+                - feature/develop/.+
