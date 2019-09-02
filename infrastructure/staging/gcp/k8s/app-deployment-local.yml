@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: loadtest-service
+  labels:
+    app: loadtest
+spec:
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: loadtest
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: loadtest-deployment
+  labels:
+    app: loadtest
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: loadtest
+  template:
+    metadata:
+      labels:
+        app: loadtest
+    spec:
+      containers:
+      - name: loadtest
+        image: bambootuna/loadtest:latest
+        #localのdocker imageを使用する際に必要
+        imagePullPolicy: Never
+        env:
+          - name: RDB_HOST
+            value: "db-service-mysql"
+          - name: RDB_PORT
+            value: "3306"
+          - name: LOADTEST_RDB_USER
+            valueFrom:
+              secretKeyRef:
+                name: dbsecret
+                key: user
+          - name: LOADTEST_RDB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: dbsecret
+                key: password
+          - name: RDB_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: dbsecret
+                key: databese_name
+          - name: DATADOG_HOSTNAME
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+          - name: DATADOG_PORT
+            value: "8125"
+          - name: JVM_HEAP_MIN
+            value: "3072M"
+          - name: JVM_HEAP_MAX
+            value: "3072M"
+          - name: JVM_META_MAX
+              value: "1024M"
+        resources:
+          requests:
+            memory: "3072Mi"
+            cpu: "1000m"
+          limits:
+            memory: "3072MMi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 8080

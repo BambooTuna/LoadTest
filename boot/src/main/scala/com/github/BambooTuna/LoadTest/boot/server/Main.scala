@@ -3,11 +3,16 @@ package com.github.BambooTuna.LoadTest.boot.server
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.jdbc.JdbcSetting
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.redis.RedisSetting
 import com.typesafe.config.{ Config, ConfigFactory }
 import kamon.Kamon
 import org.slf4j.LoggerFactory
+import slick.basic.DatabaseConfig
+import slick.jdbc.JdbcProfile
 
 import scala.concurrent.ExecutionContextExecutor
+import scala.concurrent.duration._
 
 object Main extends App {
 
@@ -23,7 +28,20 @@ object Main extends App {
 
   val serverConfig = ServerConfig(system.settings.config.getString("boot.server.host"),
                                   system.settings.config.getString("boot.server.port").toInt)
-  val route         = Routes.route
+
+  val jdbcSetting: JdbcSetting = JdbcSetting(
+    config = DatabaseConfig.forConfig[JdbcProfile](path = "slick", rootConfig)
+  )
+
+  val redisSetting = RedisSetting(
+    host = system.settings.config.getString("redis.host"),
+    port = system.settings.config.getInt("redis.port"),
+    password = Some(system.settings.config.getString("redis.password")).filter(_.nonEmpty),
+    redis_db = Some(system.settings.config.getInt("redis.db")),
+    connectTimeout = Some(system.settings.config.getDuration("redis.connect-timeout").toMillis.millis)
+  )
+
+  val route         = Routes.createRouter(jdbcSetting, redisSetting).create
   val bindingFuture = Http().bindAndHandle(route, serverConfig.host, serverConfig.port)
 
   sys.addShutdownHook {

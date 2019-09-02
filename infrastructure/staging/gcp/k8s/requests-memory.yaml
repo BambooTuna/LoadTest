@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: requests-memory
+spec:
+  hard:
+    requests.memory: "8G"
+    requests.cpu: "4000m"
+    limits.memory: "8G"
+    limits.cpu: "4000m"

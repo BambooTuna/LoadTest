@@ -91,6 +91,12 @@ object MySQL {
   val connector: ModuleID = "mysql" % "mysql-connector-java" % version
 }
 
+// これを追加しないと以下のエラーがでる
+//Failed to load class of driverClassName com.mysql.jdbc.Driver
+object MySQLConnectorJava {
+  val version = "mysql" % "mysql-connector-java" % "5.1.42"
+}
+
 object Kamon {
   private val version = "0.6.7"
 
@@ -151,6 +157,10 @@ object AspectjLib {
   val aspectjweaver = "org.aspectj" % "aspectjweaver" % "1.8.10"
 }
 
+object Monix {
+  val monixVersion = "3.0.0-RC2"
+  val version      = "io.monix" %% "monix" % monixVersion
+}
 
 object DDDBase {
   private val scalaDddBaseVersion = "1.0.27"
@@ -159,4 +169,9 @@ object DDDBase {
   val slick = "com.github.j5ik2o" %% "scala-ddd-base-slick" % scalaDddBaseVersion
   val redis = "com.github.j5ik2o" %% "scala-ddd-base-redis" % scalaDddBaseVersion
   val dynamo = "com.github.j5ik2o" %% "scala-ddd-base-dynamodb" % scalaDddBaseVersion
+}
+
+object Redis {
+  val client   = "com.github.etaty" %% "rediscala"     % "1.8.0"
+  val embRedis = "com.chatwork"     % "embedded-redis" % "0.7"
 }

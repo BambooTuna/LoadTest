@@ -1,0 +1,11 @@
+image:
+  repository: datadog/agent
+  tag: 6.9.0
+  pullPolicy: IfNotPresent
+
+datadog:
+  logLevel: "INFO"
+  nonLocalTraffic: true
+
+daemonset:
+  useHostNetwork: true

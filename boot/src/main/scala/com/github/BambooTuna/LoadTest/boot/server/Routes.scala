@@ -1,46 +1,53 @@
 package com.github.BambooTuna.LoadTest.boot.server
 
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.server.Directives._
-import com.github.BambooTuna.LoadTest.adaptor.json.{UserRequestJson, UserResponseJson}
-
-import io.circe.generic.auto._
-import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
-import kamon.Kamon
-import kamon.akka.http.KamonTraceDirectives
+import akka.actor.ActorSystem
+import akka.http.scaladsl.model.HttpMethods.{ GET, POST, PUT }
+import akka.stream.ActorMaterializer
+import com.github.BambooTuna.LoadTest.adaptor.routes._
 import org.slf4j.LoggerFactory
+import akka.http.scaladsl.server.Directives._
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.jdbc.JdbcSetting
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.{ OnRedisClient, OnSlickClient }
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.redis.RedisSetting
+import com.github.BambooTuna.LoadTest.adaptor.storage.repository.jdbc.UserRepositoryOnJDBCImpl
+import com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis.UserRepositoryOnRedisImpl
+import com.github.BambooTuna.LoadTest.usecase.{ AddUserUseCaseImpl, GetUserUseCaseImpl }
 
-object Routes extends FailFastCirceSupport with KamonTraceDirectives {
+object Routes {
 
   val logger = LoggerFactory.getLogger(getClass)
 
-  val root =
-    pathSingleSlash {
-      get {
-        extractUri { uri =>
-          Kamon.metrics.counter("get").increment()
-          complete(uri.toString())
-        }
-      }
-    }
+  def createRouter(jdbcSetting: JdbcSetting, redisSetting: RedisSetting)(implicit system: ActorSystem,
+                                                                         materializer: ActorMaterializer): Router = {
 
-  val ping =
-    path("ping") {
-      get {
-        complete("pong")
-      }
-    }
+    val slickClient: OnSlickClient = jdbcSetting.client
+    val redisClient: OnRedisClient = redisSetting.client
 
-  val `json-test` =
-    path("json") {
-      post {
-        entity(as[UserRequestJson]) { request =>
-          complete(StatusCodes.OK, UserResponseJson())
-        }
-      }
-    }
+    commonRouter + mysqlRouter(slickClient) + redisRouter(redisClient)
+  }
 
-  val route: Route = root ~ ping ~ `json-test`
+  def commonRouter(implicit materializer: ActorMaterializer): Router =
+    Router(
+      route(GET, "", CommonRoute().top),
+      route(GET, "ping", CommonRoute().ping)
+    )
+
+  def mysqlRouter(client: OnSlickClient)(implicit materializer: ActorMaterializer): Router = {
+    val repository = new UserRepositoryOnJDBCImpl(client)
+    Router(
+      route(GET, "user" / "get", GetUserRoute(GetUserUseCaseImpl(repository)).route),
+      route(POST, "user" / "add", AddUserRoute(AddUserUseCaseImpl(repository)).route),
+      route(PUT, "user" / "update", EditUserRoute().route)
+    )
+  }
+
+  def redisRouter(client: OnRedisClient)(implicit materializer: ActorMaterializer): Router = {
+    val repository = new UserRepositoryOnRedisImpl(client)
+    Router(
+      route(GET, "redis" / "user" / "get", GetUserRoute(GetUserUseCaseImpl(repository)).route),
+      route(POST, "redis" / "user" / "add", AddUserRoute(AddUserUseCaseImpl(repository)).route),
+      route(PUT, "redis" / "user" / "update", EditUserRoute().route)
+    )
+  }
 
 }
