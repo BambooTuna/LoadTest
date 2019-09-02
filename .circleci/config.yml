@@ -129,22 +129,16 @@ workflows:
             - build
           filters:
             branches:
-              ignore: /.*/
-            tags:
-              only: /^v.*/
+              only: develop
       - push:
           requires:
             - staging
           filters:
             branches:
-              ignore: /.*/
-            tags:
-              only: /^v.*/
+              only: develop
       - deploy:
           requires:
             - push
           filters:
             branches:
-              ignore: /.*/
-            tags:
-              only: /^v.*/
+              only: developk
