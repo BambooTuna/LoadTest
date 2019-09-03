@@ -75,11 +75,21 @@ jobs:
           name: Docker build and push
           command: |
             . ~/project/infrastructure/staging/gcp/gcloud-env
-            export DOCKER_TAG=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}:latest" | tr '[:upper:]' '[:lower:]'`
-            export IMAGE_NAME=gcr.io/${GOOGLE_PROJECT_ID}/${DOCKER_TAG}
+            export APP_IMAGE=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}" | tr '[:upper:]' '[:lower:]'`
+            export IMAGE_NAME=gcr.io/${GOOGLE_PROJECT_ID}/${APP_IMAGE}
+
+            export GATLING_IMAGE=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}-gatling" | tr '[:upper:]' '[:lower:]'`
+            export GATLING_IMAGE_NAME=gcr.io/${GOOGLE_PROJECT_ID}/${GATLING_IMAGE}
+
             sbt docker:publishLocal
-            docker tag ${DOCKER_TAG} ${IMAGE_NAME}
+            sbt gatling-test/docker:publishLocal
+
+            docker tag ${APP_IMAGE}:latest ${IMAGE_NAME}:latest
             docker push ${IMAGE_NAME}
+
+            docker tag ${GATLING_IMAGE}:latest ${GATLING_IMAGE_NAME}:latest
+            docker push ${GATLING_IMAGE_NAME}
+
             cd tools/mysql
             docker build . -t gcr.io/${GOOGLE_PROJECT_ID}/mysql:latest
             docker push gcr.io/${GOOGLE_PROJECT_ID}/mysql:latest
