@@ -53,7 +53,9 @@ $ redis-cli
 
 ### Gatling Test
 ```sbtshell
-$ sbt clean gatling:test
+$ GATLING_BASE_URL=http://localhost:8080 \
+MR_GATLING_USERS=10000 \
+sbt clean gatling:test
 ```
 
 ### Locust Test

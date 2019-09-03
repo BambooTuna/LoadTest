@@ -3,27 +3,20 @@ package com.github.BambooTuna.LoadTest.gatling.test
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 
-import scala.concurrent.duration._
+class PingSimulation extends Simulation with SimulationConfig {
 
-class PingSimulation extends Simulation {
-
-  val request = 1000 //   /s
-  val set     = 60   //   セット回数
-
-  val httpConf = http
-    .baseUrl("http://localhost:8080")
-
-  val scn = scenario("PingSimulation")
+  val scn = scenario(getClass.getName)
     .exec(
-      http("ping")
+      http(getClass.getName)
         .get("/ping")
+        .check(status.is(200))
     )
 
   setUp(
     scn.inject(
-//      constantUsersPerSec(request).during(set.seconds)
-      rampUsersPerSec(1).to(request).during(set.seconds)
+      rampUsers(gatlingUser.numOfUser).during(gatlingUser.rampDuration)
+      //      rampUsersPerSec(1).to(request).during(set.seconds)
     )
-  ).protocols(httpConf)
+  ).protocols(httpConf).maxDuration(gatlingUser.entireDuration)
 
 }

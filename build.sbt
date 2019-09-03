@@ -73,14 +73,19 @@ lazy val boot = (project in file("boot"))
 
 lazy val `gatling-test` = (project in file("tools/gatling-test"))
   .settings(commonSettings)
+  .settings(gatlingCommonSettings)
   .enablePlugins(GatlingPlugin)
   .settings(
     name := "LoadTest-gatling-test",
     version := "0.1",
     scalaVersion := "2.12.8",
     libraryDependencies ++= Seq(
+      Circe.core,
+      Circe.generic,
+      Circe.parser,
     ) ++ Gatling.all
   )
+  .dependsOn(interface)
 
 lazy val root =
   (project in file("."))
