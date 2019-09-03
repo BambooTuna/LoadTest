@@ -229,3 +229,6 @@ Cloud builder should e moving.
 ## References
 - DaoImpl
 [scala-ddd-base](https://github.com/j5ik2o/scala-ddd-base)
+
+- Aerospike
+[ソフトウェアエンジニアに知ってほしいAerospike](https://www.slideshare.net/kousukeyabumoto9/aerospike-59009640)

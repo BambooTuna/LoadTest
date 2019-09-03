@@ -15,7 +15,7 @@ services:
     restart: always # OS起動時にコンテナを自動起動
     image: aerospike
     ports:
-      - "3000:3000"
+      - 3000:3000
     volumes:
       - ./tools/aerpsike/data:/opt/aerpsike/data
       - ./tools/aerpsike/conf:/etc/aerpsike
@@ -39,6 +39,7 @@ services:
 #      - DATADOG_HOSTNAME=datadog
 #      - DATADOG_PORT=8125
       - LOADTEST_REDIS_HOST=redis
+      - AEROSPIKE_HOST=aerpsike
     depends_on:
       - db
       - redis

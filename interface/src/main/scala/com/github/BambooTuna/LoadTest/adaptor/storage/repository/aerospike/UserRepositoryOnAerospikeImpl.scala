@@ -19,7 +19,7 @@ class UserRepositoryOnAerospikeImpl(val client: OnAerospikeClient)
   override def get(id: Id): Task[Option[Record]] =
     Task
       .deferFutureAction { implicit ec =>
-        db.getString(generateKey(id)).map(parser.decode[Record](_).toOption)
+        db.getString(generateKey(id)).map(parser.decode[RecordJson](_).map(convertToData).toOption)
       }
 
   override def getMulti(ids: Seq[Id]): Task[Seq[Record]] = ???
@@ -27,7 +27,7 @@ class UserRepositoryOnAerospikeImpl(val client: OnAerospikeClient)
   override def put(record: Record): Task[Long] =
     Task
       .deferFutureAction { implicit ec =>
-        db.putString("testKey", SingleBin(generateKey(record.userId), convertToJson(record).asJson.noSpaces)).map(
+        db.putString(generateKey(record.userId), SingleBin("user_id", convertToJson(record).asJson.noSpaces)).map(
             _ => 1L
           )
       }
