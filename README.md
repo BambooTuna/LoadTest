@@ -41,6 +41,15 @@ $ curl -X GET -H "Content-Type: application/json" -d '{"user_id":1}' localhost:8
 {"user":{"user_id":6795494702222648856,"name":"bambootuna","age":20},"error_messages":[]}
 ```
 
+- Aerospike
+```bash
+$ curl -X POST -H "Content-Type: application/json" -d '{"name":"bambootuna","age":20}' localhost:8080/aerospike/user/add
+{"id":{"user_id":-4934742503425198802},"error_messages":[]}
+
+$ curl -X GET -H "Content-Type: application/json" -d '{"user_id":1}' localhost:8080/aerospike/user/get
+{"user":{"user_id":6795494702222648856,"name":"bambootuna","age":20},"error_messages":[]}
+```
+
 **コンテナに入ってデータの確認をする**
 `SELECT 1`でデータベースを指定している所に注意！
 ```bash
