@@ -126,7 +126,7 @@ $ gcloud auth activate-service-account --key-file=infrastructure/staging/gcp/ter
 
 5. Add role
 [IAM](https://console.cloud.google.com/iam-admin/)
-`Compute Engine default service account` <- `Kubernetes Engine サービス エージェント`
+`Compute Engine default service account` <- `Kubernetes Engine 管理者`
 
 ### CircleCI->GCR->GKE
 CircleCI  
