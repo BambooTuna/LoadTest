@@ -6,7 +6,7 @@ import akka.stream.ActorMaterializer
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.aerospike.AerospikeSetting
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.jdbc.JdbcSetting
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.redis.RedisSetting
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.{ Config, ConfigFactory }
 import kamon.Kamon
 import org.slf4j.LoggerFactory
 import ru.tinkoff.aerospike.dsl.SpikeImpl
@@ -50,9 +50,6 @@ object Main extends App {
     namespace = system.settings.config.getString("aerospike.namespace"),
     setName = system.settings.config.getString("aerospike.setName"),
   )
-
-  val client = AClient.client
-  val spike: SpikeImpl = new SpikeImpl(client)
 
   val route         = Routes.createRouter(jdbcSetting, redisSetting, aerospikeSetting).create
   val bindingFuture = Http().bindAndHandle(route, serverConfig.host, serverConfig.port)

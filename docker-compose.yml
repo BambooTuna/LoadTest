@@ -11,16 +11,20 @@ services:
     restart: always # OS起動時にコンテナを自動起動
     ports:
       - "6379:6379"
-#  datadog:
-#    image: datadog/agent:latest-jmx
-#    restart: always # OS起動時にコンテナを自動起動
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock:ro
-#      - /proc/:/host/proc/:ro
-#      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
-#    env_file: ./tools/datadog/.env # 環境変数に外部ファイルを指定
-#    links:
-#      - boot
+  aerpsike:
+    restart: always # OS起動時にコンテナを自動起動
+    image: aerospike
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./tools/aerpsike/data:/opt/aerpsike/data
+      - ./tools/aerpsike/conf:/etc/aerpsike
+    command: [ "--config-file","/etc/aerospike/aerospike.conf"]
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 64000
+        hard: 64000
   boot:
     image: bambootuna/loadtest:latest
     restart: always # OS起動時にコンテナを自動起動

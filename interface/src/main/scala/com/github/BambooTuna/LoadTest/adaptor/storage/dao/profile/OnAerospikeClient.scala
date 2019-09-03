@@ -1,11 +1,11 @@
 package com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile
 
-import com.aerospike.client.async.AsyncClient
+import ru.tinkoff.aerospikeexamples.example.SampleScheme
 import ru.tinkoff.aerospikemacro.domain.DBCredentials
 
 trait OnAerospikeClient extends Client {
 
-  override type Connection = AsyncClient
+  override type Connection = SampleScheme
 
   val profile: DBCredentials
 

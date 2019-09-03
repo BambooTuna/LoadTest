@@ -1,29 +1,31 @@
 package com.github.BambooTuna.LoadTest.boot.server
 
 import akka.actor.ActorSystem
-import akka.http.scaladsl.model.HttpMethods.{GET, POST, PUT}
+import akka.http.scaladsl.model.HttpMethods.{ GET, POST, PUT }
 import akka.stream.ActorMaterializer
 import com.github.BambooTuna.LoadTest.adaptor.routes._
 import org.slf4j.LoggerFactory
 import akka.http.scaladsl.server.Directives._
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.aerospike.AerospikeSetting
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.jdbc.JdbcSetting
-import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.{OnAerospikeClient, OnRedisClient, OnSlickClient}
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.{ OnAerospikeClient, OnRedisClient, OnSlickClient }
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.redis.RedisSetting
 import com.github.BambooTuna.LoadTest.adaptor.storage.repository.aerospike.UserRepositoryOnAerospikeImpl
 import com.github.BambooTuna.LoadTest.adaptor.storage.repository.jdbc.UserRepositoryOnJDBCImpl
 import com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis.UserRepositoryOnRedisImpl
-import com.github.BambooTuna.LoadTest.usecase.{AddUserUseCaseImpl, GetUserUseCaseImpl}
+import com.github.BambooTuna.LoadTest.usecase.{ AddUserUseCaseImpl, GetUserUseCaseImpl }
 
 object Routes {
 
   val logger = LoggerFactory.getLogger(getClass)
 
-  def createRouter(jdbcSetting: JdbcSetting, redisSetting: RedisSetting, aerospikeSetting: AerospikeSetting)(implicit system: ActorSystem,
-                                                                         materializer: ActorMaterializer): Router = {
+  def createRouter(jdbcSetting: JdbcSetting, redisSetting: RedisSetting, aerospikeSetting: AerospikeSetting)(
+      implicit system: ActorSystem,
+      materializer: ActorMaterializer
+  ): Router = {
 
-    val slickClient: OnSlickClient = jdbcSetting.client
-    val redisClient: OnRedisClient = redisSetting.client
+    val slickClient: OnSlickClient         = jdbcSetting.client
+    val redisClient: OnRedisClient         = redisSetting.client
     val aerospikeClient: OnAerospikeClient = aerospikeSetting.client
 
     commonRouter + mysqlRouter(slickClient) + redisRouter(redisClient) + aerospikeRouter(aerospikeClient)
