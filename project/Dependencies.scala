@@ -175,3 +175,14 @@ object Redis {
   val client   = "com.github.etaty" %% "rediscala"     % "1.8.0"
   val embRedis = "com.chatwork"     % "embedded-redis" % "0.7"
 }
+
+object Aerospike {
+  private val version = "1.1.14"
+  
+  val core = "ru.tinkoff" %% "aerospike-scala" % version
+  val client = "com.aerospike" % "aerospike-client" % "3.3.1" // in case you don't have it
+  val example = "ru.tinkoff" %% "aerospike-scala-example" % version // usage examples
+  val proto = "ru.tinkoff" %% "aerospike-scala-proto" % version // protobuff serialization support
+  
+  val all = Seq(core, client, example, proto)
+}

@@ -73,7 +73,7 @@ lazy val boot = (project in file("boot"))
 
 lazy val `gatling-test` = (project in file("tools/gatling-test"))
   .settings(commonSettings)
-  .settings(gatlingCommonSettings)
+//  .settings(gatlingCommonSettings)
   .enablePlugins(GatlingPlugin)
   .settings(
     name := "LoadTest-gatling-test",

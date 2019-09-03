@@ -13,6 +13,7 @@ sleep 20s
 helm upgrade --install dd-agent --set datadog.apiKey=${DD_API_KEY} -f ./helm/datadog-values.yaml stable/datadog
 helm upgrade --install db-service --set image=${DB_IMAGE} --set imageTag=${DB_TAG} -f ./helm/mysql-values.yaml stable/mysql
 helm upgrade --install redis-service -f ./helm/redis-values.yaml stable/redis
+helm upgrade --install aerospike-service -f ./helm/aerospike-values.yaml stable/aerospike
 
 # setup db
 kubectl apply -f ./db-secret.yml

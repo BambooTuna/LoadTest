@@ -21,8 +21,9 @@ object Settings {
       Airframe.di,
       Monix.version,
       MySQLConnectorJava.version,
-      Redis.client
-    ),
+      Redis.client,
+    ) 
+      ++ Aerospike.all,
     scalafmtOnCompile in Compile := true,
     scalafmtTestOnCompile in Compile := true
   )
@@ -31,7 +32,7 @@ object Settings {
     fork := true,
     name := "loadtest",
     version := "latest",
-  dockerBaseImage := "adoptopenjdk/openjdk11:x86_64-alpine-jdk-11.0.4_11-slim",
+    dockerBaseImage := "adoptopenjdk/openjdk11:x86_64-alpine-jdk-11.0.4_11-slim",
     maintainer in Docker := "BambooTuna <bambootuna@gmail.com>",
     dockerUpdateLatest := true,
     dockerUsername := Some("bambootuna"),

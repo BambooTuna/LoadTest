@@ -64,6 +64,8 @@ spec:
                 key: databese_name
           - name: LOADTEST_REDIS_HOST
             value: "redis-service-master"
+          - name: AEROSPIKE_HOST
+            value: "aerospike-service"
           - name: DATADOG_HOSTNAME
             valueFrom:
               fieldRef:
