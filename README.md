@@ -7,6 +7,7 @@
 Use `sbt-native-packager` to build docker image.
 ```bash
 $ sbt docker:publishLocal
+$ sbt gatling-test/docker:publishLocal
 ```
 
 2. Run

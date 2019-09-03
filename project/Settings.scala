@@ -64,7 +64,7 @@ object Settings {
     maintainer in Docker := "BambooTuna <bambootuna@gmail.com>",
     dockerUpdateLatest := true,
     dockerUsername := Some("bambootuna"),
-    mainClass in (Compile, bashScriptDefines) := Some("com.github.BambooTuna.LoadTest.boot.server.Main"),
+    //mainClass in (Compile, bashScriptDefines) := Some("com.github.BambooTuna.LoadTest.boot.server.Main"),
     packageName in Docker := name.value
   )
 

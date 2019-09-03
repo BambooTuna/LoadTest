@@ -22,5 +22,8 @@ kubectl apply -f ./db-secret.yml
 # setup app
 kubectl apply -f ./app-deployment.yml
 
+# setup gatling
+kubectl applu -f ./gatling-job.yml
+
 # view logs
 kubectl get svc,pod,rc

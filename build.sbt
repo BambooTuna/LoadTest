@@ -72,13 +72,11 @@ lazy val boot = (project in file("boot"))
   .dependsOn(interface, infrastructure)
 
 lazy val `gatling-test` = (project in file("tools/gatling-test"))
+  .enablePlugins(JavaAppPackaging, AshScriptPlugin, DockerPlugin)
   .settings(commonSettings)
-//  .settings(gatlingCommonSettings)
+  .settings(gatlingCommonSettings)
   .enablePlugins(GatlingPlugin)
   .settings(
-    name := "LoadTest-gatling-test",
-    version := "0.1",
-    scalaVersion := "2.12.8",
     libraryDependencies ++= Seq(
       Circe.core,
       Circe.generic,
