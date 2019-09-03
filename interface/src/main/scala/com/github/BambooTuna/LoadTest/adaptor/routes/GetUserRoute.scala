@@ -41,7 +41,7 @@ case class GetUserRoute(getUserUseCase: GetUserUseCase)(implicit materializer: A
           case GetUserCommandFailed(error_message) =>
             val result = GetUserResponseJson(None, Seq(error_message))
             val entity = HttpEntity(MediaTypes.`application/json`, result.asJson.noSpaces)
-            complete(StatusCodes.BadRequest, entity)
+            complete(StatusCodes.NoContent, entity)
           case _ =>
             val result = GetUserResponseJson(None, Seq("unknown error"))
             val entity = HttpEntity(MediaTypes.`application/json`, result.asJson.noSpaces)

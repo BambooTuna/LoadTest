@@ -52,7 +52,7 @@ case class AddUserRoute(addUserUseCase: AddUserUseCase)(implicit materializer: A
             val result = AddUserResponseJson(None, Seq(error_message))
             val entity = HttpEntity(MediaTypes.`application/json`, result.asJson.noSpaces)
             responseTime.record(java.time.Instant.now().getEpochSecond - time)
-            complete(StatusCodes.BadRequest, entity)
+            complete(StatusCodes.NoContent, entity)
           case _ =>
             val result = AddUserResponseJson(None, Seq("unknown error"))
             val entity = HttpEntity(MediaTypes.`application/json`, result.asJson.noSpaces)

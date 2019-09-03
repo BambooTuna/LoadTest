@@ -7,12 +7,12 @@ import io.gatling.http.Predef._
 import io.circe.syntax._
 import io.circe.generic.auto._
 
-class GetUserSimulation extends Simulation with SimulationConfig {
+class GetUserOnRedisSimulation extends Simulation with SimulationConfig {
 
   val scn = scenario(getClass.getName)
     .exec(
       http(getClass.getName)
-        .get("/user/get")
+        .get("/redis/user/get")
         .headers(Map("Content-Type" -> "application/json"))
         .body(
           StringBody(
@@ -25,7 +25,7 @@ class GetUserSimulation extends Simulation with SimulationConfig {
   setUp(
     scn.inject(
       rampUsers(gatlingUser.numOfUser).during(gatlingUser.rampDuration)
-//      rampUsersPerSec(1).to(request).during(set.seconds)
+      //      rampUsersPerSec(1).to(request).during(set.seconds)
     )
   ).protocols(httpConf).maxDuration(gatlingUser.entireDuration)
 

@@ -55,4 +55,16 @@ object Settings {
 //    )
   )
 
+  lazy val gatlingCommonSettings = Seq(
+    fork := true,
+    name := "loadtest-gatling",
+    version := "latest",
+    dockerBaseImage := "adoptopenjdk/openjdk11:x86_64-alpine-jdk-11.0.4_11-slim",
+    maintainer in Docker := "BambooTuna <bambootuna@gmail.com>",
+    dockerUpdateLatest := true,
+    dockerUsername := Some("bambootuna"),
+    mainClass in (Compile, bashScriptDefines) := Some("com.github.BambooTuna.LoadTest.boot.server.Main"),
+    packageName in Docker := name.value
+  )
+
 }
