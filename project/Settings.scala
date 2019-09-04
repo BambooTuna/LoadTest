@@ -36,7 +36,7 @@ object Settings {
     fork := true,
     name := "loadtest",
     version := "latest",
-    dockerBaseImage := sdk8,
+    dockerBaseImage := sdk11,
     maintainer in Docker := "BambooTuna <bambootuna@gmail.com>",
     dockerUpdateLatest := true,
     dockerUsername := Some("bambootuna"),
