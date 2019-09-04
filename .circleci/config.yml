@@ -86,15 +86,15 @@ jobs:
             export LOCAL_CREDENTIAL_PATH=${HOME}/account.json
             sbt gatling-runner/docker:publishLocal
 
-            docker tag ${APP_IMAGE}:latest ${IMAGE_NAME}:${CIRCLE_TAG}
+            docker tag ${APP_IMAGE}:latest ${IMAGE_NAME}:${CIRCLE_SHA1}
             docker push ${IMAGE_NAME}
 
-            docker tag ${GATLING_IMAGE}:latest ${GATLING_IMAGE_NAME}:${CIRCLE_TAG}
+            docker tag ${GATLING_IMAGE}:latest ${GATLING_IMAGE_NAME}:${CIRCLE_SHA1}
             docker push ${GATLING_IMAGE_NAME}
 
             cd tools/mysql
-            docker build . -t gcr.io/${GOOGLE_PROJECT_ID}/mysql:${CIRCLE_TAG}
-            docker push gcr.io/${GOOGLE_PROJECT_ID}/mysql:${CIRCLE_TAG}
+            docker build . -t gcr.io/${GOOGLE_PROJECT_ID}/mysql:${CIRCLE_SHA1}
+            docker push gcr.io/${GOOGLE_PROJECT_ID}/mysql:${CIRCLE_SHA1}
 
   deploy:
     docker:
@@ -113,13 +113,13 @@ jobs:
             . ~/project/infrastructure/staging/gcp/gcloud-env
 
             export DOCKER_TAG=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}" | tr '[:upper:]' '[:lower:]'`
-            export IMAGE_NAME=gcr.io/${GOOGLE_PROJECT_ID}/${DOCKER_TAG}:${CIRCLE_TAG}
+            export IMAGE_NAME=gcr.io/${GOOGLE_PROJECT_ID}/${DOCKER_TAG}:${CIRCLE_SHA1}
 
             export GATLING_IMAGE=`echo "${CIRCLE_PROJECT_USERNAME}/gatling-runner" | tr '[:upper:]' '[:lower:]'`
-            export GATLING_IMAGE_NAME=gcr.io/${GOOGLE_PROJECT_ID}/${GATLING_IMAGE}:${CIRCLE_TAG}
+            export GATLING_IMAGE_NAME=gcr.io/${GOOGLE_PROJECT_ID}/${GATLING_IMAGE}:${CIRCLE_SHA1}
 
             export DB_IMAGE=gcr.io/${GOOGLE_PROJECT_ID}/mysql
-            export DB_TAG=${CIRCLE_TAG}
+            export DB_TAG=${CIRCLE_SHA1}
 
             echo $GCLOUD_SERVICE_KEY | base64 -d > ${HOME}/account.json
             gcloud auth activate-service-account --key-file ${HOME}/account.json
