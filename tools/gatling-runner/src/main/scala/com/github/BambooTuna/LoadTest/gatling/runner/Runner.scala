@@ -17,14 +17,14 @@ object Runner extends App {
   val location           = config.getString("gatling.gcp.location")
   val bucketName         = config.getString("gatling.gcp.bucket-name")
 
-  val simulationClassNames = Seq(config.getString("gatling.simulation-classname"))
+  val simulationClassNames = config.getStringList("gatling.simulation-classname")
 
   val gatlingConfig = ConfigFactory.load("gatling.conf")
   val gatlingDir    = gatlingConfig.getString("gatling.core.directory.results")
 
   val dynamic = new ReflectiveDynamicAccess(getClass.getClassLoader)
 
-  simulationClassNames.foreach(run)
+  simulationClassNames.forEach(run)
 
   def run(simulationClassName: String) = {
 
@@ -38,7 +38,7 @@ object Runner extends App {
 
     val latestTimestamp = new File(gatlingDir).listFiles().map(_.getName.split("-")(1).toLong).max
     val targetLogFile   = s"$gatlingDir/${simulationName.toLowerCase()}-$latestTimestamp/simulation.log"
-    val keyName         = s"gatling_log/${clazz.getCanonicalName}/${java.util.UUID.randomUUID()}.log"
+    val keyName         = s"gatling_log/${simulationName.toLowerCase()}/${java.util.UUID.randomUUID()}.log"
 
     val gcs = GoogleCloudStorage(projectName, credentialFilePath)
     gcs
@@ -49,5 +49,6 @@ object Runner extends App {
       )
 
   }
+  Thread.sleep(1000000)
 
 }

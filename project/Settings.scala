@@ -6,6 +6,9 @@ import com.typesafe.sbt.SbtNativePackager.autoImport.{maintainer, packageName}
 import com.typesafe.sbt.packager.archetypes.scripts.BashStartScriptPlugin.autoImport.{bashScriptDefines, bashScriptExtraDefines}
 import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport._
 object Settings {
+
+  val sdk8 = "adoptopenjdk/openjdk8:x86_64-ubuntu-jdk8u212-b03-slim"
+  val sdk11 = "adoptopenjdk/openjdk11:x86_64-alpine-jdk-11.0.4_11-slim"
   
   lazy val commonSettings = Seq(
     organization := "com.github.BambooTuna",
@@ -33,13 +36,13 @@ object Settings {
     fork := true,
     name := "loadtest",
     version := "latest",
-    dockerBaseImage := "adoptopenjdk/openjdk11:x86_64-alpine-jdk-11.0.4_11-slim",
+    dockerBaseImage := sdk8,
     maintainer in Docker := "BambooTuna <bambootuna@gmail.com>",
     dockerUpdateLatest := true,
     dockerUsername := Some("bambootuna"),
     mainClass in (Compile, bashScriptDefines) := Some("com.github.BambooTuna.LoadTest.boot.server.Main"),
     packageName in Docker := name.value,
-    dockerExposedPorts := Seq(8080, 8999),
+    dockerExposedPorts := Seq(8080),
     bashScriptExtraDefines ++= Seq(
       {
         val revision =
@@ -61,7 +64,8 @@ object Settings {
     fork := true,
     name := "loadtest-gatling",
     version := "latest",
-    dockerBaseImage := "adoptopenjdk/openjdk11:x86_64-alpine-jdk-11.0.4_11-slim",
+    //JDLの負荷試験の成績[20 ms < t < 50 ms](sdk8 : sdk11 = 2 : 1 = 40% : 20%)
+    dockerBaseImage := sdk8,
     maintainer in Docker := "BambooTuna <bambootuna@gmail.com>",
     dockerUpdateLatest := true,
     dockerUsername := Some("bambootuna"),
@@ -70,6 +74,11 @@ object Settings {
     mappings in Universal += {
       file(s"${sys.env.getOrElse("LOCAL_CREDENTIAL_PATH", "infrastructure/staging/gcp/terraform/account.json")}") -> "account.json"
     },
+//    IPv6（Javaでデフォルトで有効になっている）がパフォーマンスの問題を引き起こすことがあるため
+//    javaOptions in Universal ++= Seq(
+//      "-Djava.net.preferIPv4Stack=true",
+//      "-Djava.net.preferIPv6Addresses=false"
+//    ),
     scalacOptions ++= Seq(
       "-feature",
       "-deprecation",
@@ -95,6 +104,21 @@ object Settings {
       // Warn when imports are unused.
       "-Ywarn-unused-import",
       "-Ywarn-numeric-widen"
+    )
+  )
+
+  lazy val jvmSettings = Seq(
+    fork := true,
+    dockerExposedPorts := Seq(8999),
+    javaOptions in Universal ++= Seq(
+      "-server",
+      "-Djava.rmi.server.hostname=127.0.0.1",
+      s"-Dcom.sun.management.jmxremote.rmi.port=${sys.env.getOrElse("JMX_PORT", "8999")}",
+      "-Dcom.sun.management.jmxremote.ssl=false",
+      "-Dcom.sun.management.jmxremote.local.only=false",
+      "-Dcom.sun.management.jmxremote.authenticate=false",
+      "-Dcom.sun.management.jmxremote",
+      s"-Dcom.sun.management.jmxremote.port=${sys.env.getOrElse("JMX_PORT", "8999")}"
     )
   )
 

@@ -7,7 +7,6 @@
 Use `sbt-native-packager` to build docker image.
 ```bash
 $ sbt docker:publishLocal
-$ sbt gatling-runner/docker:publishLocal
 
 //$ sbt docker:stage
 ```
@@ -64,10 +63,23 @@ $ redis-cli
 ```
 
 ### Gatling Test
+- From local
+```bash
+$ sbt gatling-runner/docker:publishLocal
+...
+
+$ docker run \
+-e GATLING_BASE_URL=http://35.200.14.159:8080 \
+-e GATLING_USERS=1000 \
+--rm bambootuna/gatling-runner
+...
+
+$ docker cp [Conteiner ID]:/opt/docker/ ./target
+```
+
+- See docker status(cpu : memory)
 ```sbtshell
-$ GATLING_BASE_URL=http://localhost:8080 \
-MR_GATLING_USERS=10000 \
-sbt clean gatling:test
+$ docker stats [Conteiner ID]
 ```
 
 ### Locust Test
@@ -230,6 +242,9 @@ After pushed, see next page.
 Cloud builder should e moving.  
 
 ## References
+- Gatling
+[複数台のgatlingサーバを用いた負荷試験について](https://ceblog.mediba.jp/post/160686944382/%E8%A4%87%E6%95%B0%E5%8F%B0%E3%81%AEgatling%E3%82%B5%E3%83%BC%E3%83%90%E3%82%92%E7%94%A8%E3%81%84%E3%81%9F%E8%B2%A0%E8%8D%B7%E8%A9%A6%E9%A8%93%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)
+
 - DaoImpl
 [scala-ddd-base](https://github.com/j5ik2o/scala-ddd-base)
 

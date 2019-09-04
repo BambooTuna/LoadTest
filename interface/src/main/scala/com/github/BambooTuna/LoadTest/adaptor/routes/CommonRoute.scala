@@ -12,7 +12,7 @@ case class CommonRoute() {
   val topHistogram  = Kamon.metrics.histogram(this.getClass.getName + "-top")
   val pingHistogram = Kamon.metrics.histogram(this.getClass.getName + "-ping")
 
-  def top: Route = complete("Top Page!")
+  def top: Route = complete(StatusCodes.OK, "Top Page!")
 
   def ping: Route = {
     val time   = java.time.Instant.now().getEpochSecond
