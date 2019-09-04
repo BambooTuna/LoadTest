@@ -186,3 +186,9 @@ object Aerospike {
   
   val all = Seq(core, client, example, proto)
 }
+
+object GoogleAPIs {
+
+  val cloudStorage = "com.google.cloud" % "google-cloud-storage" % "1.89.0"
+  
+}

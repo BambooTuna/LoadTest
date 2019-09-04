@@ -82,7 +82,9 @@ jobs:
             export GATLING_IMAGE_NAME=gcr.io/${GOOGLE_PROJECT_ID}/${GATLING_IMAGE}
 
             sbt docker:publishLocal
-            sbt gatling-test/docker:publishLocal
+
+            export LOCAL_CREDENTIAL_PATH=${HOME}/account.json
+            sbt gatling-runner/docker:publishLocal
 
             docker tag ${APP_IMAGE}:latest ${IMAGE_NAME}:latest
             docker push ${IMAGE_NAME}

@@ -94,6 +94,7 @@ lazy val `gatling-runner` = (project in file("tools/gatling-runner"))
   .settings(
     name := "gatling-runner",
     libraryDependencies ++= Seq(
+      GoogleAPIs.cloudStorage
     ) ++ Gatling.all
   )
   .dependsOn(

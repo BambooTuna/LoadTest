@@ -1,10 +1,10 @@
 import sbt.Keys._
 import sbt._
 import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport._
+import com.typesafe.sbt.SbtNativePackager.Universal
 import com.typesafe.sbt.SbtNativePackager.autoImport.{maintainer, packageName}
 import com.typesafe.sbt.packager.archetypes.scripts.BashStartScriptPlugin.autoImport.{bashScriptDefines, bashScriptExtraDefines}
 import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport._
-
 object Settings {
   
   lazy val commonSettings = Seq(
@@ -67,6 +67,9 @@ object Settings {
     dockerUsername := Some("bambootuna"),
     mainClass in (Compile, bashScriptDefines) := Some("com.github.BambooTuna.LoadTest.gatling.runner.Runner"),
     packageName in Docker := name.value,
+    mappings in Universal += {
+      file(s"${sys.env.getOrElse("LOCAL_CREDENTIAL_PATH", "infrastructure/staging/gcp/terraform/account.json")}") -> "account.json"
+    },
     scalacOptions ++= Seq(
       "-feature",
       "-deprecation",
