@@ -17,33 +17,37 @@ object Runner extends App {
   val location           = config.getString("gatling.gcp.location")
   val bucketName         = config.getString("gatling.gcp.bucket-name")
 
-  val simulationClassName = config.getString("gatling.simulation-classname")
+  val simulationClassNames = Seq(config.getString("gatling.simulation-classname"))
 
   val gatlingConfig = ConfigFactory.load("gatling.conf")
   val gatlingDir    = gatlingConfig.getString("gatling.core.directory.results")
 
-  val dynamic                       = new ReflectiveDynamicAccess(getClass.getClassLoader)
-  val clazz: Class[_ <: Simulation] = dynamic.getClassFor[Simulation](simulationClassName).get
-  val simulationName                = clazz.getSimpleName
+  val dynamic = new ReflectiveDynamicAccess(getClass.getClassLoader)
 
-  println(s"Simulation class is: ${clazz.getCanonicalName}")
-  println(s"Simulation name is: $simulationName")
+  simulationClassNames.foreach(run)
 
-  val props = new GatlingPropertiesBuilder
-  props
-    .simulationClass(clazz.getCanonicalName)
+  def run(simulationClassName: String) = {
 
-  Gatling.fromMap(props.build)
+    val clazz: Class[_ <: Simulation] = dynamic.getClassFor[Simulation](simulationClassName).get
+    val simulationName                = clazz.getSimpleName
 
-  val latestTimestamp = new File(gatlingDir).listFiles().map(_.getName.split("-")(1).toLong).max
-  val targetLogFile   = s"$gatlingDir/${simulationName.toLowerCase()}-$latestTimestamp/simulation.log"
+    val props = new GatlingPropertiesBuilder
+    props
+      .simulationClass(clazz.getCanonicalName)
+    Gatling.fromMap(props.build)
 
-  println("generated gatling log file is " + targetLogFile)
+    val latestTimestamp = new File(gatlingDir).listFiles().map(_.getName.split("-")(1).toLong).max
+    val targetLogFile   = s"$gatlingDir/${simulationName.toLowerCase()}-$latestTimestamp/simulation.log"
+    val keyName         = s"gatling_log/${clazz.getCanonicalName}/${java.util.UUID.randomUUID()}.log"
 
-  val keyName = s"test/${java.util.UUID.randomUUID()}.log"
-  println(s"sending to bucket `$bucketName` with key `$keyName`")
+    val gcs = GoogleCloudStorage(projectName, credentialFilePath)
+    gcs
+      .createBucket(bucketName, location)
+      .create(
+        keyName,
+        new FileInputStream(targetLogFile)
+      )
 
-  val gcs = GoogleCloudStorage(projectName, credentialFilePath)
-  gcs.createBucket(bucketName, location).create(keyName, new FileInputStream(targetLogFile))
+  }
 
 }

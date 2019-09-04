@@ -5,10 +5,6 @@ import com.google.auth.oauth2.ServiceAccountCredentials
 import com.google.cloud.storage.Storage
 import com.google.cloud.storage.StorageOptions
 
-import java.nio.charset.StandardCharsets.UTF_8
-import com.google.cloud.storage.Blob
-import com.google.cloud.storage.BlobId
-import com.google.cloud.storage.BlobInfo
 import com.google.cloud.storage.Bucket
 import com.google.cloud.storage.BucketInfo
 
@@ -26,18 +22,18 @@ case class GoogleCloudStorage(projectName: String, credentialFilePath: String) {
       .build()
       .getService
 
-  def createBucket(bucketName: String, location: String): Bucket =
-    storage.create(
-      BucketInfo
-        .newBuilder(bucketName)
-        .setLocation(location)
-        .build()
-    )
+  def getBucket(bucketName: String): Option[Bucket] =
+    Option(storage.get(bucketName))
 
-  def createTestBlob(bucketName: String, filePath: String): Blob = {
-    val blobId: BlobId     = BlobId.of(bucketName, filePath)
-    val blobInfo: BlobInfo = BlobInfo.newBuilder(blobId).build()
-    storage.create(blobInfo, "a simple blob".getBytes(UTF_8))
+  def createBucket(bucketName: String, location: String): Bucket = {
+    getBucket(bucketName).getOrElse(
+      storage.create(
+        BucketInfo
+          .newBuilder(bucketName)
+          .setLocation(location)
+          .build()
+      )
+    )
   }
 
 }

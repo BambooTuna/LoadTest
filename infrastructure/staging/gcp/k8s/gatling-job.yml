@@ -1,15 +1,24 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: gatling
+  name: gatling-runner
 spec:
+  backoffLimit: 1
+  parallelism: 1
+  completions: 1
   template:
     metadata:
-      name: gatling
+      labels:
+        name: gatling-runner
     spec:
-      restartPolicy: Never
       containers:
-        - name: gatling
+        - name: gatling-runner
           image: GATLING_IMAGE_NAME
-          imagePullPolicy: IfNotPresent
-#          command: ["sbt",  "clean", "gatling:test"]
+          resources:
+            limits:
+              cpu: 500m
+              memory: 2500Mi
+            requests:
+              cpu: 500m
+              memory: 2500Mi
+      restartPolicy: Never
