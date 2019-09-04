@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gatling
+spec:
+  template:
+    metadata:
+      name: gatling
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: gatling
+          image: GATLING_IMAGE_NAME
+          imagePullPolicy: IfNotPresent
+#          command: ["sbt",  "clean", "gatling:test"]

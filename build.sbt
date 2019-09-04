@@ -72,19 +72,34 @@ lazy val boot = (project in file("boot"))
   .dependsOn(interface, infrastructure)
 
 lazy val `gatling-test` = (project in file("tools/gatling-test"))
-  .enablePlugins(JavaAppPackaging, AshScriptPlugin, DockerPlugin)
   .settings(commonSettings)
-  .settings(gatlingCommonSettings)
   .enablePlugins(GatlingPlugin)
   .settings(
+    name := "gatling-test",
     libraryDependencies ++= Seq(
       Circe.core,
       Circe.generic,
       Circe.parser,
+    ) ++ Gatling.all,
+    publishArtifact in(GatlingIt, packageBin) := true
+  )
+  .settings(addArtifact(artifact in(GatlingIt, packageBin), packageBin in GatlingIt))
+  .dependsOn(interface)
+
+lazy val `gatling-runner` = (project in file("tools/gatling-runner"))
+  .enablePlugins(JavaAppPackaging, AshScriptPlugin, DockerPlugin)
+  .enablePlugins(GatlingPlugin)
+  .settings(commonSettings)
+  .settings(gatlingCommonSettings)
+  .settings(
+    name := "gatling-runner",
+    libraryDependencies ++= Seq(
     ) ++ Gatling.all
   )
-  .dependsOn(interface)
+  .dependsOn(
+    `gatling-test` % "compile->gatling-it"
+  )
 
 lazy val root =
   (project in file("."))
-    .aggregate(boot, `gatling-test`)
+    .aggregate(boot, `gatling-test`, `gatling-runner`)
