@@ -78,7 +78,7 @@ jobs:
             export APP_IMAGE=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}" | tr '[:upper:]' '[:lower:]'`
             export IMAGE_NAME=gcr.io/${GOOGLE_PROJECT_ID}/${APP_IMAGE}
 
-            export GATLING_IMAGE=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}-gatling" | tr '[:upper:]' '[:lower:]'`
+            export GATLING_IMAGE=`echo "${CIRCLE_PROJECT_USERNAME}/gatling-runner" | tr '[:upper:]' '[:lower:]'`
             export GATLING_IMAGE_NAME=gcr.io/${GOOGLE_PROJECT_ID}/${GATLING_IMAGE}
 
             sbt docker:publishLocal
@@ -115,7 +115,7 @@ jobs:
             export DOCKER_TAG=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}" | tr '[:upper:]' '[:lower:]'`
             export IMAGE_NAME=gcr.io/${GOOGLE_PROJECT_ID}/${DOCKER_TAG}:latest
 
-            export GATLING_IMAGE=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}-gatling" | tr '[:upper:]' '[:lower:]'`
+            export GATLING_IMAGE=`echo "${CIRCLE_PROJECT_USERNAME}/gatling-runner" | tr '[:upper:]' '[:lower:]'`
             export GATLING_IMAGE_NAME=gcr.io/${GOOGLE_PROJECT_ID}/${GATLING_IMAGE}:latst
 
             export DB_IMAGE=gcr.io/${GOOGLE_PROJECT_ID}/mysql
