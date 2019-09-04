@@ -86,10 +86,10 @@ jobs:
             export LOCAL_CREDENTIAL_PATH=${HOME}/account.json
             sbt gatling-runner/docker:publishLocal
 
-            docker tag ${APP_IMAGE}:${CIRCLE_TAG} ${IMAGE_NAME}:${CIRCLE_TAG}
+            docker tag ${APP_IMAGE}:latest ${IMAGE_NAME}:${CIRCLE_TAG}
             docker push ${IMAGE_NAME}
 
-            docker tag ${GATLING_IMAGE}:${CIRCLE_TAG} ${GATLING_IMAGE_NAME}:${CIRCLE_TAG}
+            docker tag ${GATLING_IMAGE}:latest ${GATLING_IMAGE_NAME}:${CIRCLE_TAG}
             docker push ${GATLING_IMAGE_NAME}
 
             cd tools/mysql
