@@ -1,6 +1,5 @@
 # replace env
 sed -i -e 's!IMAGE_NAME!'${IMAGE_NAME}'!' ./app-deployment.yml
-sed -i -e 's!GATLING_IMAGE_NAME!'${GATLING_IMAGE_NAME}'!' ./gatling-job.yml
 
 kubectl create serviceaccount --namespace kube-system tiller
 kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
@@ -21,9 +20,6 @@ kubectl apply -f ./db-secret.yml
 
 # setup app
 kubectl apply -f ./app-deployment.yml
-
-# setup gatling
-kubectl apply -f ./gatling-job.yml
 
 # view logs
 kubectl get svc,pod,rc

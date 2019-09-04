@@ -73,13 +73,25 @@ $ docker run \
 -e GATLING_USERS=1000 \
 --rm bambootuna/gatling-runner
 ...
+$ docker cp [Conteiner ID]:/opt/docker/tools/gatling-runner/target/gatling ./tools/gatling-runner/target/
 
-$ docker cp [Conteiner ID]:/opt/docker/ ./target
+//See docker status(cpu : memory)
+$ docker stats [Conteiner ID]
 ```
 
-- See docker status(cpu : memory)
+- from server
 ```sbtshell
-$ docker stats [Conteiner ID]
+$ gcloud container clusters get-credentials gatling-runner-cluster --zone asia-northeast1-a --project [Your project id]
+$ cd infrastructure/staging/gcp/k8s
+$ kubectl apply -f ./gatling-job.yml
+$ kubectl delete job gatling-runner
+```
+
+- Create html report from `simulation.log`
+`tools/gatling-runner/target/gatling/pingsimulation-ooooooooooooooo`にログファイルを入れる  
+名前が被らないように適当にインデックスをつけて以下を実行するとHTML形式ファイルが生成される  
+```sbtshell
+$ sbt gatling-runner/gatling-it:generateReport
 ```
 
 ### Locust Test

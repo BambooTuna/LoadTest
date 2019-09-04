@@ -14,11 +14,16 @@ spec:
       containers:
         - name: gatling-runner
           image: GATLING_IMAGE_NAME
+          env:
+            - name: GATLING_BASE_URL
+              value: "http://35.200.14.159:8080"
+            - name: GATLING_USERS
+              value: "500"
           resources:
             limits:
-              cpu: 500m
-              memory: 2500Mi
+              cpu: 1000m
+              memory: 1000Mi
             requests:
-              cpu: 500m
-              memory: 2500Mi
+              cpu: 1000m
+              memory: 1000Mi
       restartPolicy: Never

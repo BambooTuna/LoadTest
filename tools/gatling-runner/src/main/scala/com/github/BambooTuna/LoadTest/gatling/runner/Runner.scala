@@ -49,6 +49,5 @@ object Runner extends App {
       )
 
   }
-  Thread.sleep(1000000)
 
 }
