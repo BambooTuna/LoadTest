@@ -62,7 +62,7 @@ resource "google_container_cluster" "default" {
 resource "google_container_cluster" "loadtest-server" {
   name               = "gatling-runner-cluster"
   zone               = "${var.GOOGLE_COMPUTE_ZONE}"
-  initial_node_count = 1
+  initial_node_count = 4
   network            = "${google_compute_subnetwork.default.name}"
   subnetwork         = "${google_compute_subnetwork.default.name}"
 
