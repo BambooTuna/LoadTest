@@ -1,34 +1,49 @@
 package com.github.BambooTuna.LoadTest.boot.server
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.model.HttpMethods.{ GET, POST, PUT }
+import java.io.File
+
+import akka.NotUsed
+import akka.actor.{Actor, ActorSystem, Props}
+import akka.http.scaladsl.model.HttpMethods.{GET, POST, PUT}
+import akka.http.scaladsl.model.StatusCodes
 import akka.stream.ActorMaterializer
 import com.github.BambooTuna.LoadTest.adaptor.routes._
 import org.slf4j.LoggerFactory
 import akka.http.scaladsl.server.Directives._
+import akka.stream.scaladsl.{Flow, RunnableGraph, Sink, Source}
+import com.aerospike.client.AerospikeClient
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.aerospike.AerospikeSetting
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.jdbc.JdbcSetting
-import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.{ OnAerospikeClient, OnRedisClient, OnSlickClient }
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.{OnAerospikeClient, OnRedisClient, OnSlickClient}
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.redis.RedisSetting
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.aerospike.UserRepositoryOnAerospikeImpl
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.jdbc.UserRepositoryOnJDBCImpl
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis.UserRepositoryOnRedisImpl
-import com.github.BambooTuna.LoadTest.usecase.{ AddUserUseCaseImpl, GetUserUseCaseImpl }
+import com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis.{AdvertiserIdRepositoryOnRedisImpl, BudgetRepositoryOnRedisImpl, UserInfoRepositoryOnRedisImpl}
+import com.github.BambooTuna.LoadTest.boot.server.SetupRedis.tryProcessSource
+import com.github.BambooTuna.LoadTest.domain.model.dsp.ad.WinNoticeEndpoint
+import com.github.BambooTuna.LoadTest.usecase.command.DspCommandProtocol.AddUserCommandRequest
+import com.github.BambooTuna.LoadTest.usecase.{AddUserInfoUseCase, AddWinUseCase, _}
+import com.github.BambooTuna.LoadTest.usecase.calculate.{CalculateModelUseCase, CalculateModelUseCaseImpl}
+import com.github.BambooTuna.LoadTest.usecase.json.UserDataJson
+import monix.eval.Task
+import monix.execution.Scheduler.Implicits.global
+
+import scala.concurrent.Future
+import scala.io.Source
+import scala.util.Try
 
 object Routes {
 
   val logger = LoggerFactory.getLogger(getClass)
 
-  def createRouter(jdbcSetting: JdbcSetting, redisSetting: RedisSetting, aerospikeSetting: AerospikeSetting)(
+  def createRouter(jdbcSetting: JdbcSetting, redisSettings: RedisSetting, aerospikeSetting: AerospikeSetting)(
       implicit system: ActorSystem,
       materializer: ActorMaterializer
   ): Router = {
 
-    val slickClient: OnSlickClient         = jdbcSetting.client
-    val redisClient: OnRedisClient         = redisSetting.client
+    val mysqlClient: OnSlickClient       = jdbcSetting.client
+    val redisClient: OnRedisClient = redisSettings.client
     val aerospikeClient: OnAerospikeClient = aerospikeSetting.client
 
-    commonRouter + mysqlRouter(slickClient) + redisRouter(redisClient) + aerospikeRouter(aerospikeClient)
+    commonRouter + dspServerRouter(mysqlClient, redisClient, aerospikeClient)
   }
 
   def commonRouter(implicit materializer: ActorMaterializer): Router =
@@ -37,30 +52,106 @@ object Routes {
       route(GET, "ping", CommonRoute().ping)
     )
 
-  def mysqlRouter(client: OnSlickClient)(implicit materializer: ActorMaterializer): Router = {
-    val repository = new UserRepositoryOnJDBCImpl(client)
-    Router(
-      route(GET, "user" / "get", GetUserRoute(GetUserUseCaseImpl(repository)).route),
-      route(POST, "user" / "add", AddUserRoute(AddUserUseCaseImpl(repository)).route),
-      route(PUT, "user" / "update", EditUserRoute().route)
-    )
-  }
+  def dspServerRouter(mysqlClient: OnSlickClient, redisClient: OnRedisClient, aerospikeClient: OnAerospikeClient)(implicit system: ActorSystem, materializer: ActorMaterializer): Router = {
+    val (userRedisClients, o)                  = clientCluster.redisClients.splitAt(3)
+    val (adidRedisClients, budgetRedisClients) = o.splitAt(3)
 
-  def redisRouter(client: OnRedisClient)(implicit materializer: ActorMaterializer): Router = {
-    val repository = new UserRepositoryOnRedisImpl(client)
-    Router(
-      route(GET, "redis" / "user" / "get", GetUserRoute(GetUserUseCaseImpl(repository)).route),
-      route(POST, "redis" / "user" / "add", AddUserRoute(AddUserUseCaseImpl(repository)).route),
-      route(PUT, "redis" / "user" / "update", EditUserRoute().route)
-    )
-  }
+    require(userRedisClients.size == 3 && adidRedisClients.size == 3, budgetRedisClients.size == 1)
 
-  def aerospikeRouter(client: OnAerospikeClient)(implicit materializer: ActorMaterializer): Router = {
-    val repository = new UserRepositoryOnAerospikeImpl(client)
+    val userRepositories = userRedisClients.map(new UserInfoRepositoryOnRedisImpl(_))
+    val adidRepository   = adidRedisClients.map(new AdvertiserIdRepositoryOnRedisImpl(_))
+    val budgetRepository = budgetRedisClients.map(new BudgetRepositoryOnRedisImpl(_))
+
+    val getUserUseCase: GetUserInfoUseCase = GetUserInfoUseCaseImpl(
+      UserInfoRepositoryBalancer(userRepositories)
+    )
+
+    val getBudgetUseCase: GetBudgetUseCase = GetBudgetUseCase(
+      BudgetRepositoryBalancer(budgetRepository)
+    )
+
+    val getAdIdUseCase: GetAdvertiserIdUseCase = GetAdvertiserIdUseCase(
+      GetAdvertiserIdRepositoryBalancer(adidRepository)
+    )
+    val addAdIdUseCase: AddAdIdUseCase = AddAdIdUseCaseImpl(
+      GetAdvertiserIdRepositoryBalancer(adidRepository)
+    )
+
+    val addWinUseCase: AddWinUseCase = AddWinUseCaseImpl(
+      budgetRepository.head,
+      getAdIdUseCase
+    )
+
+    val addUserUseCase: AddUserInfoUseCase = AddUserInfoUseCase(
+      UserInfoRepositoryBalancer(userRepositories)
+    )
+
+    val setBudgetUseCase: SetBudgetUseCase = SetBudgetUseCaseImpl(
+      BudgetRepositoryBalancer(budgetRepository)
+    )
+
+    val calculateModelUseCase: CalculateModelUseCase = CalculateModelUseCaseImpl()
+    val getModelUseCase: GetModelUseCase             = GetModelUseCaseImpl(calculateModelUseCase)
+
+//    val actor = system.actorOf(Props(classOf[SetDataActor], addUserUseCase), "SetDataActor")
+
+    val tryLinesIrvingTxNoHeader: Try[List[List[String]]] =
+      tryProcessSource(
+        new File("/opt/docker/sample_user.csv"),
+        parseLine = (index, unparsedLine) => Some(unparsedLine.split(",").toList),
+        filterLine = (index, parsedValues) =>
+          Some(
+            index != 0 //skip header line
+        )
+      )
+
+    tryLinesIrvingTxNoHeader.map(_.map {
+      case List(a, b, c, d, e, f, g) =>
+        val j = UserDataJson(a, b.toInt, c.toDouble, d.toDouble, e.toDouble, f.toDouble, g.toDouble)
+        addUserUseCase.run(AddUserCommandRequest(j))
+    })
+
     Router(
-      route(GET, "aerospike" / "user" / "get", GetUserRoute(GetUserUseCaseImpl(repository)).route),
-      route(POST, "aerospike" / "user" / "add", AddUserRoute(AddUserUseCaseImpl(repository)).route),
-      route(PUT, "aerospike" / "user" / "update", EditUserRoute().route)
+      route(
+        POST,
+        "bid_request",
+        BidRequestRoute(
+          BidRequestUseCaseImpl(
+            getUserUseCase,
+            addAdIdUseCase,
+            getBudgetUseCase,
+            getModelUseCase,
+            WinNoticeEndpoint("http://34.84.137.136:8080/win") //TODO
+          )
+        ).route
+      ),
+      route(POST, "win", WinResultRoute(addWinUseCase).route),
+      route(POST,
+            "user" / "add",
+            AddUserRoute(
+              addUserUseCase
+            ).route),
+      route(POST,
+            "budget" / "set",
+            SetBudgetRoute(
+              setBudgetUseCase
+            ).route),
+      route(
+        GET,
+        "setup",
+        extractActorSystem { implicit system =>
+          extractRequestContext { c =>
+            println("actor ! run")
+//            actor ! "run"
+            val f = Task {
+              println("none task")
+            }.runToFuture
+            onSuccess(f) {
+              case _ => c.complete(StatusCodes.OK)
+            }
+          }
+        }
+      )
     )
   }
 
