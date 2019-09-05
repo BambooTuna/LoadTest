@@ -91,7 +91,7 @@ $ kubectl delete job gatling-runner
 `tools/gatling-runner/target/gatling/pingsimulation-ooooooooooooooo`にログファイルを入れる  
 名前が被らないように適当にインデックスをつけて以下を実行するとHTML形式ファイルが生成される  
 ```sbtshell
-$ sbt gatling-runner/gatling-it:generateReport
+$ sbt gatling-runner/gatling:generateReport
 ```
 
 ### Locust Test
