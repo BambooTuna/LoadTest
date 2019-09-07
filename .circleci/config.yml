@@ -152,8 +152,8 @@ workflows:
 #                - develop
 #                - /feature\/develop\/.+/
       - push:
-          requires:
-            - staging
+#          requires:
+#            - staging
           filters:
             branches:
               only:
