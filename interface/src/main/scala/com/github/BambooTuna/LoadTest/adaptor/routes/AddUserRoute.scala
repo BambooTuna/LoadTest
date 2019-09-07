@@ -12,8 +12,8 @@ import akka.http.scaladsl.server.Directives.{
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 
-import com.github.BambooTuna.LoadTest.usecase.AddUserUseCase
-import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol._
+import com.github.BambooTuna.LoadTest.usecase.AddUserInfoUseCase
+import com.github.BambooTuna.LoadTest.usecase.command.DspCommandProtocol._
 import com.github.BambooTuna.LoadTest.usecase.json.UserDataJson
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import kamon.Kamon
@@ -22,7 +22,7 @@ import monix.execution.Scheduler.Implicits.global
 import io.circe.syntax._
 import io.circe.generic.auto._
 
-case class AddUserRoute(addUserUseCase: AddUserUseCase)(implicit materializer: ActorMaterializer)
+case class AddUserRoute(addUserUseCase: AddUserInfoUseCase)(implicit materializer: ActorMaterializer)
     extends FailFastCirceSupport {
 
   val successCounter   = Kamon.metrics.counter(this.getClass.getName + "-success")

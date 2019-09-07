@@ -43,6 +43,9 @@ object Settings {
     mainClass in (Compile, bashScriptDefines) := Some("com.github.BambooTuna.LoadTest.boot.server.Main"),
     packageName in Docker := name.value,
     dockerExposedPorts := Seq(8080),
+    mappings in Universal += {
+      file(s"${sys.env.getOrElse("REDIS_USER_CSV_PATH", "sample_user.csv")}") -> "sample_user.csv"
+    },
     bashScriptExtraDefines ++= Seq(
       {
         val revision =
