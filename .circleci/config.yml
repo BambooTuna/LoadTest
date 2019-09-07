@@ -139,18 +139,18 @@ workflows:
   version: 2
   build-n-deploy:
     jobs:
-      - build:
-          filters:
-            tags:
-              only: /.*/
-      - staging:
-          requires:
-            - build
-          filters:
-            branches:
-              only:
-                - develop
-                - /feature\/develop\/.+/
+#      - build:
+#          filters:
+#            tags:
+#              only: /.*/
+#      - staging:
+#          requires:
+#            - build
+#          filters:
+#            branches:
+#              only:
+#                - develop
+#                - /feature\/develop\/.+/
       - push:
           requires:
             - staging

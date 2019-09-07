@@ -44,11 +44,11 @@ trait UserComponentOnJDBC extends DaoOnSlick {
     UserRecord(
       id.value,
       item.advertiser_id,
-      item.game_install_count,
-      item.game_login_count,
-      item.game_paid_count,
-      item.game_tutorial_count,
-      item.game_extension_count
+      item.game_install_count.toInt,
+      item.game_login_count.toInt,
+      item.game_paid_count.toInt,
+      item.game_tutorial_count.toInt,
+      item.game_extension_count.toInt
     )
 
   def convertToAggregate(item: UserRecord): UserDataJson =

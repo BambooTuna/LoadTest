@@ -15,8 +15,10 @@ import com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis.{AdIdRepo
 import com.github.BambooTuna.LoadTest.domain.model.ad.WinRedirectUrl
 import com.github.BambooTuna.LoadTest.usecase.{AddUserUseCase, AddWinUseCase, _}
 import com.github.BambooTuna.LoadTest.usecase.calculate.{CalculateModelUseCase, CalculateModelUseCaseImpl}
+import com.github.BambooTuna.LoadTest.usecase.json.UserDataJson
 
 import scala.io.Source
+import scala.util.Try
 
 object Routes {
 
@@ -93,7 +95,7 @@ object Routes {
             addAdIdUseCase,
             getBudgetUseCase,
             getModelUseCase,
-            WinRedirectUrl("http://34.84.220.110:8080/win") //TODO
+            WinRedirectUrl("http://34.84.137.136:8080/win") //TODO
           )
         ).route
       ),
@@ -108,6 +110,72 @@ object Routes {
             SetBudgetRoute(
               setBudgetUseCase
             ).route)
+    )
+  }
+
+  def addDataToRedis = {
+    val tryLinesIrvingTxNoHeader: Try[List[List[String]]] =
+      tryProcessSource(
+        new File("C:/Users/Jim/Desktop/test.csv"),
+        parseLine = (index, unparsedLine) => Some(unparsedLine.split(",").toList),
+      )
+
+    tryLinesIrvingTxNoHeader.map(_.map{
+      case List(device_id, advertiser_id, game_install_count, game_login_count, game_paid_count, game_tutorial_count, game_extension_count) =>
+        UserDataJson(device_id, advertiser_id.toInt, game_install_count.toDouble, game_login_count.toDouble, game_paid_count.toDouble, game_tutorial_count.toDouble, game_extension_count.toDouble)
+    })
+
+  }
+
+
+  import scala.io.Source
+  import scala.util.Try
+
+  import java.io.File
+
+  def tryProcessSource(
+      file: File,
+      parseLine: (Int, String) => Option[List[String]] = (index, unparsedLine) => Some(List(unparsedLine)),
+      filterLine: (Int, List[String]) => Option[Boolean] = (index, parsedValues) => Some(true),
+      retainValues: (Int, List[String]) => Option[List[String]] = (index, parsedValues) => Some(parsedValues)
+  ): Try[List[List[String]]] = {
+    def usingSource[S <: Source, R](source: S)(transfer: S => R): Try[R] =
+      try { Try(transfer(source)) } finally { source.close() }
+    def recursive(
+        remaining: Iterator[(String, Int)],
+        accumulator: List[List[String]],
+        isEarlyAbort: Boolean = false
+    ): List[List[String]] = {
+      if (isEarlyAbort || !remaining.hasNext)
+        accumulator
+      else {
+        val (line, index) =
+          remaining.next
+        parseLine(index, line) match {
+          case Some(values) =>
+            filterLine(index, values) match {
+              case Some(keep) =>
+                if (keep)
+                  retainValues(index, values) match {
+                    case Some(valuesNew) =>
+                      recursive(remaining, valuesNew :: accumulator) //capture values
+                    case None =>
+                      recursive(remaining, accumulator, isEarlyAbort = true) //early abort
+                  } else
+                  recursive(remaining, accumulator) //discard row
+              case None =>
+                recursive(remaining, accumulator, isEarlyAbort = true) //early abort
+            }
+          case None =>
+            recursive(remaining, accumulator, isEarlyAbort = true) //early abort
+        }
+      }
+    }
+    Try(Source.fromFile(file)).flatMap(
+      bufferedSource =>
+        usingSource(bufferedSource) { source =>
+          recursive(source.getLines().buffered.zipWithIndex, Nil).reverse
+      }
     )
   }
 

@@ -20,7 +20,7 @@ metadata:
   labels:
     app: loadtest
 spec:
-  replicas: 80
+  replicas: 60
   selector:
     matchLabels:
       app: loadtest
@@ -71,9 +71,9 @@ spec:
         resources:
           requests:
             memory: "1512Mi"
-            cpu: "1200m"
+            cpu: "2000m"
           limits:
             memory: "1512Mi"
-            cpu: "1200m"
+            cpu: "2000m"
         ports:
         - containerPort: 8080
