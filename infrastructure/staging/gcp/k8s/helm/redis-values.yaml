@@ -6,7 +6,7 @@ image:
 
 cluster:
   enabled: true
-  slaveCount: 2
+  slaveCount: 5
 
 redis:
   fullname: [name]

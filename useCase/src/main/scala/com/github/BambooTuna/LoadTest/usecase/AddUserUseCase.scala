@@ -4,9 +4,9 @@ import com.github.BambooTuna.LoadTest.adaptor.storage.repository.UserRepository
 import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol.{ AddUserCommandRequest, AddUserCommandResponse }
 import monix.eval.Task
 
-trait AddUserUseCase {
+trait AddUserUseCase extends UseCaseCommon {
 
-  val userRepository: UserRepository
+  val userRepositories: GetUserRepositoryBalance[UserRepository]
 
   def run(arg: AddUserCommandRequest): Task[AddUserCommandResponse]
 

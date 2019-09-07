@@ -75,10 +75,10 @@ jobs:
           name: Docker build and push
           command: |
             . ~/project/infrastructure/staging/gcp/gcloud-env
-            export APP_IMAGE=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}" | tr '[:upper:]' '[:lower:]'`
+            export APP_IMAGE="cyberagenthack/adtech-compe-2019-d-loadtest"
             export IMAGE_NAME=gcr.io/${GOOGLE_PROJECT_ID}/${APP_IMAGE}
 
-            export GATLING_IMAGE=`echo "${CIRCLE_PROJECT_USERNAME}/gatling-runner" | tr '[:upper:]' '[:lower:]'`
+            export GATLING_IMAGE="cyberagenthack/gatling-runner"
             export GATLING_IMAGE_NAME=gcr.io/${GOOGLE_PROJECT_ID}/${GATLING_IMAGE}
 
             sbt docker:publishLocal
@@ -112,10 +112,10 @@ jobs:
           command: |
             . ~/project/infrastructure/staging/gcp/gcloud-env
 
-            export DOCKER_TAG=`echo "${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}" | tr '[:upper:]' '[:lower:]'`
+            export DOCKER_TAG="cyberagenthack/adtech-compe-2019-d-loadtest"
             export IMAGE_NAME=gcr.io/${GOOGLE_PROJECT_ID}/${DOCKER_TAG}:${CIRCLE_SHA1}
 
-            export GATLING_IMAGE=`echo "${CIRCLE_PROJECT_USERNAME}/gatling-runner" | tr '[:upper:]' '[:lower:]'`
+            export GATLING_IMAGE="cyberagenthack/gatling-runner"
             export GATLING_IMAGE_NAME=gcr.io/${GOOGLE_PROJECT_ID}/${GATLING_IMAGE}:${CIRCLE_SHA1}
 
             export DB_IMAGE=gcr.io/${GOOGLE_PROJECT_ID}/mysql

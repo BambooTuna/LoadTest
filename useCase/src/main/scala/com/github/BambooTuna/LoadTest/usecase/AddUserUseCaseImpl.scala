@@ -1,35 +1,28 @@
 package com.github.BambooTuna.LoadTest.usecase
 
 import com.github.BambooTuna.LoadTest.adaptor.storage.repository.UserRepository
-import com.github.BambooTuna.LoadTest.domain.model.user.{ User, UserId }
-import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol.{
-  AddUserCommandFailed,
-  AddUserCommandRequest,
-  AddUserCommandResponse,
-  AddUserCommandSucceeded
-}
+import com.github.BambooTuna.LoadTest.domain.model.user.UserId
+import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol._
 import monix.eval.Task
 
-import scala.util.Random
-
-case class AddUserUseCaseImpl(userRepository: UserRepository) extends AddUserUseCase {
+case class AddUserUseCaseImpl(userRepositories: GetUserRepositoryBalance[UserRepository]) extends AddUserUseCase {
 
   override def run(arg: AddUserCommandRequest): Task[AddUserCommandResponse] = {
-
-    val id = Random.nextLong()
+    setResponseTimer
     (for {
       aggregate <- Task.pure(
-        User(
-          UserId(id),
-          arg.name,
-          arg.age
+        (
+          UserId(arg.user.device_id),
+          arg.user
         )
       )
-      _ <- userRepository.put(aggregate)
-    } yield aggregate.userId)
+      r <- userRepositories.getConnectionWithUserId(aggregate._1).put(aggregate)
+    } yield r)
       .map { result =>
-        AddUserCommandSucceeded(result)
+        successCounterIncrement
+        AddUserCommandSucceeded(UserId(result.toString))
       }.onErrorHandle { ex =>
+        failedCounterIncrement
         AddUserCommandFailed(ex.getMessage)
       }
 

@@ -192,3 +192,22 @@ object GoogleAPIs {
   val cloudStorage = "com.google.cloud" % "google-cloud-storage" % "1.89.0"
   
 }
+
+object ComputeScala {
+
+  private val computeVersion = "0.4.3"
+  private val openCLVersion = "3.1.0"
+
+  val cpu = "com.thoughtworks.compute" %% "cpu" % computeVersion
+  val gpu = "com.thoughtworks.compute" %% "gpu" % computeVersion
+
+  val openCL = ("org.lwjgl" % "lwjgl-opencl" % openCLVersion).jar().classifier {
+    "natives-linux"
+  }
+
+//  sealed case class Natives(value: String)
+//  case object Mac extends Natives("natives-macos")
+//  case object Linux extends Natives("natives-linux")
+//  case object Win extends Natives("natives-windows")
+
+}

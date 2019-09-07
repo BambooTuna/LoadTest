@@ -2,9 +2,9 @@ package com.github.BambooTuna.LoadTest.adaptor.storage.repository.aerospike
 
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.aerospike.UserComponentOnAerospike
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.OnAerospikeClient
+import com.github.BambooTuna.LoadTest.usecase.json.UserDataJson
 import monix.eval.Task
 import ru.tinkoff.aerospikescala.domain.SingleBin
-
 import io.circe._
 import io.circe.syntax._
 import io.circe.generic.auto._
@@ -19,7 +19,7 @@ class UserRepositoryOnAerospikeImpl(val client: OnAerospikeClient)
   override def get(id: Id): Task[Option[Record]] =
     Task
       .deferFutureAction { implicit ec =>
-        db.getString(generateKey(id)).map(parser.decode[RecordJson](_).map(convertToData).toOption)
+        db.getString(generateKey(id)).map(parser.decode[UserDataJson](_).map((id, _)).toOption)
       }
 
   override def getMulti(ids: Seq[Id]): Task[Seq[Record]] = ???
@@ -27,7 +27,7 @@ class UserRepositoryOnAerospikeImpl(val client: OnAerospikeClient)
   override def put(record: Record): Task[Long] =
     Task
       .deferFutureAction { implicit ec =>
-        db.putString(generateKey(record.userId), SingleBin("user_id", convertToJson(record).asJson.noSpaces)).map(
+        db.putString(generateKey(record._1), SingleBin("user_id", record.asJson.noSpaces)).map(
             _ => 1L
           )
       }

@@ -34,12 +34,12 @@ object Settings {
   
   lazy val dockerSettings = Seq(
     fork := true,
-    name := "loadtest",
+    name := "adtech-compe-2019-d-loadtest",
     version := "latest",
     dockerBaseImage := sdk11,
     maintainer in Docker := "BambooTuna <bambootuna@gmail.com>",
     dockerUpdateLatest := true,
-    dockerUsername := Some("bambootuna"),
+    dockerUsername := Some("cyberagenthack"),
     mainClass in (Compile, bashScriptDefines) := Some("com.github.BambooTuna.LoadTest.boot.server.Main"),
     packageName in Docker := name.value,
     dockerExposedPorts := Seq(8080),
@@ -62,13 +62,13 @@ object Settings {
 
   lazy val gatlingCommonSettings = Seq(
     fork := true,
-    name := "loadtest-gatling",
+    name := "adtech-compe-2019-d-loadtest-gatling",
     version := "latest",
     //JDLの負荷試験の成績[20 ms < t < 50 ms](sdk8 : sdk11 = 2 : 1 = 40% : 20%)
     dockerBaseImage := sdk8,
     maintainer in Docker := "BambooTuna <bambootuna@gmail.com>",
     dockerUpdateLatest := true,
-    dockerUsername := Some("bambootuna"),
+    dockerUsername := Some("cyberagenthack"),
     mainClass in (Compile, bashScriptDefines) := Some("com.github.BambooTuna.LoadTest.gatling.runner.Runner"),
     packageName in Docker := name.value,
     mappings in Universal += {

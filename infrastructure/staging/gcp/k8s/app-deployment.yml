@@ -20,7 +20,7 @@ metadata:
   labels:
     app: loadtest
 spec:
-  replicas: 18
+  replicas: 80
   selector:
     matchLabels:
       app: loadtest
@@ -62,8 +62,6 @@ spec:
               secretKeyRef:
                 name: dbsecret
                 key: databese_name
-          - name: LOADTEST_REDIS_HOST
-            value: "redis-service-master"
           - name: AEROSPIKE_HOST
             value: "aerospike-service"
           - name: DATADOG_HOSTNAME
@@ -72,10 +70,10 @@ spec:
                 fieldPath: status.hostIP
         resources:
           requests:
-            memory: "512Mi"
-            cpu: "361m"
+            memory: "1012Mi"
+            cpu: "800m"
           limits:
-            memory: "512Mi"
-            cpu: "361m"
+            memory: "1012Mi"
+            cpu: "800m"
         ports:
         - containerPort: 8080
