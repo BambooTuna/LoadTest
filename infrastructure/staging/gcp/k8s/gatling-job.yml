@@ -13,17 +13,17 @@ spec:
     spec:
       containers:
         - name: gatling-runner
-          image: GATLING_IMAGE_NAME
+          image: gcr.io/cyberagent-320/cyberagenthack/gatling-runner:6be4f7e5ad5018ff352912a1f1a57bef4bddfe7c
           env:
             - name: GATLING_BASE_URL
-              value: "http://35.200.14.159:8080"
+              value: "http://34.84.220.110:8080"
             - name: GATLING_USERS
-              value: "500"
+              value: "100"
           resources:
             limits:
-              cpu: 1000m
+              cpu: 5000m
               memory: 1000Mi
             requests:
-              cpu: 1000m
+              cpu: 5000m
               memory: 1000Mi
       restartPolicy: Never

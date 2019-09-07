@@ -28,6 +28,9 @@ lazy val useCase = (project in file("useCase"))
       Akka.http,
       Akka.stream,
       Akka.slf4j,
+      Akka.`akka-http-crice`,
+      ComputeScala.cpu,
+      ComputeScala.openCL
     )
       ++ Kamon.all
   )

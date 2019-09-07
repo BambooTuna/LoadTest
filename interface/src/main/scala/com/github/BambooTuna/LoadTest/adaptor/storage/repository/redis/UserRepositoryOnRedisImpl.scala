@@ -2,6 +2,7 @@ package com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis
 
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.OnRedisClient
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.redis.UserComponentOnRedis
+import com.github.BambooTuna.LoadTest.usecase.json.UserDataJson
 import monix.eval.Task
 
 import scala.concurrent.ExecutionContext
@@ -16,16 +17,15 @@ class UserRepositoryOnRedisImpl(client: OnRedisClient) extends UserRepositoryOnR
   override def get(id: Id): Task[Option[Record]] =
     Task
       .deferFutureAction { implicit ec =>
-        client.db.get[RecordJson](generateKey(id)).map(_.map(convertToData))
+        client.db.get[UserDataJson](generateKey(id)).map(_.map((id, _)))
       }
   override def getMulti(ids: Seq[Id]): Task[Seq[Record]] = ???
 
   override def put(record: Record): Task[Long] = {
-    val json = convertToJson(record)
     Task
       .deferFutureAction { implicit ec =>
         client.db
-          .set[RecordJson](generateKey(record.userId), json, exSeconds = None)
+          .set[UserDataJson](generateKey(record._1), record._2, exSeconds = None)
           .map(r => if (r) 1L else 0L)
       }
   }

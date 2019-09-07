@@ -14,7 +14,7 @@ class UserRepositoryOnJDBCImpl(val client: OnSlickClient) extends UserRepository
     Task
       .deferFutureAction { implicit ec =>
         client.db.run(dao.filter(_.userId === id.value).result)
-      }.map(_.headOption.map(convertToAggregate))
+      }.map(_.headOption.map(convertToAggregate).map((id, _)))
   }
 
   override def getMulti(ids: Seq[Id]): Task[Seq[Record]] = ???
@@ -22,7 +22,7 @@ class UserRepositoryOnJDBCImpl(val client: OnSlickClient) extends UserRepository
   override def put(record: Record): Task[Long] = {
     Task
       .deferFutureAction { implicit ec =>
-        client.db.run(dao += convertToRecord(record))
+        client.db.run(dao += convertToRecord(record._1, record._2))
       }.map(_.toLong)
   }
 

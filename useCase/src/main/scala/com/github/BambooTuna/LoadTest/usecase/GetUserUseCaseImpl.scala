@@ -1,6 +1,7 @@
 package com.github.BambooTuna.LoadTest.usecase
 
 import com.github.BambooTuna.LoadTest.adaptor.storage.repository.UserRepository
+import com.github.BambooTuna.LoadTest.domain.setting.TimeZoneSetting
 import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol.{
   GetUserCommandFailed,
   GetUserCommandRequest,
@@ -9,19 +10,21 @@ import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol.{
 }
 import monix.eval.Task
 
-case class GetUserUseCaseImpl(userRepository: UserRepository) extends GetUserUseCase {
+case class GetUserUseCaseImpl(userRepositories: GetUserRepositoryBalance[UserRepository]) extends GetUserUseCase {
 
   override def run(arg: GetUserCommandRequest): Task[GetUserCommandResponse] = {
-
+    setResponseTimer
     (for {
       aggregate <- Task.pure(
         arg.id
       )
-      r <- userRepository.get(aggregate)
+      r <- userRepositories.getConnectionWithUserId(aggregate).get(aggregate).timeout(TimeZoneSetting.timeout)
     } yield r)
       .map { result =>
-        GetUserCommandSucceeded(result.get)
+        successCounterIncrement
+        GetUserCommandSucceeded(result.get._2)
       }.onErrorHandle { ex =>
+        failedCounterIncrement
         GetUserCommandFailed(ex.getMessage)
       }
 
