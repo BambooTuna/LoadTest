@@ -15,10 +15,10 @@ case class CommonRoute() {
   def top: Route = complete(StatusCodes.OK, "Top Page!")
 
   def ping: Route = {
-    val time   = java.time.Instant.now().getEpochSecond
+    val time   = java.time.Instant.now().toEpochMilli
     val result = PongResponseJson("pong")
     val entity = HttpEntity(MediaTypes.`application/json`, result.asJson.noSpaces)
-    pingHistogram.record(java.time.Instant.now().getEpochSecond - time)
+    pingHistogram.record(java.time.Instant.now().toEpochMilli - time)
     complete(StatusCodes.OK, entity)
   }
 

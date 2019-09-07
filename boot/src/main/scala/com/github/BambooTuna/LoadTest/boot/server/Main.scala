@@ -9,13 +9,13 @@ import com.github.BambooTuna.LoadTest.adaptor.storage.dao.redis.RedisSetting
 import com.typesafe.config.{ Config, ConfigFactory }
 import kamon.Kamon
 import org.slf4j.LoggerFactory
-import ru.tinkoff.aerospike.dsl.SpikeImpl
-import ru.tinkoff.aerospikeexamples.example.AClient
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration._
+
+import collection.JavaConverters._
 
 object Main extends App {
 

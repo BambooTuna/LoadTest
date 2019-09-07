@@ -1,0 +1,6 @@
+device_id,advertiser_id,game_install_count,game_login_count,game_paid_count,game_tutorial_count,game_extension_count
+a,1,1.1,1.2,1.1,1.2,1.1
+s,2,1.1,1.2,1.1,1.2,1.1
+d,3,1.1,1.2,1.1,1.2,1.1
+f,4,1.1,1.2,1.1,1.2,1.1
+g,5,1.1,1.2,1.1,1.2,1.1
