@@ -1,27 +1,64 @@
-cat ./infrastructure/staging/gcp/terraform/account.json | docker login -u _json_key --password-stdin https://gcr.io
 
-. infrastructure/staging/gcp/gcloud-env
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":1,"event_type":0,"price":10000}' http://34.84.220.110:8080/budget/set
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":1,"event_type":1,"price":0}' http://34.84.220.110:8080/budget/set
 
-export CIRCLE_SHA1=100
-export APP_IMAGE=cyberagenthack/adtech-compe-2019-d-loadtest
-export IMAGE_NAME=gcr.io/${GOOGLE_PROJECT_ID}/${APP_IMAGE}
-sbt docker:publishLocal
-export LOCAL_CREDENTIAL_PATH=./infrastructure/staging/gcp/terraform/account.json
-sbt gatling-runner/docker:publishLocal
-docker tag ${APP_IMAGE}:latest ${IMAGE_NAME}:${CIRCLE_SHA1}
-docker push ${IMAGE_NAME}
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":2,"event_type":0,"price":10000}' http://34.84.220.110:8080/budget/set
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":2,"event_type":1,"price":0}' http://34.84.220.110:8080/budget/set
 
-docker tag ${GATLING_IMAGE}:latest ${GATLING_IMAGE_NAME}:${CIRCLE_SHA1}
-docker push ${GATLING_IMAGE_NAME}
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":3,"event_type":0,"price":10000}' http://34.84.220.110:8080/budget/set
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":3,"event_type":1,"price":0}' http://34.84.220.110:8080/budget/set
 
-curl https://storage.googleapis.com/kubernetes-helm/helm-v2.12.3-linux-amd64.tar.gz | tar zx linux-amd64/helm
-mv linux-amd64/helm /usr/local/bin/helm; rm -rf linux-amd64
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":4,"event_type":0,"price":10000}' http://34.84.220.110:8080/budget/set
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":4,"event_type":1,"price":0}' http://34.84.220.110:8080/budget/set
 
-gcloud auth activate-service-account --key-file ./infrastructure/staging/gcp/terraform/account.json
-gcloud --quiet config set project $GOOGLE_PROJECT_ID
-gcloud --quiet config set compute/region $GOOGLE_COMPUTE_REGION
-gcloud --quiet config set compute/zone $GOOGLE_COMPUTE_ZONE
-gcloud --quiet container clusters get-credentials $GOOGLE_CLUSTER_NAME
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":5,"event_type":0,"price":10000}' http://34.84.220.110:8080/budget/set
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":5,"event_type":1,"price":0}' http://34.84.220.110:8080/budget/set
 
-cd ./infrastructure/staging/gcp/k8s
-sh ./setup-k8s.sh
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":6,"event_type":0,"price":10000}' http://34.84.220.110:8080/budget/set
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":6,"event_type":1,"price":0}' http://34.84.220.110:8080/budget/set
+
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":7,"event_type":0,"price":10000}' http://34.84.220.110:8080/budget/set
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":7,"event_type":1,"price":0}' http://34.84.220.110:8080/budget/set
+
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":8,"event_type":0,"price":10000}' http://34.84.220.110:8080/budget/set
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":8,"event_type":1,"price":0}' http://34.84.220.110:8080/budget/set
+
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":9,"event_type":0,"price":10000}' http://34.84.220.110:8080/budget/set
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":9,"event_type":1,"price":0}' http://34.84.220.110:8080/budget/set
+
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":10,"event_type":0,"price":10000}' http://34.84.220.110:8080/budget/set
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":10,"event_type":1,"price":0}' http://34.84.220.110:8080/budget/set
+
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":11,"event_type":0,"price":10000}' http://34.84.220.110:8080/budget/set
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":11,"event_type":1,"price":0}' http://34.84.220.110:8080/budget/set
+
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":12,"event_type":0,"price":10000}' http://34.84.220.110:8080/budget/set
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":12,"event_type":1,"price":0}' http://34.84.220.110:8080/budget/set
+
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":13,"event_type":0,"price":10000}' http://34.84.220.110:8080/budget/set
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":13,"event_type":1,"price":0}' http://34.84.220.110:8080/budget/set
+
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":14,"event_type":0,"price":10000}' http://34.84.220.110:8080/budget/set
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":14,"event_type":1,"price":0}' http://34.84.220.110:8080/budget/set
+
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":15,"event_type":0,"price":10000}' http://34.84.220.110:8080/budget/set
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":15,"event_type":1,"price":0}' http://34.84.220.110:8080/budget/set
+
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":16,"event_type":0,"price":10000}' http://34.84.220.110:8080/budget/set
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":16,"event_type":1,"price":0}' http://34.84.220.110:8080/budget/set
+
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":17,"event_type":0,"price":10000}' http://34.84.220.110:8080/budget/set
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":17,"event_type":1,"price":0}' http://34.84.220.110:8080/budget/set
+
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":18,"event_type":0,"price":10000}' http://34.84.220.110:8080/budget/set
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":18,"event_type":1,"price":0}' http://34.84.220.110:8080/budget/set
+
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":19,"event_type":0,"price":10000}' http://34.84.220.110:8080/budget/set
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":19,"event_type":1,"price":0}' http://34.84.220.110:8080/budget/set
+
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":20,"event_type":0,"price":10000}' http://34.84.220.110:8080/budget/set
+curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":20,"event_type":1,"price":0}' http://34.84.220.110:8080/budget/set
+
+# curl -X POST -H "Content-Type: application/json" -d '{"id":"1","timestamp":1234567890,"device_id":"1","banner_size":1,"media_id":1,"os_type":1,"banner_position":1,"is_interstitial":1,"floor_price":1.0,"ext":[]}' http://34.84.220.110:8080/bid_request
+# curl -X POST -H "Content-Type: application/json" -d '{"device_id":"1","advertiser_id":1,"game_install_count":1,"game_login_count":1,"game_paid_count":1,"game_tutorial_count":1,"game_extension_count":1}' http://34.84.220.110:8080/user/add
+# curl -X POST -H "Content-Type: application/json" -d '{"id":"","price":1.21,"is_click":0}' http://34.84.220.110:8080/win

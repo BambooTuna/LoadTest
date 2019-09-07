@@ -38,11 +38,11 @@ spec:
           - name: DATADOG_PORT
             value: "8125"
           - name: JVM_HEAP_MIN
-            value: "524M"
+            value: "1524M"
           - name: JVM_HEAP_MAX
-            value: "1024M"
+            value: "1524M"
           - name: JVM_META_MAX
-            value: "512M"
+            value: "712M"
           - name: RDB_HOST
             value: "db-service-mysql"
           - name: RDB_PORT
@@ -70,10 +70,10 @@ spec:
                 fieldPath: status.hostIP
         resources:
           requests:
-            memory: "1012Mi"
-            cpu: "800m"
+            memory: "1512Mi"
+            cpu: "1200m"
           limits:
-            memory: "1012Mi"
-            cpu: "800m"
+            memory: "1512Mi"
+            cpu: "1200m"
         ports:
         - containerPort: 8080

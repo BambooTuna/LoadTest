@@ -1,22 +1,22 @@
 package com.github.BambooTuna.LoadTest.boot.server
 
+import java.io.File
+
 import akka.actor.ActorSystem
-import akka.http.scaladsl.model.HttpMethods.{ GET, POST, PUT }
+import akka.http.scaladsl.model.HttpMethods.{GET, POST, PUT}
 import akka.stream.ActorMaterializer
 import com.github.BambooTuna.LoadTest.adaptor.routes._
 import org.slf4j.LoggerFactory
 import akka.http.scaladsl.server.Directives._
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.jdbc.JdbcSetting
-import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.{ OnRedisClient, OnSlickClient }
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.{OnRedisClient, OnSlickClient}
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.redis.RedisSetting
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis.{
-  AdIdRepositoryOnRedisImpl,
-  BudgetRepositoryOnRedisImpl,
-  UserRepositoryOnRedisImpl
-}
+import com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis.{AdIdRepositoryOnRedisImpl, BudgetRepositoryOnRedisImpl, UserRepositoryOnRedisImpl}
 import com.github.BambooTuna.LoadTest.domain.model.ad.WinRedirectUrl
-import com.github.BambooTuna.LoadTest.usecase.{ AddUserUseCase, AddWinUseCase, _ }
-import com.github.BambooTuna.LoadTest.usecase.calculate.{ CalculateModelUseCase, CalculateModelUseCaseImpl }
+import com.github.BambooTuna.LoadTest.usecase.{AddUserUseCase, AddWinUseCase, _}
+import com.github.BambooTuna.LoadTest.usecase.calculate.{CalculateModelUseCase, CalculateModelUseCaseImpl}
+
+import scala.io.Source
 
 object Routes {
 

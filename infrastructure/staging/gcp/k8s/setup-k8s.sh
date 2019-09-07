@@ -23,7 +23,7 @@ helm upgrade --install redis-adid3 -f ./helm/redis-values.yaml stable/redis
 helm upgrade --install redis-budget -f ./helm/redis-values.yaml stable/redis
 
 # setup db
-# kubectl apply -f ./db-secret.yml
+kubectl apply -f ./db-secret.yml
 # kubectl apply -f ./db-deployment.yml
 
 # setup app
