@@ -125,7 +125,7 @@ object Routes {
         "setup", {
           val f = Task {
             SetupRedis.addDataToRedis(addUserUseCase)
-            Thread.sleep(99999999L)
+//            Thread.sleep(99999999L)
           }.runToFuture
           onComplete(f) {
             case _ => complete(StatusCodes.OK)
