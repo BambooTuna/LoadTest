@@ -31,10 +31,10 @@ $ curl -X POST -H "Content-Type: application/json" -d '{"id":"","price":1.21,"is
 ```
 
 ```sbtshell
-loadtest-deployment-748c6fcf74-xh8wl
-kubectl cp ./foot_converted.csv loadtest-deployment-59dc8c84b5-hbz4z:/opt/docker/sample_user_up.csv
-kubectl exec -it loadtest-deployment-59dc8c84b5-hbz4z  sh
-kubectl logs -f loadtest-deployment-59dc8c84b5-hbz4z
+loadtest-deployment-6bbd54b674-kvxnt 
+kubectl cp ./foot_converted.csv loadtest-deployment-6bbd54b674-kvxnt:/opt/docker/sample_user_up.csv
+kubectl exec -it loadtest-deployment-6bbd54b674-kvxnt   sh
+kubectl logs -f loadtest-deployment-6bbd54b674-kvxnt 
 curl -X GET http://34.84.137.136:8080/setup
 
 rm sample_user.csv

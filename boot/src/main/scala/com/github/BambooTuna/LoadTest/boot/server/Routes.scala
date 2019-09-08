@@ -90,7 +90,7 @@ object Routes {
     val calculateModelUseCase: CalculateModelUseCase = CalculateModelUseCaseImpl()
     val getModelUseCase: GetModelUseCase             = GetModelUseCaseImpl(calculateModelUseCase)
 
-    val actor = system.actorOf(Props[SetDataActor], "SetDataActor")
+    val actor = system.actorOf(Props(classOf[SetDataActor], addUserUseCase), "SetDataActor")
 
     Router(
       route(
