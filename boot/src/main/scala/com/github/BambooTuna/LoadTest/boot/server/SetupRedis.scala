@@ -61,9 +61,7 @@ object SetupRedis {
     })
 
     val runnable = source via invert to sink
-
     runnable.run()
-
   }
 
   def tryProcessSource(

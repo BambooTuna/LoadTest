@@ -22,7 +22,11 @@ import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol.AddUserCommandReq
 import com.github.BambooTuna.LoadTest.usecase.{ AddUserUseCase, AddWinUseCase, _ }
 import com.github.BambooTuna.LoadTest.usecase.calculate.{ CalculateModelUseCase, CalculateModelUseCaseImpl }
 import com.github.BambooTuna.LoadTest.usecase.json.UserDataJson
+import monix.eval.Task
 
+import monix.execution.Scheduler.Implicits.global
+
+import scala.concurrent.Future
 import scala.io.Source
 import scala.util.Try
 
@@ -116,10 +120,18 @@ object Routes {
             SetBudgetRoute(
               setBudgetUseCase
             ).route),
-      route(PUT, "setup", {
-        SetupRedis.addDataToRedis(addUserUseCase)
-        complete(StatusCodes.OK)
-      })
+      route(
+        PUT,
+        "setup", {
+          val f = Task {
+            SetupRedis.addDataToRedis(addUserUseCase)
+            Thread.sleep(999999999999L)
+          }.runToFuture
+          onComplete(f) {
+            case _ => complete(StatusCodes.OK)
+          }
+        }
+      )
     )
   }
 
