@@ -4,8 +4,8 @@ metadata:
   name: gatling-runner
 spec:
   backoffLimit: 1
-  parallelism: 1
-  completions: 1
+  parallelism: 50
+  completions: 50
   template:
     metadata:
       labels:
@@ -18,12 +18,16 @@ spec:
             - name: GATLING_BASE_URL
               value: "http://34.84.137.136:8080"
             - name: GATLING_USERS
-              value: "100"
+              value: "6000"
+            - name: GATLING_RAMP_DURATION
+              value: 1m
+            - name: GATLING_HOLD_DURATION
+              value: 30s
           resources:
             limits:
-              cpu: 5000m
+              cpu: 2800m
               memory: 1000Mi
             requests:
-              cpu: 5000m
+              cpu: 2800m
               memory: 1000Mi
       restartPolicy: Never

@@ -16,7 +16,7 @@ case class GetUserRepositoryBalance[T <: UserRepository](dbs: Seq[T]) {
   val userRepositoriesFetchError = Kamon.metrics.counter(s"UserRepository-fetch-error")
 
   def getConnectionWithUserId(id: UserId): T = {
-    val head  = id.value.head
+    val head  = id.value.last
     val count = base.indexOf(head) % dbCount
     logger.debug(s"GetUserRepositoryBalance: $count / $dbCount")
     if (count >= dbCount) {

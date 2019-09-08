@@ -16,7 +16,7 @@ case class GetAdIdRepositoryBalance[T <: AdIdRepository](dbs: Seq[T]) {
   val budgetRepositoriesFetchError = Kamon.metrics.counter(s"GetAdIdRepository-fetch-error")
 
   def getConnectionWithAdRequestId(id: AdRequestId): T = {
-    val head  = id.value.head
+    val head  = id.value.last
     val count = base.indexOf(head) % dbCount
     logger.debug(s"GetAdIdRepositoryBalance: $count / $dbCount")
     if (count >= dbCount) {
