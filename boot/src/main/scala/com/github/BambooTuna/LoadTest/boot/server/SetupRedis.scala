@@ -6,14 +6,15 @@ import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol.AddUserCommandReq
 import com.github.BambooTuna.LoadTest.usecase.json.UserDataJson
 
 import scala.util.Try
-import java.net.{ HttpURLConnection, URL }
+import java.net.{HttpURLConnection, URL}
 
 import sys.process._
 import java.net.URL
 import java.io.File
 
+import akka.NotUsed
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{ Flow, Sink, Source }
+import akka.stream.scaladsl.{Flow, RunnableGraph, Sink, Source}
 import com.github.BambooTuna.LoadTest.usecase.AddUserUseCase
 
 object SetupRedis {
@@ -60,7 +61,7 @@ object SetupRedis {
         .runToFuture
     })
 
-    val runnable = source via invert to sink
+    val runnable: RunnableGraph[NotUsed] = source via invert to sink
     runnable.run()
   }
 

@@ -2,28 +2,23 @@ package com.github.BambooTuna.LoadTest.boot.server
 
 import java.io.File
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.model.HttpMethods.{ GET, POST, PUT }
+import akka.actor.{Actor, ActorSystem, Props}
+import akka.http.scaladsl.model.HttpMethods.{GET, POST, PUT}
 import akka.http.scaladsl.model.StatusCodes
 import akka.stream.ActorMaterializer
 import com.github.BambooTuna.LoadTest.adaptor.routes._
 import org.slf4j.LoggerFactory
 import akka.http.scaladsl.server.Directives._
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.jdbc.JdbcSetting
-import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.{ OnRedisClient, OnSlickClient }
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.{OnRedisClient, OnSlickClient}
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.redis.RedisSetting
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis.{
-  AdIdRepositoryOnRedisImpl,
-  BudgetRepositoryOnRedisImpl,
-  UserRepositoryOnRedisImpl
-}
+import com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis.{AdIdRepositoryOnRedisImpl, BudgetRepositoryOnRedisImpl, UserRepositoryOnRedisImpl}
 import com.github.BambooTuna.LoadTest.domain.model.ad.WinRedirectUrl
 import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol.AddUserCommandRequest
-import com.github.BambooTuna.LoadTest.usecase.{ AddUserUseCase, AddWinUseCase, _ }
-import com.github.BambooTuna.LoadTest.usecase.calculate.{ CalculateModelUseCase, CalculateModelUseCaseImpl }
+import com.github.BambooTuna.LoadTest.usecase.{AddUserUseCase, AddWinUseCase, _}
+import com.github.BambooTuna.LoadTest.usecase.calculate.{CalculateModelUseCase, CalculateModelUseCaseImpl}
 import com.github.BambooTuna.LoadTest.usecase.json.UserDataJson
 import monix.eval.Task
-
 import monix.execution.Scheduler.Implicits.global
 
 import scala.concurrent.Future
@@ -54,7 +49,7 @@ object Routes {
       route(GET, "ping", CommonRoute().ping)
     )
 
-  def adPro(clientCluster: ClientCluster)(implicit materializer: ActorMaterializer): Router = {
+  def adPro(clientCluster: ClientCluster)(implicit system: ActorSystem, materializer: ActorMaterializer): Router = {
     val (userRedisClients, o)                  = clientCluster.redisClients.splitAt(3)
     val (adidRedisClients, budgetRedisClients) = o.splitAt(3)
 
@@ -95,6 +90,8 @@ object Routes {
     val calculateModelUseCase: CalculateModelUseCase = CalculateModelUseCaseImpl()
     val getModelUseCase: GetModelUseCase             = GetModelUseCaseImpl(calculateModelUseCase)
 
+    val actor = system.actorOf(Props[SetDataActor], "SetDataActor")
+
     Router(
       route(
         POST,
@@ -124,8 +121,8 @@ object Routes {
         GET,
         "setup", {
           val f = Task {
-            SetupRedis.addDataToRedis(addUserUseCase)
-//            Thread.sleep(99999999L)
+            println("actor ! run")
+            actor ! "run"
           }.runToFuture
           onComplete(f) {
             case _ => complete(StatusCodes.OK)
@@ -133,6 +130,21 @@ object Routes {
         }
       )
     )
+  }
+
+}
+
+
+class SetDataActor(addUserUseCase: AddUserUseCase) extends Actor {
+
+  implicit val materializer: ActorMaterializer            = ActorMaterializer()
+
+  override def receive = {
+    case "run"  =>
+      println("actor receive")
+      SetupRedis.addDataToRedis(addUserUseCase)
+    case _ => ()
+
   }
 
 }

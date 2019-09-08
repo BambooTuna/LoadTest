@@ -15,7 +15,7 @@ case class CalculateModelUseCaseImpl() extends CalculateModelUseCase {
     val result: Double           = 1 / (1 + scala.math.exp(-z))
 
     //TODO
-    GetModelResponseJson(result)
+    GetModelResponseJson(0.05)
   }
 
   case class ModelArray(r: List[Double]) {
