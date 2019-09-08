@@ -70,13 +70,13 @@ case class BidRoute(bidUseCase: BidUseCase)(implicit materializer: ActorMaterial
             noContentCounter.increment()
             responseTime.record(java.time.Instant.now().toEpochMilli - time)
             logger.debug("BidCommandFailed")
-            complete(StatusCodes.BadRequest, entity)
+            complete(StatusCodes.NoContent, entity)
           case e =>
             val entity = HttpEntity(MediaTypes.`application/json`, e.toString)
             errorCounter.increment()
             responseTime.record(java.time.Instant.now().toEpochMilli - time)
             logger.debug("UnKnown")
-            complete(StatusCodes.BadRequest, entity)
+            complete(StatusCodes.NoContent, entity)
         }
       }
     }
