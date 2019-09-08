@@ -7,15 +7,21 @@ import com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis.BudgetRep
 import com.github.BambooTuna.LoadTest.domain.model.ad.AdvertiserId
 import com.github.BambooTuna.LoadTest.domain.setting.TimeZoneSetting
 import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol._
-import com.github.BambooTuna.LoadTest.usecase.json.{ GetBudgetRequestJson, GetBudgetResponseJson }
+import com.github.BambooTuna.LoadTest.usecase.json.{GetBudgetRequestJson, GetBudgetResponseJson}
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
+import kamon.Kamon
+import kamon.metric.instrument.Gauge
 import monix.eval.Task
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 case class GetBudgetUseCaseImpl(budgetRepositoriesOnRedis: GetBudgetRepositoryBalance[BudgetRepositoryOnRedis])
     extends GetBudgetUseCase
     with FailFastCirceSupport {
+
+  val budgetBalances = (1 to 20).map(i => {
+    Kamon.metrics.gauge(s"BudgetBalance-$i")(Gauge.functionZeroAsCurrentValueCollector(() => 0L))
+  })
 
   //TODO budgetRepositoryを作る（時間あれば）
   override def run(arg: GetBudgetCommandRequest): Task[GetBudgetCommandResponse] = {
@@ -26,6 +32,9 @@ case class GetBudgetUseCaseImpl(budgetRepositoriesOnRedis: GetBudgetRepositoryBa
       )
       budget <- budgetRepositoriesOnRedis
         .getConnectionWithAdvertiserId(aggregate).resolveById(aggregate)
+      _ <- Task.pure{
+        budgetBalances(aggregate.value).record(budget.value.toLong)
+      }
     } yield budget)
       .map { result =>
         successCounterIncrement
