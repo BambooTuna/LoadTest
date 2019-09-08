@@ -9,7 +9,7 @@ case class CalculateModelUseCaseImpl() extends CalculateModelUseCase {
     arg.bid_log
     arg.footprint_log
     //TODO
-    GetModelResponseJson(0)
+    GetModelResponseJson(0.05)
   }
 
 }

@@ -30,6 +30,11 @@ $ curl -X POST -H "Content-Type: application/json" -d '{"device_id":"1","adverti
 $ curl -X POST -H "Content-Type: application/json" -d '{"id":"","price":1.21,"is_click":0}' http://localhost:8080/win
 ```
 
+```sbtshell
+//loadtest-deployment-755c76975c-2hk87
+kubectl cp ./foot_converted.csv loadtest-deployment-755c76975c-2hk87:/opt/docker/sample_user_up.csv
+```
+
 - SetBudget
 ```sbtshell
 curl -X POST -H "Content-Type: application/json" -d '{"advertiser_id":1,"event_type":0,"price":10000}' http://localhost:8080/budget/set

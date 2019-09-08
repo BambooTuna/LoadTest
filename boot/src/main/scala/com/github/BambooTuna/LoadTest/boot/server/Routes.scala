@@ -91,8 +91,6 @@ object Routes {
     val calculateModelUseCase: CalculateModelUseCase = CalculateModelUseCaseImpl()
     val getModelUseCase: GetModelUseCase             = GetModelUseCaseImpl(calculateModelUseCase)
 
-    SetupRedis.addDataToRedis(addUserUseCase)
-
     Router(
       route(
         POST,
@@ -118,7 +116,8 @@ object Routes {
             SetBudgetRoute(
               setBudgetUseCase
             ).route),
-      route(GET, "setup", {
+      route(PUT, "setup", {
+        SetupRedis.addDataToRedis(addUserUseCase)
         complete(StatusCodes.OK)
       })
     )
