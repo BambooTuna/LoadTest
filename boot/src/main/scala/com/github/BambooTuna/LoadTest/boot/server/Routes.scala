@@ -97,7 +97,23 @@ object Routes {
     val calculateModelUseCase: CalculateModelUseCase = CalculateModelUseCaseImpl()
     val getModelUseCase: GetModelUseCase             = GetModelUseCaseImpl(calculateModelUseCase)
 
-    val actor = system.actorOf(Props(classOf[SetDataActor], addUserUseCase), "SetDataActor")
+//    val actor = system.actorOf(Props(classOf[SetDataActor], addUserUseCase), "SetDataActor")
+
+    val tryLinesIrvingTxNoHeader: Try[List[List[String]]] =
+      tryProcessSource(
+        new File("/opt/docker/sample_user.csv"),
+        parseLine = (index, unparsedLine) => Some(unparsedLine.split(",").toList),
+        filterLine = (index, parsedValues) =>
+          Some(
+            index != 0 //skip header line
+          )
+      )
+
+    tryLinesIrvingTxNoHeader.map(_.map{
+      case List(a, b, c, d, e, f, g) =>
+        val j = UserDataJson(a, b.toInt, c.toDouble, d.toDouble, e.toDouble, f.toDouble, g.toDouble)
+        addUserUseCase.run(AddUserCommandRequest(j))
+    })
 
     Router(
       route(
@@ -129,7 +145,7 @@ object Routes {
         "setup", extractActorSystem { implicit system =>
           extractRequestContext { c =>
             println("actor ! run")
-            actor ! "run"
+//            actor ! "run"
             val f = Task{
               println("none task")
             }.runToFuture
