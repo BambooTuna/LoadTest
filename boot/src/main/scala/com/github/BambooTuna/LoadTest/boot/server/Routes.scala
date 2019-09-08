@@ -3,23 +3,27 @@ package com.github.BambooTuna.LoadTest.boot.server
 import java.io.File
 
 import akka.NotUsed
-import akka.actor.{Actor, ActorSystem, Props}
-import akka.http.scaladsl.model.HttpMethods.{GET, POST, PUT}
+import akka.actor.{ Actor, ActorSystem, Props }
+import akka.http.scaladsl.model.HttpMethods.{ GET, POST, PUT }
 import akka.http.scaladsl.model.StatusCodes
 import akka.stream.ActorMaterializer
 import com.github.BambooTuna.LoadTest.adaptor.routes._
 import org.slf4j.LoggerFactory
 import akka.http.scaladsl.server.Directives._
-import akka.stream.scaladsl.{Flow, RunnableGraph, Sink, Source}
+import akka.stream.scaladsl.{ Flow, RunnableGraph, Sink, Source }
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.jdbc.JdbcSetting
-import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.{OnRedisClient, OnSlickClient}
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.{ OnRedisClient, OnSlickClient }
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.redis.RedisSetting
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis.{AdIdRepositoryOnRedisImpl, BudgetRepositoryOnRedisImpl, UserRepositoryOnRedisImpl}
+import com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis.{
+  AdIdRepositoryOnRedisImpl,
+  BudgetRepositoryOnRedisImpl,
+  UserRepositoryOnRedisImpl
+}
 import com.github.BambooTuna.LoadTest.boot.server.SetupRedis.tryProcessSource
 import com.github.BambooTuna.LoadTest.domain.model.ad.WinRedirectUrl
 import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol.AddUserCommandRequest
-import com.github.BambooTuna.LoadTest.usecase.{AddUserUseCase, AddWinUseCase, _}
-import com.github.BambooTuna.LoadTest.usecase.calculate.{CalculateModelUseCase, CalculateModelUseCaseImpl}
+import com.github.BambooTuna.LoadTest.usecase.{ AddUserUseCase, AddWinUseCase, _ }
+import com.github.BambooTuna.LoadTest.usecase.calculate.{ CalculateModelUseCase, CalculateModelUseCaseImpl }
 import com.github.BambooTuna.LoadTest.usecase.json.UserDataJson
 import monix.eval.Task
 import monix.execution.Scheduler.Implicits.global
@@ -122,17 +126,16 @@ object Routes {
             ).route),
       route(
         GET,
-        "setup", {
-
-          println("actor ! run")
-          actor ! "run"
-
-          val f = Task {
-
-          }.runToFuture
-
-          onComplete(f) {
-            case _ => complete(StatusCodes.OK)
+        "setup", extractActorSystem { implicit system =>
+          extractRequestContext { c =>
+            println("actor ! run")
+            actor ! "run"
+            val f = Task{
+              println("none task")
+            }.runToFuture
+            onSuccess(f) {
+              case _ => c.complete(StatusCodes.OK)
+            }
           }
         }
       )
@@ -141,13 +144,12 @@ object Routes {
 
 }
 
-
 class SetDataActor(addUserUseCase: AddUserUseCase) extends Actor {
 
   implicit val materializer: ActorMaterializer = ActorMaterializer()
 
   override def receive = {
-    case "run"  =>
+    case "run" =>
       println("actor receive")
 
       import monix.execution.Scheduler.Implicits.global
@@ -158,7 +160,7 @@ class SetDataActor(addUserUseCase: AddUserUseCase) extends Actor {
           filterLine = (index, parsedValues) =>
             Some(
               index != 0 //skip header line
-            )
+          )
         )
 
       val source = Source[List[String]](
@@ -167,12 +169,12 @@ class SetDataActor(addUserUseCase: AddUserUseCase) extends Actor {
 
       val invert = Flow[List[String]].map {
         case List(device_id,
-        advertiser_id,
-        game_install_count,
-        game_login_count,
-        game_paid_count,
-        game_tutorial_count,
-        game_extension_count) =>
+                  advertiser_id,
+                  game_install_count,
+                  game_login_count,
+                  game_paid_count,
+                  game_tutorial_count,
+                  game_extension_count) =>
           UserDataJson(
             device_id,
             advertiser_id.toInt,
