@@ -6,6 +6,7 @@ import akka.http.scaladsl.model.HttpMethods.POST
 import akka.http.scaladsl.model.{HttpEntity, HttpRequest, HttpResponse, MediaTypes}
 import akka.stream.{ActorMaterializer, Materializer}
 import com.github.BambooTuna.LoadTest.adaptor.routes.json.BidRequestJson
+import com.github.BambooTuna.LoadTest.domain.model.ad.AdRequestExt
 import com.github.BambooTuna.LoadTest.usecase.json.UserDataJson
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
@@ -39,7 +40,7 @@ class BidSimulation extends Simulation with SimulationConfig {
                 banner_position = 1,
                 is_interstitial = 1,
                 floor_price = 1f,
-                ext = Seq.empty
+                ext = AdRequestExt(1L)
               ).asJson.noSpaces
             )
           )

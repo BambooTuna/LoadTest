@@ -12,5 +12,5 @@ case class BidRequestCommand(
     bannerPosition: BannerPosition,
     isInterstitial: IsInterstitial,
     floorPrice: FloorPrice,
-    ext: Seq[AdRequestExt]
+    ext: AdRequestExt
 )

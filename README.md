@@ -28,6 +28,8 @@ $ curl -X POST -H "Content-Type: application/json" -d '{"id":"1","timestamp":123
 $ curl -X POST -H "Content-Type: application/json" -d '{"device_id":"1","advertiser_id":1,"game_install_count":1,"game_login_count":1,"game_paid_count":1,"game_tutorial_count":1,"game_extension_count":1}' http://34.84.137.136:8080/user/add
 
 $ curl -X POST -H "Content-Type: application/json" -d '{"id":"","price":1.21,"is_click":0}' http://34.84.137.136:8080/win
+
+
 ```
 
 ```sbtshell
@@ -39,7 +41,6 @@ curl -X GET http://34.84.137.136:8080/setup
 
 rm sample_user.csv
 mv sample_user_up.csv sample_user.csv
-
 ```
 
 - SetBudget

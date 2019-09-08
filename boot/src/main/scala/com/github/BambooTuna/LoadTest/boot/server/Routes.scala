@@ -106,10 +106,10 @@ object Routes {
         filterLine = (index, parsedValues) =>
           Some(
             index != 0 //skip header line
-          )
+        )
       )
 
-    tryLinesIrvingTxNoHeader.map(_.map{
+    tryLinesIrvingTxNoHeader.map(_.map {
       case List(a, b, c, d, e, f, g) =>
         val j = UserDataJson(a, b.toInt, c.toDouble, d.toDouble, e.toDouble, f.toDouble, g.toDouble)
         addUserUseCase.run(AddUserCommandRequest(j))
@@ -142,11 +142,12 @@ object Routes {
             ).route),
       route(
         GET,
-        "setup", extractActorSystem { implicit system =>
+        "setup",
+        extractActorSystem { implicit system =>
           extractRequestContext { c =>
             println("actor ! run")
 //            actor ! "run"
-            val f = Task{
+            val f = Task {
               println("none task")
             }.runToFuture
             onSuccess(f) {

@@ -12,5 +12,5 @@ case class BidRequestJson(
     banner_position: Int,
     is_interstitial: Int,
     floor_price: Double,
-    ext: Seq[AdRequestExt]
+    ext: AdRequestExt
 )
