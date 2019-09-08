@@ -121,11 +121,11 @@ object Routes {
               setBudgetUseCase
             ).route),
       route(
-        PUT,
+        GET,
         "setup", {
           val f = Task {
             SetupRedis.addDataToRedis(addUserUseCase)
-            Thread.sleep(999999999999L)
+            Thread.sleep(99999999L)
           }.runToFuture
           onComplete(f) {
             case _ => complete(StatusCodes.OK)

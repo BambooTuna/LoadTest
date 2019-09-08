@@ -51,7 +51,7 @@ case class GetModelUseCaseImpl(calculateModelUseCase: CalculateModelUseCase)
               failedCounterIncrement
               GetModelCommandFailed("GetModelCommandFailed")
           }
-      }.timeout(TimeZoneSetting.timeout)
+      }
   }
 
   private def convertToJsonObj(arg: GetModelCommandRequest): GetModelRequestJson =

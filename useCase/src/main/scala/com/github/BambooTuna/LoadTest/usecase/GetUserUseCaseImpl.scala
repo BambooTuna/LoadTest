@@ -18,7 +18,7 @@ case class GetUserUseCaseImpl(userRepositories: GetUserRepositoryBalance[UserRep
       aggregate <- Task.pure(
         arg.id
       )
-      r <- userRepositories.getConnectionWithUserId(aggregate).get(aggregate).timeout(TimeZoneSetting.timeout)
+      r <- userRepositories.getConnectionWithUserId(aggregate).get(aggregate)
     } yield r)
       .map { result =>
         successCounterIncrement

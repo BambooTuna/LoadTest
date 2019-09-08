@@ -1,21 +1,18 @@
 package com.github.BambooTuna.LoadTest.adaptor.routes
 
-import akka.http.scaladsl.model.{ HttpEntity, MediaTypes, StatusCodes }
-import akka.http.scaladsl.server.Directives.{ as, entity, extractActorSystem, extractRequestContext, onSuccess, _ }
+import akka.http.scaladsl.model.{HttpEntity, MediaTypes, StatusCodes}
+import akka.http.scaladsl.server.Directives.{as, entity, extractActorSystem, extractRequestContext, onSuccess, _}
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import io.circe.syntax._
 import io.circe.generic.auto._
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
-import com.github.BambooTuna.LoadTest.adaptor.routes.json.{ BidRequestJson, BidResponseJson }
+import com.github.BambooTuna.LoadTest.adaptor.routes.json.{BidRequestJson, BidResponseJson}
 import com.github.BambooTuna.LoadTest.domain.model.ad._
 import com.github.BambooTuna.LoadTest.domain.model.ad.command.BidRequestCommand
+import com.github.BambooTuna.LoadTest.domain.setting.TimeZoneSetting
 import com.github.BambooTuna.LoadTest.usecase.BidUseCase
-import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol.{
-  BidCommandFailed,
-  BidCommandRequest,
-  BidCommandSucceeded
-}
+import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol.{BidCommandFailed, BidCommandRequest, BidCommandSucceeded}
 import monix.execution.Scheduler.Implicits.global
 import kamon.Kamon
 import kamon.metric.instrument.Gauge
@@ -54,6 +51,7 @@ case class BidRoute(bidUseCase: BidUseCase)(implicit materializer: ActorMaterial
                 )
               )
             )
+            .timeout(TimeZoneSetting.timeout)
             .runToFuture
         onSuccess(f) {
           case BidCommandSucceeded(response) =>

@@ -25,7 +25,7 @@ case class GetBudgetUseCaseImpl(budgetRepositoriesOnRedis: GetBudgetRepositoryBa
         AdvertiserId(arg.request.advertiser_id)
       )
       budget <- budgetRepositoriesOnRedis
-        .getConnectionWithAdvertiserId(aggregate).resolveById(aggregate).timeout(TimeZoneSetting.timeout)
+        .getConnectionWithAdvertiserId(aggregate).resolveById(aggregate)
     } yield budget)
       .map { result =>
         successCounterIncrement
@@ -51,7 +51,7 @@ case class GetBudgetUseCaseImpl(budgetRepositoriesOnRedis: GetBudgetRepositoryBa
 //              logger.debug("GetBudgetCommandFailed")
 //              GetBudgetCommandFailed("GetBudgetCommandFailed")
 //          }
-//      }.timeout(TimeZoneSetting.timeout)
+//      }
 //  }
 
   private def convertToJsonObj(arg: GetBudgetCommandRequest): GetBudgetRequestJson =

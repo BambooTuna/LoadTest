@@ -28,8 +28,8 @@ case class BidUseCaseImpl(getUserUseCase: GetUserUseCase,
       aggregate <- Task.pure(
         UserId(arg.request.deviceId.value)
       )
-      userData <- getUserUseCase.run(GetUserCommandRequest(aggregate)).timeout(TimeZoneSetting.timeout)
-      res <- (userData match {
+      userData <- getUserUseCase.run(GetUserCommandRequest(aggregate))
+      res <- userData match {
         case GetUserCommandSucceeded(user) =>
           Task.parMap4(
             Task(
@@ -82,7 +82,7 @@ case class BidUseCaseImpl(getUserUseCase: GetUserUseCase,
             failedCounterIncrement
             BidCommandFailed(s"GetUserCommandFailed: $v")
           }
-      }).timeout(TimeZoneSetting.timeout)
+      }
     } yield res
 
   }
