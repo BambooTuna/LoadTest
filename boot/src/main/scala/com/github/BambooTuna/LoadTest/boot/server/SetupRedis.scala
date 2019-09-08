@@ -19,52 +19,6 @@ import com.github.BambooTuna.LoadTest.usecase.AddUserUseCase
 
 object SetupRedis {
 
-  def addDataToRedis(addUserUseCase: AddUserUseCase)(implicit materializer: ActorMaterializer) = {
-    import monix.execution.Scheduler.Implicits.global
-    val tryLinesIrvingTxNoHeader: Try[List[List[String]]] =
-      tryProcessSource(
-        new File("/opt/docker/sample_user.csv"),
-        parseLine = (index, unparsedLine) => Some(unparsedLine.split(",").toList),
-        filterLine = (index, parsedValues) =>
-          Some(
-            index != 0 //skip header line
-        )
-      )
-
-    val source = Source[List[String]](
-      tryLinesIrvingTxNoHeader.get
-    )
-
-    val invert = Flow[List[String]].map {
-      case List(device_id,
-                advertiser_id,
-                game_install_count,
-                game_login_count,
-                game_paid_count,
-                game_tutorial_count,
-                game_extension_count) =>
-        UserDataJson(
-          device_id,
-          advertiser_id.toInt,
-          game_install_count.toDouble,
-          game_login_count.toDouble,
-          game_paid_count.toDouble,
-          game_tutorial_count.toDouble,
-          game_extension_count.toDouble
-        )
-    }
-    val sink = Sink.foreach[UserDataJson](json => {
-      addUserUseCase
-        .run(
-          AddUserCommandRequest(json)
-        )
-        .runToFuture
-    })
-
-    val runnable: RunnableGraph[NotUsed] = source via invert to sink
-    runnable.run()
-  }
-
   def tryProcessSource(
       file: File,
       parseLine: (Int, String) => Option[List[String]] = (index, unparsedLine) => Some(List(unparsedLine)),
