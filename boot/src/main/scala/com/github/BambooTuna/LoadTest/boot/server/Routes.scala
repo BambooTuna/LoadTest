@@ -123,10 +123,14 @@ object Routes {
       route(
         GET,
         "setup", {
+
+          println("actor ! run")
+          actor ! "run"
+
           val f = Task {
-            println("actor ! run")
-            actor ! "run"
+
           }.runToFuture
+
           onComplete(f) {
             case _ => complete(StatusCodes.OK)
           }
@@ -140,7 +144,7 @@ object Routes {
 
 class SetDataActor(addUserUseCase: AddUserUseCase) extends Actor {
 
-  implicit val materializer: ActorMaterializer            = ActorMaterializer()
+  implicit val materializer: ActorMaterializer = ActorMaterializer()
 
   override def receive = {
     case "run"  =>
