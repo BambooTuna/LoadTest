@@ -6,5 +6,4 @@ case class BudgetBalance(value: Double) extends AggregateDoubleId {
   require(value >= 0)
 
   def add(value: Double): BudgetBalance = copy(this.value + value)
-
 }

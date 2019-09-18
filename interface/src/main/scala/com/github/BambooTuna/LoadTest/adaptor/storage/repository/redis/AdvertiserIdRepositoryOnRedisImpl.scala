@@ -1,7 +1,7 @@
 package com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis
 
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.OnRedisClient
-import com.github.BambooTuna.LoadTest.domain.model.dsp.ad.{AdvertiserId, UserDeviceId}
+import com.github.BambooTuna.LoadTest.domain.model.dsp.ad.{ AdvertiserId, UserDeviceId }
 import monix.eval.Task
 
 import scala.concurrent.ExecutionContext

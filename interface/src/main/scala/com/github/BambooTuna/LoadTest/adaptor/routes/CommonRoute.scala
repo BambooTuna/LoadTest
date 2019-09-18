@@ -8,9 +8,7 @@ import io.circe.generic.auto._
 import com.github.BambooTuna.LoadTest.adaptor.routes.json.PongResponseJson
 import kamon.Kamon
 
-case class CommonRoute() {
-  val topHistogram  = Kamon.metrics.histogram(this.getClass.getName + "-top")
-  val pingHistogram = Kamon.metrics.histogram(this.getClass.getName + "-ping")
+case class CommonRoute() extends RouteCommonSetting {
 
   def top: Route = complete(StatusCodes.OK, "Top Page!")
 
@@ -18,7 +16,6 @@ case class CommonRoute() {
     val time   = java.time.Instant.now().toEpochMilli
     val result = PongResponseJson("pong")
     val entity = HttpEntity(MediaTypes.`application/json`, result.asJson.noSpaces)
-    pingHistogram.record(java.time.Instant.now().toEpochMilli - time)
     complete(StatusCodes.OK, entity)
   }
 

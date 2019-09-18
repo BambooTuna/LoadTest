@@ -28,6 +28,7 @@ class BudgetRepositoryOnRedisImpl(client: OnRedisClient) extends BudgetRepositor
       //TODO
       BudgetBalance(abs - dif * 120)
     })
+    ???
   }
 
   override def insert(id: Id, record: Record): Task[Long] = {
@@ -46,7 +47,6 @@ class BudgetRepositoryOnRedisImpl(client: OnRedisClient) extends BudgetRepositor
               .incr(chooseKey(Difference)(id))
           }
     }
-
   }
 
   private def generateAbsKey(id: AdvertiserId): String = s"abs_${id.value.toString}"
@@ -56,7 +56,6 @@ class BudgetRepositoryOnRedisImpl(client: OnRedisClient) extends BudgetRepositor
       case Absolute   => generateAbsKey
       case Difference => generateKey
     }
-
 
   private def convertToJson(item: BudgetEventModel): BudgetEventModelJson =
     BudgetEventModelJson(

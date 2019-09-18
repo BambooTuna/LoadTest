@@ -2,8 +2,9 @@ package com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis
 
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.OnRedisClient
 import com.github.BambooTuna.LoadTest.domain.model.dsp.UserInfo
-import com.github.BambooTuna.LoadTest.domain.model.dsp.ad.{AdvertiserId, UserDeviceId}
+import com.github.BambooTuna.LoadTest.domain.model.dsp.ad.{ AdvertiserId, UserDeviceId }
 import com.github.BambooTuna.LoadTest.domain.model.dsp.user.GameInstallCount
+import com.github.BambooTuna.LoadTest.usecase.json.UserInfoJson
 import monix.eval.Task
 
 import scala.concurrent.ExecutionContext
@@ -47,7 +48,5 @@ class UserInfoRepositoryOnRedisImpl(client: OnRedisClient) extends UserInfoRepos
       aggregate.gameInstallCount.value
     )
   }
-
-  case class UserInfoJson(device_id: String, advertiser_id: Int, game_install_count: Long)
 
 }
