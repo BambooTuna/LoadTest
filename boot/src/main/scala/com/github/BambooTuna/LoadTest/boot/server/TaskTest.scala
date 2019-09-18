@@ -4,7 +4,6 @@ import monix.eval.Task
 import scala.concurrent.duration._
 import monix.execution.Scheduler.Implicits.global
 
-
 object TaskTest extends App {
 
   val task1 = Task.sleep(1.seconds)

@@ -8,20 +8,21 @@ import com.github.BambooTuna.LoadTest.domain.model.dsp.ad._
 
 import scala.concurrent.ExecutionContext
 
-case class BidRequestUseCase(getUserUseCase: GetUserInfoUseCase,
+case class BidRequestUseCase(getUserInfoUseCase: GetUserInfoUseCase,
                              getBudgetUseCase: GetBudgetUseCase,
                              getModelUseCase: GetModelUseCase,
-                             winRedirectUrl: WinNoticeEndpoint) extends UseCaseCommon {
+                             winRedirectUrl: WinNoticeEndpoint)
+    extends UseCaseCommon {
 
   def run(arg: BidRequestCommandRequest)(implicit system: ActorSystem,
-                                           mat: Materializer): Task[BidRequestCommandResponse] = {
+                                         mat: Materializer): Task[BidRequestCommandResponse] = {
     implicit val ec: ExecutionContext = mat.executionContext
     setResponseTimer
     for {
       aggregate <- Task.pure(
         UserDeviceId(arg.deviceId.value)
       )
-      userData <- getUserUseCase.run(GetUserInfoCommandRequest(aggregate))
+      userData <- getUserInfoUseCase.run(GetUserInfoCommandRequest(aggregate))
       res <- userData match {
         case GetUserInfoCommandSucceeded(user) =>
           Task.parMap3(
@@ -34,10 +35,10 @@ case class BidRequestUseCase(getUserUseCase: GetUserInfoUseCase,
                 GetBudgetCommandRequest(user.advertiserId)
               ),
             getModelUseCase
-              //TODO runWithOutSide or run
+            //TODO runWithOutSide or run
               .run(
-              GetModelCommandRequest(user)
-            )
+                GetModelCommandRequest(user)
+              )
           ) {
             case (r, GetBudgetCommandSucceeded(b), GetModelCommandSucceeded(m)) =>
               BidRequestCommandSucceeded(

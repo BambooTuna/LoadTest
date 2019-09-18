@@ -1,7 +1,5 @@
 package com.github.BambooTuna.LoadTest.usecase
 
-import java.time.Instant
-
 import kamon.Kamon
 import kamon.metric.instrument.Gauge
 import org.slf4j.LoggerFactory
