@@ -1,3 +1,5 @@
 package com.github.BambooTuna.LoadTest.adaptor.routes.json
 
-case class GetUserResponseJson(user: Option[UserJson], error_messages: Seq[String] = Seq.empty) extends ResponseJson
+import com.github.BambooTuna.LoadTest.domain.model.dsp.ad.UserDeviceId
+
+case class GetUserResponseJson(user: Option[UserDeviceId], error_messages: Seq[String] = Seq.empty) extends ResponseJson
