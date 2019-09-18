@@ -1,5 +1,5 @@
 package com.github.BambooTuna.LoadTest.adaptor.storage.repository.aerospike
 
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.UserInfoRepository
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.UserInfoDao
 
-trait UserInfoRepositoryOnAerospike extends UserInfoRepository
+trait UserInfoRepositoryOnAerospike extends UserInfoDao

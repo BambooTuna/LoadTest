@@ -1,11 +1,11 @@
 package com.github.BambooTuna.LoadTest.usecase
 
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.UserInfoRepository
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.UserInfoDao
 import com.github.BambooTuna.LoadTest.domain.model.dsp.ad.UserDeviceId
 import kamon.Kamon
 import org.slf4j.LoggerFactory
 
-case class UserInfoRepositoryBalancer[T <: UserInfoRepository](dbs: Seq[T]) {
+case class UserInfoRepositoryBalancer[T <: UserInfoDao](dbs: Seq[T]) {
   require(dbs.nonEmpty)
 
   val logger = LoggerFactory.getLogger(getClass)

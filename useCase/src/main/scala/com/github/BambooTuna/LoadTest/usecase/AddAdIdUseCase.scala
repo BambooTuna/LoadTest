@@ -6,7 +6,7 @@ import monix.eval.Task
 
 trait AddAdIdUseCase extends UseCaseCommon {
 
-  val adidRepositories: GetAdvertiserIdRepositoryBalancer[AdvertiserIdRepository]
+  val adidRepositories: AdvertiserIdRepositoryBalancer[AdvertiserIdRepository]
 
   def run(arg: AddAdIdCommandRequest): Task[AddAdIdCommandResponse]
 

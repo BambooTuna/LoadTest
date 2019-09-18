@@ -1,11 +1,5 @@
 package com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis
 
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.BudgetRepository
-import com.github.BambooTuna.LoadTest.domain.model.budget.BudgetBalance
-import monix.eval.Task
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.BudgetDao
 
-trait BudgetRepositoryOnRedis extends BudgetRepository {
-
-  def resolveById(id: Id): Task[BudgetBalance]
-
-}
+trait BudgetRepositoryOnRedis extends BudgetDao

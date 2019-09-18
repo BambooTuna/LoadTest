@@ -1,13 +1,30 @@
 package com.github.BambooTuna.LoadTest.usecase
 
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.UserInfoRepository
-import com.github.BambooTuna.LoadTest.usecase.command.DspCommandProtocol.{GetUserInfoCommandRequest, GetUserInfoCommandResponse}
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.UserInfoDao
+import com.github.BambooTuna.LoadTest.usecase.command.DspCommandProtocol.{GetUserInfoCommandFailed, GetUserInfoCommandRequest, GetUserInfoCommandResponse, GetUserInfoCommandSucceeded}
 import monix.eval.Task
 
-trait GetUserInfoUseCase extends UseCaseCommon {
+case class GetUserInfoUseCase(userInfoRepositories: UserInfoRepositoryBalancer[UserInfoDao]) extends UseCaseCommon {
 
-  val userInfoRepositories: UserInfoRepositoryBalancer[UserInfoRepository]
+  def run(arg: GetUserInfoCommandRequest): Task[GetUserInfoCommandResponse] = {
+    setResponseTimer
+    (for {
+      _ <- Task.pure(
+        setResponseTimer
+      )
+      aggregate <- Task.pure(
+        arg.deviceId
+      )
+      r <- userInfoRepositories.getConnectionWithUserDeviceId(aggregate).resolveById(aggregate)
+    } yield r)
+      .map { result =>
+        GetUserInfoCommandSucceeded(result.get)
+      }.onErrorHandle { ex =>
+      failedCounterIncrement
+      GetUserInfoCommandFailed(ex.getMessage)
+    }
+      .doOnFinish(_ => Task.pure(recodeResponseTime))
 
-  def run(arg: GetUserInfoCommandRequest): Task[GetUserInfoCommandResponse]
+  }
 
 }

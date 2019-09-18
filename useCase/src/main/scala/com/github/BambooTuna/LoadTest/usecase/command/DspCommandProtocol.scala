@@ -54,7 +54,7 @@ object DspCommandProtocol {
 
   case class AddUserInfoCommandSucceeded(deviceId: UserDeviceId) extends AddUserInfoCommandResponse
   case class AddUserInfoCommandFailed(error: String)                   extends AddUserInfoCommandResponse
-  case class SetBudgetCommandSucceeded(budgetBalance: BudgetBalance) extends SetBudgetCommandResponse
+  case object SetBudgetCommandSucceeded extends SetBudgetCommandResponse
   case class SetBudgetCommandFailed(error: String)                   extends SetBudgetCommandResponse
   ////////////
 //  sealed trait AddWinCommandResponse   extends CommandResponse

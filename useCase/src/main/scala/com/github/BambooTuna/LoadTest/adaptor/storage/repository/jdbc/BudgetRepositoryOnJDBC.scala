@@ -1,10 +1,5 @@
 package com.github.BambooTuna.LoadTest.adaptor.storage.repository.jdbc
 
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.BudgetRepository
-import monix.eval.Task
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.BudgetDao
 
-trait BudgetRepositoryOnJDBC extends BudgetRepository {
-
-  def resolveById(id: Id): Task[Seq[Record]]
-
-}
+trait BudgetRepositoryOnJDBC extends BudgetDao

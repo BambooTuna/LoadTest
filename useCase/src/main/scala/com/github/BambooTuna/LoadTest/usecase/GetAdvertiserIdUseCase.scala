@@ -1,13 +1,24 @@
 package com.github.BambooTuna.LoadTest.usecase
 
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.AdvertiserIdRepository
-import com.github.BambooTuna.LoadTest.usecase.command.DspCommandProtocol.{ GetAdvertiserIdCommandRequest, GetAdvertiserIdCommandResponse }
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.AdvertiserIdDao
+import com.github.BambooTuna.LoadTest.usecase.command.DspCommandProtocol._
 import monix.eval.Task
 
-trait GetAdvertiserIdUseCase extends UseCaseCommon {
+case class GetAdvertiserIdUseCase(advertiserIdRepositories: AdvertiserIdRepositoryBalancer[AdvertiserIdDao]) extends UseCaseCommon {
 
-  val advertiserIdRepositories: AdvertiserIdRepositoryBalancer[AdvertiserIdRepository]
+  def run(arg: GetAdvertiserIdCommandRequest): Task[GetAdvertiserIdCommandResponse] = {
+    (for {
+      aggregate <- Task.pure(
+        arg.id
+      )
+      r <- advertiserIdRepositories.getConnectionWithAdRequestId(aggregate).resolveById(aggregate)
+    } yield r)
+      .map { result =>
+        GetAdvertiserIdCommandSucceeded(result.get)
+      }.onErrorHandle { ex =>
+        GetAdvertiserIdCommandFailed(ex.getMessage)
+      }
 
-  def run(arg: GetAdvertiserIdCommandRequest): Task[GetAdvertiserIdCommandResponse]
+  }
 
 }

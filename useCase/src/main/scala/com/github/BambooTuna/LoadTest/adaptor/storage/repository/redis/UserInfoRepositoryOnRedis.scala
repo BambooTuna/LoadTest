@@ -1,5 +1,5 @@
 package com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis
 
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.UserInfoRepository
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.UserInfoDao
 
-trait UserInfoRepositoryOnRedis extends UserInfoRepository
+trait UserInfoRepositoryOnRedis extends UserInfoDao

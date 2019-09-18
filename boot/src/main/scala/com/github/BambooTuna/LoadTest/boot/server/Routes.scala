@@ -66,11 +66,11 @@ object Routes {
       UserInfoRepositoryBalancer(userRepositories)
     )
 
-    val getBudgetUseCase: GetBudgetUseCase = GetBudgetUseCaseImpl(
+    val getBudgetUseCase: GetBudgetUseCase = GetBudgetUseCase(
       BudgetRepositoryBalancer(budgetRepository)
     )
 
-    val getAdIdUseCase: GetAdvertiserIdUseCase = GetAdvertiserIdUseCaseImpl(
+    val getAdIdUseCase: GetAdvertiserIdUseCase = GetAdvertiserIdUseCase(
       GetAdvertiserIdRepositoryBalancer(adidRepository)
     )
     val addAdIdUseCase: AddAdIdUseCase = AddAdIdUseCaseImpl(
@@ -82,7 +82,7 @@ object Routes {
       getAdIdUseCase
     )
 
-    val addUserUseCase: AddUserInfoUseCase = AddUserInfoUseCaseImpl(
+    val addUserUseCase: AddUserInfoUseCase = AddUserInfoUseCase(
       UserInfoRepositoryBalancer(userRepositories)
     )
 
