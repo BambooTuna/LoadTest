@@ -1,6 +1,6 @@
 package com.github.BambooTuna.LoadTest.adaptor.storage.dao.redis
 
-import com.github.BambooTuna.LoadTest.domain.model.ad.AdvertiserId
+import com.github.BambooTuna.LoadTest.domain.model.dsp.ad.AdvertiserId
 import com.github.BambooTuna.LoadTest.domain.model.budget._
 
 trait BudgetComponentOnRedis {

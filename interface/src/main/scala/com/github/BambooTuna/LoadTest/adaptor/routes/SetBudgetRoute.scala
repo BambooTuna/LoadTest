@@ -11,7 +11,7 @@ import akka.http.scaladsl.server.Directives.{
 }
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
-import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol.{
+import com.github.BambooTuna.LoadTest.usecase.command.DspCommandProtocol.{
   SetBudgetCommandFailed,
   SetBudgetCommandRequest,
   SetBudgetCommandSucceeded

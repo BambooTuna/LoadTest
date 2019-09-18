@@ -1,7 +1,7 @@
 package com.github.BambooTuna.LoadTest.usecase
 
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.AdIdRepository
-import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol.{
+import com.github.BambooTuna.LoadTest.adaptor.storage.repository.AdvertiserIdRepository
+import com.github.BambooTuna.LoadTest.usecase.command.DspCommandProtocol.{
   AddAdIdCommandFailed,
   AddAdIdCommandRequest,
   AddAdIdCommandResponse,
@@ -9,7 +9,7 @@ import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol.{
 }
 import monix.eval.Task
 
-case class AddAdIdUseCaseImpl(adidRepositories: GetAdIdRepositoryBalance[AdIdRepository]) extends AddAdIdUseCase {
+case class AddAdIdUseCaseImpl(adidRepositories: GetAdvertiserIdRepositoryBalancer[AdvertiserIdRepository]) extends AddAdIdUseCase {
 
   override def run(arg: AddAdIdCommandRequest): Task[AddAdIdCommandResponse] = {
     setResponseTimer
@@ -20,7 +20,6 @@ case class AddAdIdUseCaseImpl(adidRepositories: GetAdIdRepositoryBalance[AdIdRep
       r <- adidRepositories.getConnectionWithAdRequestId(aggregate._1).put(aggregate)
     } yield r)
       .map { _ =>
-        successCounterIncrement
         AddAdIdCommandSucceeded
       }.onErrorHandle { ex =>
         failedCounterIncrement

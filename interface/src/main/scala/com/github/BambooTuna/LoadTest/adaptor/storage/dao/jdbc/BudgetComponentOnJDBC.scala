@@ -1,6 +1,6 @@
 package com.github.BambooTuna.LoadTest.adaptor.storage.dao.jdbc
 
-import com.github.BambooTuna.LoadTest.domain.model.ad.AdvertiserId
+import com.github.BambooTuna.LoadTest.domain.model.dsp.ad.AdvertiserId
 import com.github.BambooTuna.LoadTest.domain.model.budget.{ BudgetDifferencePrice, BudgetEventModel, BudgetEventType }
 import com.github.BambooTuna.LoadTest.domain.setting.TimeZoneSetting
 import slick.jdbc.MySQLProfile.api._

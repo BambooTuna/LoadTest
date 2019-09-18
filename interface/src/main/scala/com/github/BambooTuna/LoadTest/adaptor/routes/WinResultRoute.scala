@@ -11,7 +11,7 @@ import akka.http.scaladsl.server.Directives.{
 }
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
-import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol.{ AddWinCommandSucceeded, _ }
+import com.github.BambooTuna.LoadTest.usecase.command.DspCommandProtocol.{ AddWinCommandSucceeded, _ }
 import com.github.BambooTuna.LoadTest.usecase.json.AddWinRequestJson
 import com.github.BambooTuna.LoadTest.usecase.AddWinUseCase
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport

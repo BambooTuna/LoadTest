@@ -1,7 +1,7 @@
 package com.github.BambooTuna.LoadTest.adaptor.storage.dao.aerospike
 
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.OnAerospikeClient
-import com.github.BambooTuna.LoadTest.domain.model.ad.AdvertiserId
+import com.github.BambooTuna.LoadTest.domain.model.dsp.ad.AdvertiserId
 import com.github.BambooTuna.LoadTest.domain.model.budget.{ BudgetDifferencePrice, BudgetEventModel, BudgetEventType }
 
 trait BudgetComponentOnAerospike {

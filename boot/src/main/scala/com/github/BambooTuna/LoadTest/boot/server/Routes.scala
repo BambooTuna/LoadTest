@@ -3,27 +3,25 @@ package com.github.BambooTuna.LoadTest.boot.server
 import java.io.File
 
 import akka.NotUsed
-import akka.actor.{ Actor, ActorSystem, Props }
-import akka.http.scaladsl.model.HttpMethods.{ GET, POST, PUT }
+import akka.actor.{Actor, ActorSystem, Props}
+import akka.http.scaladsl.model.HttpMethods.{GET, POST, PUT}
 import akka.http.scaladsl.model.StatusCodes
 import akka.stream.ActorMaterializer
 import com.github.BambooTuna.LoadTest.adaptor.routes._
 import org.slf4j.LoggerFactory
 import akka.http.scaladsl.server.Directives._
-import akka.stream.scaladsl.{ Flow, RunnableGraph, Sink, Source }
+import akka.stream.scaladsl.{Flow, RunnableGraph, Sink, Source}
+import com.aerospike.client.AerospikeClient
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.aerospike.AerospikeSetting
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.jdbc.JdbcSetting
-import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.{ OnRedisClient, OnSlickClient }
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.{OnAerospikeClient, OnRedisClient, OnSlickClient}
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.redis.RedisSetting
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis.{
-  AdIdRepositoryOnRedisImpl,
-  BudgetRepositoryOnRedisImpl,
-  UserRepositoryOnRedisImpl
-}
+import com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis.{AdvertiserIdRepositoryOnRedisImpl, BudgetRepositoryOnRedisImpl, UserInfoRepositoryOnRedisImpl}
 import com.github.BambooTuna.LoadTest.boot.server.SetupRedis.tryProcessSource
-import com.github.BambooTuna.LoadTest.domain.model.ad.WinRedirectUrl
-import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol.AddUserCommandRequest
-import com.github.BambooTuna.LoadTest.usecase.{ AddUserUseCase, AddWinUseCase, _ }
-import com.github.BambooTuna.LoadTest.usecase.calculate.{ CalculateModelUseCase, CalculateModelUseCaseImpl }
+import com.github.BambooTuna.LoadTest.domain.model.dsp.ad.WinNoticeEndpoint
+import com.github.BambooTuna.LoadTest.usecase.command.DspCommandProtocol.AddUserCommandRequest
+import com.github.BambooTuna.LoadTest.usecase.{AddUserInfoUseCase, AddWinUseCase, _}
+import com.github.BambooTuna.LoadTest.usecase.calculate.{CalculateModelUseCase, CalculateModelUseCaseImpl}
 import com.github.BambooTuna.LoadTest.usecase.json.UserDataJson
 import monix.eval.Task
 import monix.execution.Scheduler.Implicits.global
@@ -36,18 +34,16 @@ object Routes {
 
   val logger = LoggerFactory.getLogger(getClass)
 
-  def createRouter(redisSettings: Seq[RedisSetting])(
+  def createRouter(jdbcSetting: JdbcSetting, redisSettings: RedisSetting, aerospikeSetting: AerospikeSetting)(
       implicit system: ActorSystem,
       materializer: ActorMaterializer
   ): Router = {
 
-//    val slickClient: OnSlickClient       = jdbcSetting.client
-    val redisClients: Seq[OnRedisClient] = redisSettings.map(_.client)
+    val mysqlClient: OnSlickClient       = jdbcSetting.client
+    val redisClient: OnRedisClient = redisSettings.client
+    val aerospikeClient: OnAerospikeClient = aerospikeSetting.client
 
-    val clientCluster: ClientCluster = ClientCluster(redisClients)
-
-    commonRouter +
-    adPro(clientCluster)
+    commonRouter + dspServerRouter(mysqlClient, redisClient, aerospikeClient)
   }
 
   def commonRouter(implicit materializer: ActorMaterializer): Router =
@@ -56,29 +52,29 @@ object Routes {
       route(GET, "ping", CommonRoute().ping)
     )
 
-  def adPro(clientCluster: ClientCluster)(implicit system: ActorSystem, materializer: ActorMaterializer): Router = {
+  def dspServerRouter(mysqlClient: OnSlickClient, redisClient: OnRedisClient, aerospikeClient: OnAerospikeClient)(implicit system: ActorSystem, materializer: ActorMaterializer): Router = {
     val (userRedisClients, o)                  = clientCluster.redisClients.splitAt(3)
     val (adidRedisClients, budgetRedisClients) = o.splitAt(3)
 
     require(userRedisClients.size == 3 && adidRedisClients.size == 3, budgetRedisClients.size == 1)
 
-    val userRepositories = userRedisClients.map(new UserRepositoryOnRedisImpl(_))
-    val adidRepository   = adidRedisClients.map(new AdIdRepositoryOnRedisImpl(_))
+    val userRepositories = userRedisClients.map(new UserInfoRepositoryOnRedisImpl(_))
+    val adidRepository   = adidRedisClients.map(new AdvertiserIdRepositoryOnRedisImpl(_))
     val budgetRepository = budgetRedisClients.map(new BudgetRepositoryOnRedisImpl(_))
 
-    val getUserUseCase: GetUserUseCase = GetUserUseCaseImpl(
-      GetUserRepositoryBalance(userRepositories)
+    val getUserUseCase: GetUserInfoUseCase = GetUserInfoUseCaseImpl(
+      UserInfoRepositoryBalancer(userRepositories)
     )
 
     val getBudgetUseCase: GetBudgetUseCase = GetBudgetUseCaseImpl(
-      GetBudgetRepositoryBalance(budgetRepository)
+      BudgetRepositoryBalancer(budgetRepository)
     )
 
-    val getAdIdUseCase: GetAdIdUseCase = GetAdIdUseCaseImpl(
-      GetAdIdRepositoryBalance(adidRepository)
+    val getAdIdUseCase: GetAdvertiserIdUseCase = GetAdvertiserIdUseCaseImpl(
+      GetAdvertiserIdRepositoryBalancer(adidRepository)
     )
     val addAdIdUseCase: AddAdIdUseCase = AddAdIdUseCaseImpl(
-      GetAdIdRepositoryBalance(adidRepository)
+      GetAdvertiserIdRepositoryBalancer(adidRepository)
     )
 
     val addWinUseCase: AddWinUseCase = AddWinUseCaseImpl(
@@ -86,12 +82,12 @@ object Routes {
       getAdIdUseCase
     )
 
-    val addUserUseCase: AddUserUseCase = AddUserUseCaseImpl(
-      GetUserRepositoryBalance(userRepositories)
+    val addUserUseCase: AddUserInfoUseCase = AddUserInfoUseCaseImpl(
+      UserInfoRepositoryBalancer(userRepositories)
     )
 
     val setBudgetUseCase: SetBudgetUseCase = SetBudgetUseCaseImpl(
-      GetBudgetRepositoryBalance(budgetRepository)
+      BudgetRepositoryBalancer(budgetRepository)
     )
 
     val calculateModelUseCase: CalculateModelUseCase = CalculateModelUseCaseImpl()
@@ -119,13 +115,13 @@ object Routes {
       route(
         POST,
         "bid_request",
-        BidRoute(
-          BidUseCaseImpl(
+        BidRequestRoute(
+          BidRequestUseCaseImpl(
             getUserUseCase,
             addAdIdUseCase,
             getBudgetUseCase,
             getModelUseCase,
-            WinRedirectUrl("http://34.84.137.136:8080/win") //TODO
+            WinNoticeEndpoint("http://34.84.137.136:8080/win") //TODO
           )
         ).route
       ),
@@ -160,60 +156,3 @@ object Routes {
   }
 
 }
-//
-//class SetDataActor(addUserUseCase: AddUserUseCase) extends Actor {
-//
-//  implicit val materializer: ActorMaterializer = ActorMaterializer()
-//
-//  override def receive = {
-//    case "run" =>
-//      println("actor receive")
-//
-//      import monix.execution.Scheduler.Implicits.global
-//      val tryLinesIrvingTxNoHeader: Try[List[List[String]]] =
-//        tryProcessSource(
-//          new File("/opt/docker/sample_user.csv"),
-//          parseLine = (index, unparsedLine) => Some(unparsedLine.split(",").toList),
-//          filterLine = (index, parsedValues) =>
-//            Some(
-//              index != 0 //skip header line
-//          )
-//        )
-//
-//      val source = Source[List[String]](
-//        tryLinesIrvingTxNoHeader.get
-//      )
-//
-//      val invert = Flow[List[String]].map {
-//        case List(device_id,
-//                  advertiser_id,
-//                  game_install_count,
-//                  game_login_count,
-//                  game_paid_count,
-//                  game_tutorial_count,
-//                  game_extension_count) =>
-//          UserDataJson(
-//            device_id,
-//            advertiser_id.toInt,
-//            game_install_count.toDouble,
-//            game_login_count.toDouble,
-//            game_paid_count.toDouble,
-//            game_tutorial_count.toDouble,
-//            game_extension_count.toDouble
-//          )
-//      }
-//      val sink = Sink.foreach[UserDataJson](json => {
-//        addUserUseCase
-//          .run(
-//            AddUserCommandRequest(json)
-//          )
-//          .runToFuture
-//      })
-//
-//      val runnable: RunnableGraph[NotUsed] = source via invert to sink
-//      runnable.run()
-//    case _ => ()
-//
-//  }
-//
-//}

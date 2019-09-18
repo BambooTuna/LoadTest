@@ -5,8 +5,8 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.HttpMethods.POST
 import akka.http.scaladsl.model.{HttpEntity, HttpRequest, HttpResponse, MediaTypes}
 import akka.stream.{ActorMaterializer, Materializer}
-import com.github.BambooTuna.LoadTest.adaptor.routes.json.BidRequestJson
-import com.github.BambooTuna.LoadTest.domain.model.ad.AdRequestExt
+import com.github.BambooTuna.LoadTest.adaptor.routes.json.BidRequestRequestJson
+import com.github.BambooTuna.LoadTest.domain.model.dsp.ad.AdRequestExt
 import com.github.BambooTuna.LoadTest.usecase.json.UserDataJson
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
@@ -30,7 +30,7 @@ class BidSimulation extends Simulation with SimulationConfig {
           .headers(Map("Content-Type" -> "application/json"))
           .body(
             StringBody(
-              BidRequestJson(
+              BidRequestRequestJson(
                 id = "1",
                 timestamp = 1234567890L,
                 device_id = "1",

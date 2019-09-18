@@ -2,7 +2,7 @@ package com.github.BambooTuna.LoadTest.boot.server
 
 import java.io._
 
-import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol.AddUserCommandRequest
+import com.github.BambooTuna.LoadTest.usecase.command.DspCommandProtocol.AddUserCommandRequest
 import com.github.BambooTuna.LoadTest.usecase.json.UserDataJson
 
 import scala.util.Try
@@ -15,7 +15,7 @@ import java.io.File
 import akka.NotUsed
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{ Flow, RunnableGraph, Sink, Source }
-import com.github.BambooTuna.LoadTest.usecase.AddUserUseCase
+import com.github.BambooTuna.LoadTest.usecase.AddUserInfoUseCase
 
 object SetupRedis {
 

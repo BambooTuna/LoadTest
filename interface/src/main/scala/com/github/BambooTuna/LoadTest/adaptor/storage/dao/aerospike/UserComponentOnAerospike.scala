@@ -1,7 +1,7 @@
 package com.github.BambooTuna.LoadTest.adaptor.storage.dao.aerospike
 
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.OnAerospikeClient
-import com.github.BambooTuna.LoadTest.domain.model.user.UserId
+import com.github.BambooTuna.LoadTest.domain.model.dsp.user.UserId
 
 trait UserComponentOnAerospike {
 

@@ -1,6 +1,6 @@
 package com.github.BambooTuna.LoadTest.adaptor.storage.dao.jdbc
 
-import com.github.BambooTuna.LoadTest.domain.model.user._
+import com.github.BambooTuna.LoadTest.domain.model.dsp.user._
 import com.github.BambooTuna.LoadTest.usecase.json.UserDataJson
 import slick.jdbc.MySQLProfile.api._
 

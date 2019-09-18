@@ -1,88 +1,79 @@
 package com.github.BambooTuna.LoadTest.usecase
 
-import akka.http.scaladsl.model.HttpResponse
+import akka.actor.ActorSystem
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.model.HttpMethods.GET
+import akka.http.scaladsl.model.{HttpEntity, HttpRequest, HttpResponse, MediaTypes}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
 import com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis.BudgetRepositoryOnRedis
-import com.github.BambooTuna.LoadTest.domain.model.ad.AdvertiserId
-import com.github.BambooTuna.LoadTest.domain.setting.TimeZoneSetting
-import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol._
-import com.github.BambooTuna.LoadTest.usecase.json.{ GetBudgetRequestJson, GetBudgetResponseJson }
+import com.github.BambooTuna.LoadTest.domain.model.budget.BudgetBalance
+import com.github.BambooTuna.LoadTest.usecase.command.DspCommandProtocol.{GetBudgetCommandResponse, _}
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
-import kamon.Kamon
-import kamon.metric.instrument.Gauge
 import monix.eval.Task
+import io.circe.syntax._
+import io.circe.generic.auto._
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
-case class GetBudgetUseCaseImpl(budgetRepositoriesOnRedis: GetBudgetRepositoryBalance[BudgetRepositoryOnRedis])
+case class GetBudgetUseCaseImpl(budgetRepositories: BudgetRepositoryBalancer[BudgetRepositoryOnRedis])
     extends GetBudgetUseCase
     with FailFastCirceSupport {
 
-  val budgetBalances = (1 to 20).map(i => {
-    Kamon.metrics.gauge(s"BudgetBalance-$i")(Gauge.functionZeroAsCurrentValueCollector(() => 0L))
-  })
-
-  //TODO budgetRepositoryを作る（時間あれば）
   override def run(arg: GetBudgetCommandRequest): Task[GetBudgetCommandResponse] = {
-    setResponseTimer
     (for {
-      aggregate <- Task.pure(
-        AdvertiserId(arg.request.advertiser_id)
+      _ <- Task.pure(
+        setResponseTimer
       )
-      budget <- budgetRepositoriesOnRedis
+      aggregate <- Task.pure(
+        arg.advertiserId
+      )
+      budget <- budgetRepositories
         .getConnectionWithAdvertiserId(aggregate).resolveById(aggregate)
-      _ <- Task.pure {
-        budgetBalances(aggregate.value).record(budget.value.toLong)
-      }
     } yield budget)
-      .map { result =>
-        successCounterIncrement
-        GetBudgetCommandSucceeded(GetBudgetResponseJson(result.value))
-      }.onErrorHandle { ex =>
+      .map(GetBudgetCommandSucceeded)
+      .onErrorHandle { ex =>
         failedCounterIncrement
         GetBudgetCommandFailed(ex.getMessage)
       }
+      .doOnFinish(_ => Task.pure(recodeResponseTime))
   }
 
-//  override def runWithOutSide(arg: GetBudgetCommandRequest)(implicit system: ActorSystem,
-//                                                            mat: Materializer): Task[GetBudgetCommandResponse] = {
-//    val request = HttpRequest(POST, s"/budget")
-//      .withEntity(HttpEntity(MediaTypes.`application/json`, convertToJsonObj(arg).asJson.noSpaces))
-//    Task
-//      .deferFutureAction { implicit ec =>
-//        Http()
-//          .singleRequest(request)
-//          .flatMap(handleErrorResponse(_)(_.to[GetBudgetResponseJson]))
-//          .recover {
-//            case _ =>
-//              getBudgetCommandFailedTaskCounter.increment()
-//              logger.debug("GetBudgetCommandFailed")
-//              GetBudgetCommandFailed("GetBudgetCommandFailed")
-//          }
-//      }
-//  }
+  private case class GetBudgetRequestJson(advertiser_id: Int)
+  private case class GetBudgetResponseJson(budget_balance: Double)
 
-  private def convertToJsonObj(arg: GetBudgetCommandRequest): GetBudgetRequestJson =
-    arg.request
+  override def runWithOtherServer(arg: GetBudgetCommandRequest)
+                                 (implicit system: ActorSystem, mat: Materializer): Task[GetBudgetCommandResponse] =
+  {
+    val request = HttpRequest(GET, s"/budget")
+      .withEntity(HttpEntity(MediaTypes.`application/json`, convertToJson(arg).asJson.noSpaces))
+    Task
+      .deferFutureAction { implicit ec =>
+        Http()
+          .singleRequest(request)
+          .flatMap(handleErrorResponse(_)(_.to[GetBudgetResponseJson]))
+          .recover {
+            case e =>
+              GetBudgetCommandFailed(s"GetBudgetCommandFailed: ${e.getMessage}")
+          }
+      }
+  }
 
-  private def handleErrorResponse(
-      r: HttpResponse
-  )(
-      f: Unmarshal[HttpResponse] => Future[GetBudgetResponseJson]
-  )(
-      implicit ec: ExecutionContext,
-      mat: Materializer
-  ): Future[GetBudgetCommandResponse] = {
+  private def convertToJson(arg: GetBudgetCommandRequest): GetBudgetRequestJson =
+    GetBudgetRequestJson(arg.advertiserId.value)
+
+  private def convertToAggregate(arg: GetBudgetResponseJson): GetBudgetCommandSucceeded =
+    GetBudgetCommandSucceeded(BudgetBalance(arg.budget_balance))
+
+  private def handleErrorResponse(r: HttpResponse)
+                                 (f: Unmarshal[HttpResponse] => Future[GetBudgetResponseJson])
+                                 (implicit ec: ExecutionContext, mat: Materializer): Future[GetBudgetCommandResponse] =
+  {
     val unmarshaled: Unmarshal[HttpResponse] = Unmarshal(r)
     if (r.status.isSuccess)
-      f(unmarshaled).map(GetBudgetCommandSucceeded)
+      f(unmarshaled).map(convertToAggregate)
     else
-      Future {
-        setResponseTimer
-        failedCounterIncrement
-        GetBudgetCommandFailed("GetBudgetCommandFailed")
-      }
+      Future.failed(new Exception(s"status is not Success: $r"))
   }
 
 }

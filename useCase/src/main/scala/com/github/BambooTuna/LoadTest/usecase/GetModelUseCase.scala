@@ -2,13 +2,11 @@ package com.github.BambooTuna.LoadTest.usecase
 
 import akka.actor.ActorSystem
 import akka.stream.Materializer
-import com.github.BambooTuna.LoadTest.usecase.LoadTestProtocol.{ GetModelCommandRequest, GetModelCommandResponse }
+import com.github.BambooTuna.LoadTest.usecase.command.DspCommandProtocol.{ GetModelCommandRequest, GetModelCommandResponse }
 import com.github.BambooTuna.LoadTest.usecase.calculate.CalculateModelUseCase
 import monix.eval.Task
 
 trait GetModelUseCase extends UseCaseCommon {
-
-  val calculateModelUseCase: CalculateModelUseCase
 
   def run(arg: GetModelCommandRequest): Task[GetModelCommandResponse]
 
