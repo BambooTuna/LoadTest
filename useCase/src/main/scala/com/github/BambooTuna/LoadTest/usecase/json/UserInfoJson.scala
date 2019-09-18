@@ -1,6 +1,7 @@
 package com.github.BambooTuna.LoadTest.usecase.json
 
-case class SetBudgetRequestJson(
+case class UserInfoJson(
+    device_id: String,
     advertiser_id: Int,
-    price: Int
+    game_install_count: Long
 )

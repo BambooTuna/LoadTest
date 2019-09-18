@@ -6,16 +6,14 @@ import akka.http.scaladsl.model.HttpMethods.POST
 import akka.http.scaladsl.model.{HttpEntity, HttpRequest, HttpResponse, MediaTypes}
 import akka.stream.{ActorMaterializer, Materializer}
 import com.github.BambooTuna.LoadTest.adaptor.routes.json.BidRequestRequestJson
-import com.github.BambooTuna.LoadTest.domain.model.dsp.ad.AdRequestExt
-import com.github.BambooTuna.LoadTest.usecase.json.UserDataJson
+import com.github.BambooTuna.LoadTest.usecase.json.UserInfoJson
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import io.circe.syntax._
 import io.circe.generic.auto._
 import monix.eval.Task
 
-import scala.concurrent.{Await, ExecutionContextExecutor, duration}
-import monix.execution.Scheduler.Implicits.global
+import scala.concurrent.ExecutionContextExecutor
 
 class BidSimulation extends Simulation with SimulationConfig {
 
@@ -38,28 +36,12 @@ class BidSimulation extends Simulation with SimulationConfig {
                 media_id = 1,
                 os_type = 1,
                 banner_position = 1,
-                is_interstitial = 1,
-                floor_price = 1f,
-                ext = AdRequestExt(1L)
+                floor_price = 1f
               ).asJson.noSpaces
             )
           )
           .check(status.is(200))
       )
-
-//  before {
-//    Await.result(initRedis(
-      UserDataJson(
-        device_id = "1",
-        advertiser_id = 1,
-        game_install_count = 1,
-        game_login_count = 1,
-        game_paid_count = 1,
-        game_tutorial_count = 1,
-        game_extension_count = 1
-      )
-//    ).runToFuture, duration.Duration.Inf)
-//  }
 
   setUp(
     scn.inject(
@@ -68,8 +50,8 @@ class BidSimulation extends Simulation with SimulationConfig {
     )
   ).protocols(httpConf).maxDuration(gatlingUser.entireDuration)
 
-  def initRedis(arg: UserDataJson)(implicit system: ActorSystem,
-                                                   mat: Materializer): Task[HttpResponse] = {
+  def initRedis(arg: UserInfoJson)(implicit system: ActorSystem,
+                                   mat: Materializer): Task[HttpResponse] = {
     val request = HttpRequest(POST, s"$baseUrl/user/add")
       .withEntity(HttpEntity(MediaTypes.`application/json`, arg.asJson.noSpaces))
     Task
@@ -78,18 +60,5 @@ class BidSimulation extends Simulation with SimulationConfig {
           .singleRequest(request)
       }
   }
-
-}
-object AA extends App {
-
-  print(UserDataJson(
-    device_id = "1",
-    advertiser_id = 1,
-    game_install_count = 1,
-    game_login_count = 1,
-    game_paid_count = 1,
-    game_tutorial_count = 1,
-    game_extension_count = 1
-  ).asJson.noSpaces)
 
 }
