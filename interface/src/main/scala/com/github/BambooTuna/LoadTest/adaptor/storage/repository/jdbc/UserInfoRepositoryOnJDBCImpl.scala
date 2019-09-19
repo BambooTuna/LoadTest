@@ -48,17 +48,19 @@ class UserInfoRepositoryOnJDBCImpl(val client: OnSlickClient) extends UserInfoRe
       GameInstallCount(item.game_install_count)
     )
 
+  private val resolveByIdCompiled = Compiled((id: Rep[String]) => dao.filter(_.userId === id))
   def resolveById(id: Id): Task[Option[Record]] = {
     Task
       .deferFutureAction { implicit ec =>
-        client.db.run(dao.filter(_.userId === id.value).result)
+        client.db.run(resolveByIdCompiled(id.value).result)
       }.map(_.headOption.map(convertToAggregate))
   }
 
+  val insertCompiled = Compiled(dao.filter(_ => true: Rep[Boolean]))
   def insert(id: Id, record: Record): Task[Long] = {
     Task
       .deferFutureAction { implicit ec =>
-        client.db.run(dao += convertToRecord(id, record))
+        client.db.run(insertCompiled += convertToRecord(id, record))
       }.map(_.toLong)
   }
 
