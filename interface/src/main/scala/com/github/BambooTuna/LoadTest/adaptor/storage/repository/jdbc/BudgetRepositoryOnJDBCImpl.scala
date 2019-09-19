@@ -51,7 +51,8 @@ class BudgetRepositoryOnJDBCImpl(val client: OnSlickClient) extends BudgetReposi
       BudgetDifferencePrice(item.budget_balance)
     )
 
-  def calculateBudgetBalance(models: Seq[BudgetEventModel]): BudgetEventModel = ???
+  def calculateBudgetBalance(models: Seq[BudgetEventModel]): BudgetEventModel =
+    models.reduce(_ + _)
 
   def resolveById(id: Id): Task[Option[Record]] = {
     Task

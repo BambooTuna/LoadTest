@@ -1,6 +1,6 @@
 package com.github.BambooTuna.LoadTest.usecase
 
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis.BudgetRepositoryOnRedis
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.BudgetDao
 import com.github.BambooTuna.LoadTest.domain.model.budget.{ Absolute, BudgetDifferencePrice, BudgetEventModel }
 import com.github.BambooTuna.LoadTest.usecase.command.DspCommandProtocol.{
   SetBudgetCommandFailed,
@@ -10,8 +10,7 @@ import com.github.BambooTuna.LoadTest.usecase.command.DspCommandProtocol.{
 }
 import monix.eval.Task
 
-case class SetBudgetUseCase(budgetRepositoriesOnRedis: BudgetRepositoryBalancer[BudgetRepositoryOnRedis])
-    extends UseCaseCommon {
+case class SetBudgetUseCase(budgetRepositoriesOnRedis: BudgetRepositoryBalancer[BudgetDao]) extends UseCaseCommon {
 
   def run(arg: SetBudgetCommandRequest): Task[SetBudgetCommandResponse] = {
     (for {
