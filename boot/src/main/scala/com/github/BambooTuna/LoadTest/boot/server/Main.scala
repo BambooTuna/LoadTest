@@ -37,11 +37,11 @@ object Main extends App {
   )
 
   val redisSetting = RedisSetting(
-    host = system.settings.config.getString("redis.host"),
-    port = system.settings.config.getInt("redis.port"),
-    password = Some(system.settings.config.getString("redis.password")).filter(_.nonEmpty),
-    redis_db = Some(system.settings.config.getInt("redis.db")),
-    connectTimeout = Some(system.settings.config.getDuration("redis.connect-timeout").toMillis.millis)
+    host = system.settings.config.getString("redis.user-info.host"),
+    port = system.settings.config.getInt("redis.user-info.port"),
+    password = Some(system.settings.config.getString("redis.user-info.password")).filter(_.nonEmpty),
+    redis_db = Some(system.settings.config.getInt("redis.user-info.db")),
+    connectTimeout = Some(system.settings.config.getDuration("redis.user-info.connect-timeout").toMillis.millis)
   )
 
   val aerospikeSetting = AerospikeSetting(
