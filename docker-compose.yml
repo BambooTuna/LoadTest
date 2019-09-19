@@ -1,46 +1,21 @@
 version: "3.4"
 services:
-  db:
+  mysql-budget-db:
     restart: always # OS起動時にコンテナを自動起動
     build: ./tools/mysql
     ports:
       - 3306:3306
     env_file: ./tools/mysql/.env # 環境変数に外部ファイルを指定
-  redis-user1-master:
+  redis-user-info-master:
     image: redis:3.2.4-alpine
     restart: always # OS起動時にコンテナを自動起動
     ports:
-      - "6380:6379"
-  redis-user2-master:
+      - 6379:6379
+  redis-advertiser-id-master:
     image: redis:3.2.4-alpine
     restart: always # OS起動時にコンテナを自動起動
     ports:
-      - "6381:6379"
-  redis-user3-master:
-    image: redis:3.2.4-alpine
-    restart: always # OS起動時にコンテナを自動起動
-    ports:
-      - "6382:6379"
-  redis-adid1-master:
-    image: redis:3.2.4-alpine
-    restart: always # OS起動時にコンテナを自動起動
-    ports:
-      - "6383:6379"
-  redis-adid2-master:
-    image: redis:3.2.4-alpine
-    restart: always # OS起動時にコンテナを自動起動
-    ports:
-      - "6384:6379"
-  redis-adid3-master:
-    image: redis:3.2.4-alpine
-    restart: always # OS起動時にコンテナを自動起動
-    ports:
-      - "6385:6379"
-  redis-budget-master:
-    image: redis:3.2.4-alpine
-    restart: always # OS起動時にコンテナを自動起動
-    ports:
-      - "6386:6379"
+      - 6380:6379
   boot:
     image: bambootuna/loadtest:latest
     restart: always # OS起動時にコンテナを自動起動
@@ -52,13 +27,11 @@ services:
       - JVM_HEAP_MAX=1g
       - JVM_META_MAX=512m
       - JMX_PORT=8999
+      - RDB_HOST=mysql-budget-db
+      - USER_INFO_REDIS_HOST=redis-user-info-master
+      - ADVERTISER_ID_REDIS_HOST=redis-advertiser-id-master
 
     depends_on:
-      - db
-      - redis-user1-master
-      - redis-user2-master
-      - redis-user3-master
-      - redis-adid1-master
-      - redis-adid2-master
-      - redis-adid3-master
-      - redis-budget-master
+      - mysql-budget-db
+      - redis-user-info-master
+      - redis-advertiser-id-master

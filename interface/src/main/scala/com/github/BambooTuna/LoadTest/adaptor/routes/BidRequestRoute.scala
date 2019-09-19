@@ -1,13 +1,13 @@
 package com.github.BambooTuna.LoadTest.adaptor.routes
 
-import akka.http.scaladsl.model.{HttpEntity, MediaTypes, StatusCodes}
-import akka.http.scaladsl.server.Directives.{as, entity, extractActorSystem, extractRequestContext, onSuccess, _}
+import akka.http.scaladsl.model.{ HttpEntity, MediaTypes, StatusCodes }
+import akka.http.scaladsl.server.Directives.{ as, entity, extractActorSystem, extractRequestContext, onSuccess, _ }
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import io.circe.syntax._
 import io.circe.generic.auto._
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
-import com.github.BambooTuna.LoadTest.adaptor.routes.json.{BidRequestRequestJson, BidRequestResponseJson}
+import com.github.BambooTuna.LoadTest.adaptor.routes.json.{ BidRequestRequestJson, BidRequestResponseJson }
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.UserInfoDao
 import com.github.BambooTuna.LoadTest.domain.model.dsp.ad._
 import com.github.BambooTuna.LoadTest.domain.setting.TimeZoneSetting
