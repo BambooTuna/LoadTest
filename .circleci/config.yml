@@ -143,27 +143,27 @@ workflows:
           filters:
             tags:
               only: /.*/
-#      - staging:
-#          requires:
-#            - build
-#          filters:
-#            branches:
-#              only:
-#                - develop
-#                - /feature\/develop\/.+/
-#      - push:
-#          requires:
-#            - staging
-#          filters:
-#            branches:
-#              only:
-#                - develop
-#                - /feature\/develop\/.+/
-#      - deploy:
-#          requires:
-#            - push
-#          filters:
-#            branches:
-#              only:
-#                - develop
-#                - /feature\/develop\/.+/
+      - staging:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - develop
+                - /feature\/develop\/.+/
+      - push:
+          requires:
+            - staging
+          filters:
+            branches:
+              only:
+                - develop
+                - /feature\/develop\/.+/
+      - deploy:
+          requires:
+            - push
+          filters:
+            branches:
+              only:
+                - develop
+                - /feature\/develop\/.+/

@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: gatling-runner
-          image: gcr.io/cyberagent-320/cyberagenthack/gatling-runner:6be4f7e5ad5018ff352912a1f1a57bef4bddfe7c
+          image: gcr.io/loadtest-114/cyberagenthack/gatling-runner:6be4f7e5ad5018ff352912a1f1a57bef4bddfe7c
           env:
             - name: GATLING_BASE_URL
               value: "http://34.84.137.136:8080"
