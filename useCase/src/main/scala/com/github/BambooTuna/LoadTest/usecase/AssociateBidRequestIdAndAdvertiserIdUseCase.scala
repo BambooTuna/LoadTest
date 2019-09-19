@@ -16,6 +16,7 @@ case class AssociateBidRequestIdAndAdvertiserIdUseCase(repositories: AdvertiserI
       arg: AssociateBidRequestIdAndAdvertiserIdCommandRequest
   ): Task[AssociateBidRequestIdAndAdvertiserIdCommandResponse] = {
     (for {
+      _ <- setResponseTimer
       idAggregate <- Task.pure(
         arg.bidRequestId
       )
@@ -24,12 +25,11 @@ case class AssociateBidRequestIdAndAdvertiserIdUseCase(repositories: AdvertiserI
       )
       r <- repositories.getConnectionWithAdRequestId(idAggregate).insert(idAggregate, recordAggregate)
     } yield r)
-      .map { _ =>
-        AssociateBidRequestIdAndAdvertiserIdCommandSucceeded
-      }.onErrorHandle { ex =>
-        AssociateBidRequestIdAndAdvertiserIdCommandFailed(ex.getMessage)
-      }
-
+      .responseHandle[AssociateBidRequestIdAndAdvertiserIdCommandResponse](
+        _ => AssociateBidRequestIdAndAdvertiserIdCommandSucceeded
+      )(
+        AssociateBidRequestIdAndAdvertiserIdCommandFailed
+      )
   }
 
 }

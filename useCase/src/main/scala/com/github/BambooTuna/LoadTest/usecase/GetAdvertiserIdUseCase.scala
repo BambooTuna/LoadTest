@@ -9,17 +9,14 @@ case class GetAdvertiserIdUseCase(advertiserIdRepositories: AdvertiserIdReposito
 
   def run(arg: GetAdvertiserIdCommandRequest): Task[GetAdvertiserIdCommandResponse] = {
     (for {
+      _ <- setResponseTimer
       aggregate <- Task.pure(
         arg.id
       )
       r <- advertiserIdRepositories.getConnectionWithAdRequestId(aggregate).resolveById(aggregate)
     } yield r)
-      .map { result =>
-        GetAdvertiserIdCommandSucceeded(result.get)
-      }.onErrorHandle { ex =>
-        GetAdvertiserIdCommandFailed(ex.getMessage)
-      }
-
+      .map(_.get)
+      .responseHandle[GetAdvertiserIdCommandResponse](GetAdvertiserIdCommandSucceeded)(GetAdvertiserIdCommandFailed)
   }
 
 }

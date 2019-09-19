@@ -8,6 +8,6 @@ object BudgetEventType {
   }
 
 }
-sealed case class BudgetEventType(value: Int)
-object Absolute   extends BudgetEventType(0)
-object Difference extends BudgetEventType(1)
+sealed trait BudgetEventType
+case object Absolute   extends BudgetEventType
+case object Difference extends BudgetEventType
