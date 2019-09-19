@@ -11,6 +11,7 @@ case class ReduceBudgetFromWinNoticeUseCase(repositories: BudgetRepositoryBalanc
 
   def run(arg: ReduceBudgetFromWinNoticeCommandRequest): Task[ReduceBudgetFromWinNoticeCommandResponse] = {
     (for {
+      _ <- setResponseTimer
       idAggregate <- Task.pure(
         arg.bidRequestId
       )
@@ -28,11 +29,9 @@ case class ReduceBudgetFromWinNoticeUseCase(repositories: BudgetRepositoryBalanc
           Task.raiseError(new Exception(e))
       }
     } yield r)
-      .map { _ =>
-        ReduceBudgetFromWinNoticeCommandSucceeded
-      }.onErrorHandle { ex =>
-        ReduceBudgetFromWinNoticeCommandFailed(ex.getMessage)
-      }
+      .responseHandle[ReduceBudgetFromWinNoticeCommandResponse](_ => ReduceBudgetFromWinNoticeCommandSucceeded)(
+        ReduceBudgetFromWinNoticeCommandFailed
+      )
   }
 
 }

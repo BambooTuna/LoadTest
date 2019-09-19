@@ -16,7 +16,7 @@ case class UserInfoRepositoryBalancer[+T <: UserInfoDao](dbs: Seq[T]) {
   val userRepositoriesFetchError = Kamon.metrics.counter(s"UserInfoRepository-fetch-error")
 
   def getConnectionWithUserDeviceId(id: UserDeviceId): T = {
-    val head  = id.value.last
+    val head  = id.value.last.toString
     val count = base.indexOf(head) % dbCount
     logger.debug(s"UserInfoRepositoryBalancer: $count / $dbCount")
     if (count >= dbCount) {

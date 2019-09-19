@@ -20,13 +20,10 @@ case class GetModelUseCase() extends UseCaseCommon with FailFastCirceSupport {
 
   def run(arg: GetModelCommandRequest): Task[GetModelCommandResponse] = {
     (for {
+      _   <- setResponseTimer
       ctr <- calculateModel(arg.userInfo)
     } yield ctr)
-      .map { result =>
-        GetModelCommandSucceeded(result)
-      }.onErrorHandle { ex =>
-        GetModelCommandFailed(ex.getMessage)
-      }
+      .responseHandle[GetModelCommandResponse](GetModelCommandSucceeded)(GetModelCommandFailed)
   }
 
   def calculateModel(userInfo: UserInfo): Task[ClickThroughRate] = {

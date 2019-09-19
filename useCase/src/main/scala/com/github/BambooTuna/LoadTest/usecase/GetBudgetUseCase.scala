@@ -22,25 +22,15 @@ case class GetBudgetUseCase(budgetRepositories: BudgetRepositoryBalancer[BudgetD
 
   def run(arg: GetBudgetCommandRequest): Task[GetBudgetCommandResponse] = {
     (for {
-      _ <- Task.pure(
-        setResponseTimer
-      )
+      _ <- setResponseTimer
       aggregate <- Task.pure(
         arg.advertiserId
       )
       budget <- budgetRepositories
         .getConnectionWithAdvertiserId(aggregate).resolveById(aggregate)
     } yield budget)
-      .map { result =>
-        GetBudgetCommandSucceeded(
-          BudgetBalance(1) //TODO
-        )
-      }
-      .onErrorHandle { ex =>
-        failedCounterIncrement
-        GetBudgetCommandFailed(ex.getMessage)
-      }
-      .doOnFinish(_ => Task.pure(recodeResponseTime))
+      .map(_.get.result)
+      .responseHandle[GetBudgetCommandResponse](GetBudgetCommandSucceeded)(GetBudgetCommandFailed)
   }
 
   private case class GetBudgetRequestJson(advertiser_id: Int)

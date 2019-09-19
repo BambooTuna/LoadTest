@@ -8,7 +8,6 @@ import io.circe.syntax._
 import io.circe.generic.auto._
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import com.github.BambooTuna.LoadTest.adaptor.routes.json.{ BidRequestRequestJson, BidRequestResponseJson }
-import com.github.BambooTuna.LoadTest.adaptor.storage.dao.UserInfoDao
 import com.github.BambooTuna.LoadTest.domain.model.dsp.ad._
 import com.github.BambooTuna.LoadTest.domain.setting.TimeZoneSetting
 import com.github.BambooTuna.LoadTest.usecase.BidRequestUseCase
