@@ -54,17 +54,21 @@ class BudgetRepositoryOnJDBCImpl(val client: OnSlickClient) extends BudgetReposi
   def calculateBudgetBalance(models: Seq[BudgetEventModel]): BudgetEventModel =
     models.reduce(_ + _)
 
+  private val resolveByIdCompiled = Compiled(
+    (id: Rep[Int]) => dao.filter(_.advertiser_id === id).sortBy(_.createAt.asc)
+  )
   def resolveById(id: Id): Task[Option[Record]] = {
     Task
       .deferFutureAction { implicit ec =>
-        client.db.run(dao.filter(_.advertiser_id === id.value).sortBy(_.createAt.asc).result)
+        client.db.run(resolveByIdCompiled(id.value).result)
       }.map(_.map(convertToAggregate)).map(l => Some(calculateBudgetBalance(l)))
   }
 
+  val insertCompiled = Compiled(dao.filter(_ => true: Rep[Boolean]))
   override def insert(id: Id, record: Record): Task[Long] = {
     Task
       .deferFutureAction { implicit ec =>
-        client.db.run(dao += convertToRecord(id, record))
+        client.db.run(insertCompiled += convertToRecord(id, record))
       }.map(_.toLong)
   }
 
