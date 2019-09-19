@@ -1,11 +1,11 @@
 package com.github.BambooTuna.LoadTest.usecase
 
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis.BudgetRepositoryOnRedis
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.BudgetDao
 import com.github.BambooTuna.LoadTest.domain.model.budget.{ BudgetEventModel, Difference }
 import com.github.BambooTuna.LoadTest.usecase.command.DspCommandProtocol._
 import monix.eval.Task
 
-case class ReduceBudgetFromWinNoticeUseCase(repositories: BudgetRepositoryBalancer[BudgetRepositoryOnRedis])(
+case class ReduceBudgetFromWinNoticeUseCase(repositories: BudgetRepositoryBalancer[BudgetDao])(
     getAdvertiserIdUseCase: GetAdvertiserIdUseCase
 ) extends UseCaseCommon {
 

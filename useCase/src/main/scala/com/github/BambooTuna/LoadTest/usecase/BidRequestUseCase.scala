@@ -2,6 +2,7 @@ package com.github.BambooTuna.LoadTest.usecase
 
 import akka.actor.ActorSystem
 import akka.stream.Materializer
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.UserInfoDao
 import com.github.BambooTuna.LoadTest.usecase.command.DspCommandProtocol._
 import monix.eval.Task
 import com.github.BambooTuna.LoadTest.domain.model.dsp.ad._
@@ -11,13 +12,12 @@ import scala.concurrent.ExecutionContext
 case class BidRequestUseCase(getUserInfoUseCase: GetUserInfoUseCase,
                              getBudgetUseCase: GetBudgetUseCase,
                              getModelUseCase: GetModelUseCase,
-                             winRedirectUrl: WinNoticeEndpoint)
+                             winRedirectUrl: WinNoticeEndpoint)(implicit system: ActorSystem, mat: Materializer)
     extends UseCaseCommon {
 
-  def run(arg: BidRequestCommandRequest)(implicit system: ActorSystem,
-                                         mat: Materializer): Task[BidRequestCommandResponse] = {
-    implicit val ec: ExecutionContext = mat.executionContext
-    setResponseTimer
+  implicit val ec: ExecutionContext = mat.executionContext
+
+  def run(arg: BidRequestCommandRequest): Task[BidRequestCommandResponse] = {
     for {
       aggregate <- Task.pure(
         UserDeviceId(arg.deviceId.value)

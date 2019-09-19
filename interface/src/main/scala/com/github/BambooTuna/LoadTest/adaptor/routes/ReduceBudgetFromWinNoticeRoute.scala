@@ -1,17 +1,11 @@
 package com.github.BambooTuna.LoadTest.adaptor.routes
 
-import akka.http.scaladsl.model.{ HttpEntity, MediaTypes, StatusCodes }
-import akka.http.scaladsl.server.Directives.{
-  as,
-  complete,
-  entity,
-  extractActorSystem,
-  extractRequestContext,
-  onSuccess
-}
+import akka.http.scaladsl.model.{HttpEntity, MediaTypes, StatusCodes}
+import akka.http.scaladsl.server.Directives.{as, complete, entity, extractActorSystem, extractRequestContext, onSuccess}
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import com.github.BambooTuna.LoadTest.adaptor.routes.json.ReduceBudgetFromWinNoticeRequestJson
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.BudgetDao
 import com.github.BambooTuna.LoadTest.domain.model.budget.BudgetDifferencePrice
 import com.github.BambooTuna.LoadTest.domain.model.dsp.ad.BidRequestId
 import com.github.BambooTuna.LoadTest.usecase.command.DspCommandProtocol._
@@ -35,7 +29,7 @@ case class ReduceBudgetFromWinNoticeRoute(useCase: ReduceBudgetFromWinNoticeUseC
                .run(
                  ReduceBudgetFromWinNoticeCommandRequest(
                    BidRequestId(json.id),
-                   BudgetDifferencePrice(json.price)
+                   BudgetDifferencePrice(-120)
                  )
                )
            } else {
