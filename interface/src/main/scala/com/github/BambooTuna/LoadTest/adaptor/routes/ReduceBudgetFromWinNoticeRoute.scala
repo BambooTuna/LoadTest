@@ -12,7 +12,6 @@ import akka.http.scaladsl.server.Directives.{
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import com.github.BambooTuna.LoadTest.adaptor.routes.json.ReduceBudgetFromWinNoticeRequestJson
-import com.github.BambooTuna.LoadTest.adaptor.storage.dao.BudgetDao
 import com.github.BambooTuna.LoadTest.domain.model.budget.BudgetDifferencePrice
 import com.github.BambooTuna.LoadTest.domain.model.dsp.ad.BidRequestId
 import com.github.BambooTuna.LoadTest.usecase.command.DspCommandProtocol._

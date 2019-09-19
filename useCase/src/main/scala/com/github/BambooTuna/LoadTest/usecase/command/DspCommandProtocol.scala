@@ -36,7 +36,7 @@ object DspCommandProtocol {
   case class GetModelCommandRequest(userInfo: UserInfo)          extends CommandRequest
   case class GetAdvertiserIdCommandRequest(id: BidRequestId)     extends CommandRequest
 
-  case class AddUserInfoCommandRequest(userInfo: UserInfo)                                     extends CommandRequest
+  case class AddUserInfoCommandRequest(userInfo: Seq[UserInfo])                                extends CommandRequest
   case class SetBudgetCommandRequest(advertiserId: AdvertiserId, budgetBalance: BudgetBalance) extends CommandRequest
 
   case class AssociateBidRequestIdAndAdvertiserIdCommandRequest(bidRequestId: BidRequestId, advertiserId: AdvertiserId)
@@ -62,10 +62,10 @@ object DspCommandProtocol {
   case class GetAdvertiserIdCommandSucceeded(advertiserId: AdvertiserId) extends GetAdvertiserIdCommandResponse
   case class GetAdvertiserIdCommandFailed(error: String)                 extends GetAdvertiserIdCommandResponse
 
-  case class AddUserInfoCommandSucceeded(deviceId: UserDeviceId) extends AddUserInfoCommandResponse
-  case class AddUserInfoCommandFailed(error: String)             extends AddUserInfoCommandResponse
-  case object SetBudgetCommandSucceeded                          extends SetBudgetCommandResponse
-  case class SetBudgetCommandFailed(error: String)               extends SetBudgetCommandResponse
+  case class AddUserInfoCommandSucceeded(deviceIds: Seq[UserDeviceId]) extends AddUserInfoCommandResponse
+  case class AddUserInfoCommandFailed(error: String)                   extends AddUserInfoCommandResponse
+  case object SetBudgetCommandSucceeded                                extends SetBudgetCommandResponse
+  case class SetBudgetCommandFailed(error: String)                     extends SetBudgetCommandResponse
 
   case object AssociateBidRequestIdAndAdvertiserIdCommandSucceeded
       extends AssociateBidRequestIdAndAdvertiserIdCommandResponse

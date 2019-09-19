@@ -8,6 +8,12 @@ object BudgetEventType {
   }
 
 }
-sealed trait BudgetEventType
-case object Absolute   extends BudgetEventType
-case object Difference extends BudgetEventType
+sealed trait BudgetEventType {
+  val value: Int
+}
+case object Absolute extends BudgetEventType {
+  override val value: Int = 0
+}
+case object Difference extends BudgetEventType {
+  override val value: Int = 1
+}

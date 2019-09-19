@@ -53,8 +53,7 @@ object Settings {
       // Warn when numerics are widened.
 //      "-Ywarn-numeric-widen",
       // Warn when imports are unused.
-      "-Ywarn-unused-import",
-      "-Ywarn-numeric-widen"
+      "-Ywarn-unused-import"
     )
   )
   
