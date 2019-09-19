@@ -7,14 +7,10 @@ CREATE TABLE user
 (
   `user_id`                 VARCHAR(255) NOT NULL,
   `advertiser_id`           int NOT NULL,
-  `game_install_count`      int NOT NULL,
-  `game_login_count`        int NOT NULL,
-  `game_paid_count`         int NOT NULL,
-  `game_tutorial_count`     int NOT NULL,
-  `game_extension_count`    int NOT NULL,
+  `game_install_count`      int NOT NULL
   PRIMARY KEY  `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-INSERT INTO user (`user_id`, `advertiser_id`, `game_install_count`, `game_login_count`, `game_paid_count`, `game_tutorial_count`, `game_extension_count`) VALUES ("test_id", 1, 2, 2, 2, 2, 2);
+INSERT INTO user (`user_id`, `advertiser_id`, `game_install_count`) VALUES ("test_id", 1, 2);
 
 DROP TABLE IF EXISTS budget;
 CREATE TABLE budget

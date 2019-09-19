@@ -34,12 +34,12 @@ object Settings {
   
   lazy val dockerSettings = Seq(
     fork := true,
-    name := "adtech-compe-2019-d-loadtest",
+    name := "loadtest",
     version := "latest",
     dockerBaseImage := sdk11,
     maintainer in Docker := "BambooTuna <bambootuna@gmail.com>",
     dockerUpdateLatest := true,
-    dockerUsername := Some("cyberagenthack"),
+    dockerUsername := Some("bambootuna"),
     mainClass in (Compile, bashScriptDefines) := Some("com.github.BambooTuna.LoadTest.boot.server.Main"),
     packageName in Docker := name.value,
     dockerExposedPorts := Seq(8080),
