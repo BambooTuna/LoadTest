@@ -14,6 +14,7 @@ case class SetBudgetUseCase(budgetRepositoriesOnRedis: BudgetRepositoryBalancer[
 
   def run(arg: SetBudgetCommandRequest): Task[SetBudgetCommandResponse] = {
     (for {
+      _         <- setResponseTimer
       aggregate <- Task.pure(arg)
       r <- budgetRepositoriesOnRedis
         .getConnectionWithAdvertiserId(aggregate.advertiserId).insert(
@@ -21,11 +22,7 @@ case class SetBudgetUseCase(budgetRepositoriesOnRedis: BudgetRepositoryBalancer[
           BudgetEventModel(Absolute, BudgetDifferencePrice(aggregate.budgetBalance.value))
         )
     } yield r)
-      .map { _ =>
-        SetBudgetCommandSucceeded
-      }.onErrorHandle { ex =>
-        SetBudgetCommandFailed(ex.getMessage)
-      }
+      .responseHandle[SetBudgetCommandResponse](_ => SetBudgetCommandSucceeded)(SetBudgetCommandFailed)
   }
 
 }

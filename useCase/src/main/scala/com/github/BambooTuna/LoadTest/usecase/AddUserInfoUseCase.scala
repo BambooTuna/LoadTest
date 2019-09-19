@@ -8,6 +8,7 @@ case class AddUserInfoUseCase(userInfoRepositories: UserInfoRepositoryBalancer[U
 
   def run(arg: AddUserInfoCommandRequest): Task[AddUserInfoCommandResponse] = {
     (for {
+      _ <- setResponseTimer
       idAggregate <- Task.pure(
         arg.userInfo.userId
       )
@@ -16,12 +17,8 @@ case class AddUserInfoUseCase(userInfoRepositories: UserInfoRepositoryBalancer[U
       )
       r <- userInfoRepositories.getConnectionWithUserDeviceId(idAggregate).insert(idAggregate, recordAggregate)
     } yield r)
-      .map { _ =>
-        AddUserInfoCommandSucceeded(arg.userInfo.userId)
-      }.onErrorHandle { ex =>
-        AddUserInfoCommandFailed(ex.getMessage)
-      }
-
+      .map(_ => arg.userInfo.userId)
+      .responseHandle[AddUserInfoCommandResponse](AddUserInfoCommandSucceeded)(AddUserInfoCommandFailed)
   }
 
 }

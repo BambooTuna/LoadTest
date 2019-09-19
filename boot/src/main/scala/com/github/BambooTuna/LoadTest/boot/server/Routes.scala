@@ -52,7 +52,7 @@ object Routes {
     )
 
     commonRouter +
-    bidRequestRouter(userInfoRepositoryBalancer)(budgetRepositoryBalancer) +
+    bidRequestRouter(userInfoRepositoryBalancer)(budgetRepositoryBalancer)(advertiserIdRepositoryBalancer) +
     winNoticeRouter(budgetRepositoryBalancer)(advertiserIdRepositoryBalancer) +
     addUserInfoRoute(userInfoRepositoryBalancer) +
     setBudgetRoute(budgetRepositoryBalancer)
@@ -67,12 +67,14 @@ object Routes {
   def bidRequestRouter(
       userInfoRepositoryBalancer: UserInfoRepositoryBalancer[UserInfoDao]
   )(budgetRepositoryBalancer: BudgetRepositoryBalancer[BudgetDao])(
-      implicit system: ActorSystem,
-      materializer: ActorMaterializer
-  ): Router = {
+      advertiserIdRepositoryBalancer: AdvertiserIdRepositoryBalancer[AdvertiserIdDao]
+  )(implicit system: ActorSystem, materializer: ActorMaterializer): Router = {
     val getUserInfoUseCase = GetUserInfoUseCase(userInfoRepositoryBalancer)
     val getBudgetUseCase   = GetBudgetUseCase(budgetRepositoryBalancer)
     val getModelUseCase    = GetModelUseCase()
+    val associateBidRequestIdAndAdvertiserIdUseCase = AssociateBidRequestIdAndAdvertiserIdUseCase(
+      advertiserIdRepositoryBalancer
+    )
     Router(
       route(
         POST,
@@ -82,6 +84,7 @@ object Routes {
             getUserInfoUseCase,
             getBudgetUseCase,
             getModelUseCase,
+            associateBidRequestIdAndAdvertiserIdUseCase,
             WinNoticeEndpoint("http://localhost:8080/win") //TODO
           )
         ).route

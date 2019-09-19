@@ -8,6 +8,6 @@ object TimeZoneSetting {
   val zone = ZoneId.of("Asia/Tokyo")
 
   //TODO
-  val timeout = 80.millisecond
+  val timeout = 1000.millisecond
 
 }
