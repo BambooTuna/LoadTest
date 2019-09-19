@@ -6,7 +6,6 @@ import akka.http.scaladsl.server.Route
 import io.circe.syntax._
 import io.circe.generic.auto._
 import com.github.BambooTuna.LoadTest.adaptor.routes.json.PongResponseJson
-import kamon.Kamon
 
 case class CommonRoute() extends RouteCommonSetting {
 

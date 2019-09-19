@@ -25,7 +25,6 @@ import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import monix.execution.Scheduler.Implicits.global
 import io.circe.syntax._
 import io.circe.generic.auto._
-import monix.eval.Task
 
 case class AddUserInfoRoute(useCase: AddUserInfoUseCase)(implicit materializer: ActorMaterializer)
     extends RouteCommonSetting
@@ -35,36 +34,32 @@ case class AddUserInfoRoute(useCase: AddUserInfoUseCase)(implicit materializer: 
     extractRequestContext { _ =>
       val time = java.time.Instant.now().toEpochMilli
       successCounter.increment()
-      entity(as[AddUserInfoRequestJson]) { jsones =>
-        val fs =
-          jsones.data.map { json =>
-            useCase
-              .run(
-                AddUserInfoCommandRequest(
+      entity(as[AddUserInfoRequestJson]) { json =>
+        val f =
+          useCase
+            .run(
+              AddUserInfoCommandRequest(
+                json.data.map { j =>
                   UserInfo(
-                    UserDeviceId(json.device_id),
-                    AdvertiserId(json.advertiser_id),
-                    GameInstallCount(json.game_install_count)
+                    UserDeviceId(j.device_id),
+                    AdvertiserId(j.advertiser_id),
+                    GameInstallCount(j.game_install_count)
                   )
-                )
+                }
               )
-          }
-        val f = Task.sequence(fs).runToFuture
+            )
+            .runToFuture
         onSuccess(f) {
-          case response: Seq[AddUserInfoCommandSucceeded] =>
+          case AddUserInfoCommandSucceeded(response) =>
             val result =
               AddUserInfoResponseJson(
                 response
-                  .map(r => DeviceIdJson(r.deviceId.value))
+                  .map(r => DeviceIdJson(r.value))
               )
             val entity = HttpEntity(MediaTypes.`application/json`, result.asJson.noSpaces)
             complete(StatusCodes.OK, entity)
-          case failedResponse: Seq[AddUserInfoCommandFailed] =>
-            val result =
-              AddUserInfoResponseJson(
-                Seq.empty,
-                failedResponse.map(_.error)
-              )
+          case AddUserInfoCommandFailed(e) =>
+            val result = AddUserInfoResponseJson(error_messages = Seq(e))
             val entity = HttpEntity(MediaTypes.`application/json`, result.asJson.noSpaces)
             complete(StatusCodes.BadRequest, entity)
           case e =>

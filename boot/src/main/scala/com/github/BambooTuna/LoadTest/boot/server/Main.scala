@@ -15,8 +15,6 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration._
 
-import collection.JavaConverters._
-
 object Main extends App {
 
   Kamon.start()
