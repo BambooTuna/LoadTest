@@ -6,7 +6,7 @@ import akka.http.scaladsl.model.HttpMethods.GET
 import akka.http.scaladsl.model.{ HttpEntity, HttpRequest, HttpResponse, MediaTypes }
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis.BudgetRepositoryOnRedis
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.BudgetDao
 import com.github.BambooTuna.LoadTest.domain.model.budget.BudgetBalance
 import com.github.BambooTuna.LoadTest.usecase.command.DspCommandProtocol.{ GetBudgetCommandResponse, _ }
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
@@ -16,7 +16,7 @@ import io.circe.generic.auto._
 
 import scala.concurrent.{ ExecutionContext, Future }
 
-case class GetBudgetUseCase(budgetRepositories: BudgetRepositoryBalancer[BudgetRepositoryOnRedis])
+case class GetBudgetUseCase(budgetRepositories: BudgetRepositoryBalancer[BudgetDao])
     extends UseCaseCommon
     with FailFastCirceSupport {
 

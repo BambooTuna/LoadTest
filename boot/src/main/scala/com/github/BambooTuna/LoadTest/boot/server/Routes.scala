@@ -1,22 +1,20 @@
 package com.github.BambooTuna.LoadTest.boot.server
 
 import akka.actor.ActorSystem
-import akka.http.scaladsl.model.HttpMethods.{ GET, POST }
+import akka.http.scaladsl.model.HttpMethods.{GET, POST}
 import akka.stream.ActorMaterializer
 import com.github.BambooTuna.LoadTest.adaptor.routes._
 import org.slf4j.LoggerFactory
 import akka.http.scaladsl.server.Directives._
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.{AdvertiserIdDao, BudgetDao, UserInfoDao}
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.aerospike.AerospikeSetting
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.jdbc.JdbcSetting
-import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.{ OnAerospikeClient, OnRedisClient, OnSlickClient }
+import com.github.BambooTuna.LoadTest.adaptor.storage.dao.profile.{OnAerospikeClient, OnRedisClient, OnSlickClient}
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.redis.RedisSetting
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis.{
-  AdvertiserIdRepositoryOnRedisImpl,
-  BudgetRepositoryOnRedisImpl,
-  UserInfoRepositoryOnRedisImpl
-}
+import com.github.BambooTuna.LoadTest.adaptor.storage.repository.jdbc.BudgetRepositoryOnJDBCImpl
+import com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis.{AdvertiserIdRepositoryOnRedisImpl, BudgetRepositoryOnRedisImpl, UserInfoRepositoryOnRedisImpl}
 import com.github.BambooTuna.LoadTest.domain.model.dsp.ad.WinNoticeEndpoint
-import com.github.BambooTuna.LoadTest.usecase.{ GetAdvertiserIdUseCase, _ }
+import com.github.BambooTuna.LoadTest.usecase.{GetAdvertiserIdUseCase, _}
 
 object Routes {
 
@@ -27,13 +25,23 @@ object Routes {
       materializer: ActorMaterializer
   ): Router = {
 
-    val mysqlClient: OnSlickClient         = jdbcSetting.client
-    val redisClient: OnRedisClient         = redisSettings.client
-    val aerospikeClient: OnAerospikeClient = aerospikeSetting.client
+    val userInfoRepositoryBalancer = UserInfoRepositoryBalancer(Seq(new UserInfoRepositoryOnRedisImpl(
+      redisSettings.copy(redis_db = Some(2)).client
+    )))
+
+    val budgetRepositoryBalancer = BudgetRepositoryBalancer(Seq(new BudgetRepositoryOnJDBCImpl(
+      jdbcSetting.client
+    )))
+
+    val advertiserIdRepositoryBalancer = AdvertiserIdRepositoryBalancer(Seq(new AdvertiserIdRepositoryOnRedisImpl(
+      redisSettings.copy(redis_db = Some(3)).client
+    )))
 
     commonRouter +
-    bidRequestRouter(mysqlClient, redisClient, aerospikeClient) +
-    winNoticeRouter(mysqlClient, redisClient, aerospikeClient)
+      bidRequestRouter(userInfoRepositoryBalancer)(budgetRepositoryBalancer) +
+      winNoticeRouter(budgetRepositoryBalancer)(advertiserIdRepositoryBalancer) +
+      addUserInfoRoute(userInfoRepositoryBalancer) +
+      setBudgetRoute(budgetRepositoryBalancer)
   }
 
   def commonRouter(implicit materializer: ActorMaterializer): Router =
@@ -42,24 +50,14 @@ object Routes {
       route(GET, "ping", CommonRoute().ping)
     )
 
-  def bidRequestRouter(mysqlClient: OnSlickClient, redisClient: OnRedisClient, aerospikeClient: OnAerospikeClient)(
+  def bidRequestRouter(userInfoRepositoryBalancer: UserInfoRepositoryBalancer[UserInfoDao])
+                      (budgetRepositoryBalancer: BudgetRepositoryBalancer[BudgetDao])(
       implicit system: ActorSystem,
       materializer: ActorMaterializer
   ): Router = {
-
-    val userInfoRepository = new UserInfoRepositoryOnRedisImpl(redisClient)
-    val budgetRepository   = new BudgetRepositoryOnRedisImpl(redisClient)
-
-    val getUserInfoUseCase = GetUserInfoUseCase(
-      UserInfoRepositoryBalancer(Seq(userInfoRepository))
-    )
-
-    val getBudgetUseCase = GetBudgetUseCase(
-      BudgetRepositoryBalancer(Seq(budgetRepository))
-    )
-
+    val getUserInfoUseCase = GetUserInfoUseCase(userInfoRepositoryBalancer)
+    val getBudgetUseCase = GetBudgetUseCase(budgetRepositoryBalancer)
     val getModelUseCase = GetModelUseCase()
-
     Router(
       route(
         POST,
@@ -69,41 +67,41 @@ object Routes {
             getUserInfoUseCase,
             getBudgetUseCase,
             getModelUseCase,
-            WinNoticeEndpoint("http://34.84.137.136:8080/win") //TODO
+            WinNoticeEndpoint("http://localhost:8080/win") //TODO
           )
         ).route
       )
     )
   }
 
-  def winNoticeRouter(mysqlClient: OnSlickClient, redisClient: OnRedisClient, aerospikeClient: OnAerospikeClient)(
+  def winNoticeRouter(budgetRepositoryBalancer: BudgetRepositoryBalancer[BudgetDao])
+                     (advertiserIdRepositoryBalancer: AdvertiserIdRepositoryBalancer[AdvertiserIdDao])(
       implicit system: ActorSystem,
       materializer: ActorMaterializer
   ): Router = {
-
-    val userInfoRepository     = new UserInfoRepositoryOnRedisImpl(redisClient)
-    val budgetRepository       = new BudgetRepositoryOnRedisImpl(redisClient)
-    val advertiserIdRepository = new AdvertiserIdRepositoryOnRedisImpl(redisClient)
-
-    val getAdvertiserIdUseCase = GetAdvertiserIdUseCase(
-      AdvertiserIdRepositoryBalancer(Seq(advertiserIdRepository))
-    )
-
-    val reduceBudgetFromWinNoticeUseCase = ReduceBudgetFromWinNoticeUseCase(
-      BudgetRepositoryBalancer(Seq(budgetRepository))
-    )(getAdvertiserIdUseCase)
-
-    val addUserInfoUseCase = AddUserInfoUseCase(
-      UserInfoRepositoryBalancer(Seq(userInfoRepository))
-    )
-
-    val setBudgetUseCase: SetBudgetUseCase = SetBudgetUseCase(
-      BudgetRepositoryBalancer(Seq(budgetRepository))
-    )
-
+    val getAdvertiserIdUseCase = GetAdvertiserIdUseCase(advertiserIdRepositoryBalancer)
+    val reduceBudgetFromWinNoticeUseCase = ReduceBudgetFromWinNoticeUseCase(budgetRepositoryBalancer)(getAdvertiserIdUseCase)
     Router(
-      route(POST, "win", ReduceBudgetFromWinNoticeRoute(reduceBudgetFromWinNoticeUseCase).route),
-      route(POST, "user" / "add", AddUserInfoRoute(addUserInfoUseCase).route),
+      route(POST, "win", ReduceBudgetFromWinNoticeRoute(reduceBudgetFromWinNoticeUseCase).route)
+    )
+  }
+
+  def addUserInfoRoute(userInfoRepositoryBalancer: UserInfoRepositoryBalancer[UserInfoDao])(
+    implicit system: ActorSystem,
+    materializer: ActorMaterializer
+  ): Router = {
+    val addUserInfoUseCase = AddUserInfoUseCase(userInfoRepositoryBalancer)
+    Router(
+      route(POST, "user" / "add", AddUserInfoRoute(addUserInfoUseCase).route)
+    )
+  }
+
+  def setBudgetRoute(budgetRepositoryBalancer: BudgetRepositoryBalancer[BudgetDao])(
+    implicit system: ActorSystem,
+    materializer: ActorMaterializer
+  ): Router = {
+    val setBudgetUseCase: SetBudgetUseCase = SetBudgetUseCase(budgetRepositoryBalancer)
+    Router(
       route(POST, "budget" / "set", SetBudgetRoute(setBudgetUseCase).route)
     )
   }

@@ -42,7 +42,7 @@ services:
     ports:
       - "6386:6379"
   boot:
-    image: cyberagenthack/adtech-compe-2019-d-loadtest:latest
+    image: bambootuna/loadtest:latest
     restart: always # OS起動時にコンテナを自動起動
     ports:
       - 8080:8080
