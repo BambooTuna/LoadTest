@@ -10,13 +10,13 @@ import com.github.BambooTuna.LoadTest.adaptor.storage.dao.{ AdvertiserIdDao, Bud
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.aerospike.AerospikeSetting
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.jdbc.JdbcSetting
 import com.github.BambooTuna.LoadTest.adaptor.storage.dao.redis.RedisSetting
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.jdbc.BudgetRepositoryOnJDBCImpl
-import com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis.{
-  AdvertiserIdRepositoryOnRedisImpl,
-  UserInfoRepositoryOnRedisImpl
+import com.github.BambooTuna.LoadTest.adaptor.storage.repository.jdbc.{
+  BudgetRepositoryOnJDBCImpl,
+  UserInfoRepositoryOnJDBCImpl
 }
+import com.github.BambooTuna.LoadTest.adaptor.storage.repository.redis._
 import com.github.BambooTuna.LoadTest.domain.model.dsp.ad.WinNoticeEndpoint
-import com.github.BambooTuna.LoadTest.usecase.{ GetAdvertiserIdUseCase, _ }
+import com.github.BambooTuna.LoadTest.usecase._
 
 object Routes {
 
@@ -27,10 +27,10 @@ object Routes {
       materializer: ActorMaterializer
   ): Router = {
 
-    val userInfoRepositoryBalancer = UserInfoRepositoryBalancer(
+    val userInfoRepositoryBalancer: UserInfoRepositoryBalancer[UserInfoDao] = UserInfoRepositoryBalancer(
       Seq(
-        new UserInfoRepositoryOnRedisImpl(
-          redisSettings.copy(redis_db = Some(2)).client
+        new UserInfoRepositoryOnJDBCImpl(
+          jdbcSetting.client
         )
       )
     )
