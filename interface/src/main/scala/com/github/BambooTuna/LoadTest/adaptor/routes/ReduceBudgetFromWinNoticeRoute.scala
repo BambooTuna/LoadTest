@@ -32,16 +32,16 @@ case class ReduceBudgetFromWinNoticeRoute(useCase: ReduceBudgetFromWinNoticeUseC
         jsonParseHandle {
           val f =
             (if (json.is_click == 1) {
-              useCase
-                .run(
-                  ReduceBudgetFromWinNoticeCommandRequest(
-                    BidRequestId(json.id),
-                    BudgetDifferencePrice(-120) //TODO
-                  )
-                )
-            } else {
-              Task(ReduceBudgetFromWinNoticeCommandNoClick)
-            }).runToFuture
+               useCase
+                 .run(
+                   ReduceBudgetFromWinNoticeCommandRequest(
+                     BidRequestId(json.id),
+                     BudgetDifferencePrice(-120) //TODO
+                   )
+                 )
+             } else {
+               Task(ReduceBudgetFromWinNoticeCommandNoClick)
+             }).runToFuture
           onSuccess(f) {
             case ReduceBudgetFromWinNoticeCommandSucceeded =>
               complete(StatusCodes.OK)

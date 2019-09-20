@@ -127,7 +127,7 @@ class LoadTestE2ETest extends FreeSpecLike with Matchers with ScalaFutures {
           advertiser_id = -9999999
         ))
       val response = f.futureValue
-      response.statusCode shouldBe StatusCodes.BadRequest
+      response.statusCode shouldBe StatusCodes.MisdirectedRequest
     }
 
   }
