@@ -55,7 +55,7 @@ object Routes {
     bidRequestRouter(userInfoRepositoryBalancer)(budgetRepositoryBalancer)(advertiserIdRepositoryBalancer) +
     winNoticeRouter(budgetRepositoryBalancer)(advertiserIdRepositoryBalancer) +
     addUserInfoRoute(userInfoRepositoryBalancer) +
-    setBudgetRoute(budgetRepositoryBalancer)
+    budgetRoute(budgetRepositoryBalancer)
   }
 
   def commonRouter(implicit materializer: ActorMaterializer): Router =
@@ -116,12 +116,14 @@ object Routes {
     )
   }
 
-  def setBudgetRoute(budgetRepositoryBalancer: BudgetRepositoryBalancer[BudgetDao])(
+  def budgetRoute(budgetRepositoryBalancer: BudgetRepositoryBalancer[BudgetDao])(
       implicit system: ActorSystem,
       materializer: ActorMaterializer
   ): Router = {
+    val getBudgetUseCase: GetBudgetUseCase = GetBudgetUseCase(budgetRepositoryBalancer)
     val setBudgetUseCase: SetBudgetUseCase = SetBudgetUseCase(budgetRepositoryBalancer)
     Router(
+      route(GET, "budget" / "get", GetBudgetRoute(getBudgetUseCase).route),
       route(POST, "budget" / "set", SetBudgetRoute(setBudgetUseCase).route)
     )
   }
