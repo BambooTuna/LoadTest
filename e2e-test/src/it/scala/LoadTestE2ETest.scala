@@ -110,6 +110,29 @@ class LoadTestE2ETest extends FreeSpecLike with Matchers with ScalaFutures {
 
   }
 
+  "get budget" - {
+
+    "200OK" in {
+      val f =
+        createGetBudgetRequest(GetBudgetRequest(
+          advertiser_id = advertiserId
+        ))
+      val response = f.futureValue
+      response.statusCode shouldBe StatusCodes.OK
+    }
+
+    "BadRequest when advertiser-id is unknown" in {
+      val f =
+        createGetBudgetRequest(GetBudgetRequest(
+          advertiser_id = -9999999
+        ))
+      val response = f.futureValue
+      response.statusCode shouldBe StatusCodes.BadRequest
+    }
+
+  }
+
+
 
   def createBidRequest(bidRequestRequest: BidRequestRequest): Future[Response] = {
     val request = HttpRequest(
@@ -126,6 +149,15 @@ class LoadTestE2ETest extends FreeSpecLike with Matchers with ScalaFutures {
       uri = createUri(path = "/win"),
       headers = commonHeaderList,
       entity = HttpEntity(ContentTypes.`application/json`, reduceBudgetFromWinNoticeRequest.asJson.noSpaces))
+    Http().singleRequest(request).flatMap(convertHttpResponseToFutureString)
+  }
+
+  def createGetBudgetRequest(getBudgetRequest: GetBudgetRequest): Future[Response] = {
+    val request = HttpRequest(
+      method = HttpMethods.GET,
+      uri = createUri(path = "/budget/get"),
+      headers = commonHeaderList,
+      entity = HttpEntity(ContentTypes.`application/json`, getBudgetRequest.asJson.noSpaces))
     Http().singleRequest(request).flatMap(convertHttpResponseToFutureString)
   }
 

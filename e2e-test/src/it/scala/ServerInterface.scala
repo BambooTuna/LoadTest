@@ -25,4 +25,6 @@ case class ReduceBudgetFromWinNoticeRequest(
                                              is_click: Int //0 or 1
                                            )
 
+case class GetBudgetRequest(advertiser_id: Int)
+
 case class ErrorResponseJson(error_code: String, message: String)
