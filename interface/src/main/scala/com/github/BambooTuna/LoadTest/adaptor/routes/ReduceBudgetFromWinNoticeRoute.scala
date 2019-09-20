@@ -29,29 +29,34 @@ case class ReduceBudgetFromWinNoticeRoute(useCase: ReduceBudgetFromWinNoticeUseC
   def route: Route = extractActorSystem { implicit system =>
     extractRequestContext { _ =>
       entity(as[ReduceBudgetFromWinNoticeRequestJson]) { json =>
-        val f =
-          (if (json.is_click == 1) {
-             useCase
-               .run(
-                 ReduceBudgetFromWinNoticeCommandRequest(
-                   BidRequestId(json.id),
-                   BudgetDifferencePrice(-120)
+        jsonParseHandle {
+          val f =
+            (if (json.is_click == 1) {
+               useCase
+                 .run(
+                   ReduceBudgetFromWinNoticeCommandRequest(
+                     BidRequestId(json.id),
+                     BudgetDifferencePrice(-120) //TODO
+                   )
                  )
-               )
-           } else {
-             Task(ReduceBudgetFromWinNoticeCommandNoClick)
-           }).runToFuture
-        onSuccess(f) {
-          case ReduceBudgetFromWinNoticeCommandSucceeded =>
-            complete(StatusCodes.OK)
-          case ReduceBudgetFromWinNoticeCommandNoClick =>
-            complete(StatusCodes.NoContent)
-          case ReduceBudgetFromWinNoticeCommandFailed(e) =>
-            val entity = HttpEntity(MediaTypes.`application/json`, e.toString)
-            complete(StatusCodes.BadRequest, entity)
-          case e =>
-            val entity = HttpEntity(MediaTypes.`application/json`, e.toString)
-            complete(StatusCodes.BadRequest, entity)
+             } else {
+               Task(ReduceBudgetFromWinNoticeCommandNoClick)
+             }).runToFuture
+          onSuccess(f) {
+            case ReduceBudgetFromWinNoticeCommandSucceeded =>
+              complete(StatusCodes.OK)
+            case ReduceBudgetFromWinNoticeCommandNoClick =>
+              complete(StatusCodes.NoContent)
+            case ReduceBudgetFromWinNoticeCommandFailed(e) =>
+              val entity = HttpEntity(MediaTypes.`application/json`, e.toString)
+              complete(StatusCodes.BadRequest, entity)
+            case e =>
+              val entity = HttpEntity(MediaTypes.`application/json`, e.toString)
+              complete(StatusCodes.BadRequest, entity)
+          }
+        } { _ =>
+          val entity = HttpEntity(MediaTypes.`application/json`, "json parse error!")
+          complete(StatusCodes.MisdirectedRequest, entity)
         }
       }
     }

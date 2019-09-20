@@ -22,10 +22,16 @@ $ docker-compose up -d --build
 ...
 ```
 
+### E2E Test
+```sbtshell
+$ sbt it:test
+```
+
 ### Curl test
 
-```sbtshell//
+```sbtshell
 $ curl -X POST -H "Content-Type: application/json" -d '{"data":[{"device_id":"1","advertiser_id":1,"game_install_count":1},{"device_id":"2","advertiser_id":1,"game_install_count":1}]}' http://localhost:8080/user/add
+$ curl -X POST -H "Content-Type: application/json" -d '{"device_id":"1"}' http://localhost:8080/user/get
 $ curl -X POST -H "Content-Type: application/json" -d '{"id":"1","timestamp":1234567890,"device_id":"1","banner_size":1,"media_id":1,"os_type":1,"banner_position":1,"floor_price":1.0}' http://localhost:8080/bid_request
 
 

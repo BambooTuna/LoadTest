@@ -1,6 +1,6 @@
 package com.github.BambooTuna.LoadTest.gatling.test
 
-import com.github.BambooTuna.LoadTest.adaptor.routes.json.GetUserRequestJson
+import com.github.BambooTuna.LoadTest.adaptor.routes.json.GetUserInfoRequestJson
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 
@@ -16,7 +16,7 @@ class GetUserOnAerospikeSimulation extends Simulation with SimulationConfig {
         .headers(Map("Content-Type" -> "application/json"))
         .body(
           StringBody(
-            GetUserRequestJson(1L).asJson.noSpaces
+            GetUserInfoRequestJson("1").asJson.noSpaces
           )
         )
         .check(status.is(204))

@@ -11,56 +11,50 @@ import akka.http.scaladsl.server.Directives.{
 }
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
-import com.github.BambooTuna.LoadTest.adaptor.routes.json.{
-  AddUserInfoRequestJson,
-  AddUserInfoResponseJson,
-  DeviceIdJson
-}
-import com.github.BambooTuna.LoadTest.domain.model.dsp.UserInfo
-import com.github.BambooTuna.LoadTest.domain.model.dsp.ad.{ AdvertiserId, UserDeviceId }
-import com.github.BambooTuna.LoadTest.domain.model.dsp.user.GameInstallCount
-import com.github.BambooTuna.LoadTest.usecase.AddUserInfoUseCase
+import com.github.BambooTuna.LoadTest.adaptor.routes.json._
+import com.github.BambooTuna.LoadTest.domain.model.dsp.ad.UserDeviceId
+import com.github.BambooTuna.LoadTest.usecase.GetUserInfoUseCase
 import com.github.BambooTuna.LoadTest.usecase.command.DspCommandProtocol._
+import com.github.BambooTuna.LoadTest.usecase.json.UserInfoJson
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
-import monix.execution.Scheduler.Implicits.global
-import io.circe.syntax._
 import io.circe.generic.auto._
+import io.circe.syntax._
+import monix.execution.Scheduler.Implicits.global
 
-case class AddUserInfoRoute(useCase: AddUserInfoUseCase)(implicit materializer: ActorMaterializer)
+case class GetUserInfoRoute(useCase: GetUserInfoUseCase)(implicit materializer: ActorMaterializer)
     extends RouteCommonSetting
     with FailFastCirceSupport {
 
   def route: Route = extractActorSystem { implicit system =>
     extractRequestContext { _ =>
-      entity(as[AddUserInfoRequestJson]) { json =>
+      entity(as[GetUserInfoRequestJson]) { json =>
         jsonParseHandle {
           val f =
             useCase
               .run(
-                AddUserInfoCommandRequest(
-                  json.data.map { j =>
-                    UserInfo(
-                      UserDeviceId(j.device_id),
-                      AdvertiserId(j.advertiser_id),
-                      GameInstallCount(j.game_install_count)
-                    )
-                  }
+                GetUserInfoCommandRequest(
+                  UserDeviceId(json.device_id)
                 )
               )
               .runToFuture
           onSuccess(f) {
-            case AddUserInfoCommandSucceeded(response) =>
+            case GetUserInfoCommandSucceeded(response) =>
               val result =
-                AddUserInfoResponseJson(
-                  response
-                    .map(r => DeviceIdJson(r.value))
+                GetUserInfoResponseJson(
+                  Some(
+                    UserInfoJson(
+                      device_id = response.userId.value,
+                      advertiser_id = response.advertiserId.value,
+                      game_install_count = response.gameInstallCount.value
+                    )
+                  )
                 )
               val entity = HttpEntity(MediaTypes.`application/json`, result.asJson.noSpaces)
               complete(StatusCodes.OK, entity)
-            case AddUserInfoCommandFailed(e) =>
-              val result = AddUserInfoResponseJson(error_messages = Seq(e))
+            case GetUserInfoCommandFailed(e) =>
+              val result = GetUserInfoResponseJson(error_messages = Seq(e))
               val entity = HttpEntity(MediaTypes.`application/json`, result.asJson.noSpaces)
-              complete(StatusCodes.BadRequest, entity)
+              complete(StatusCodes.NoContent, entity)
             case e =>
               val entity = HttpEntity(MediaTypes.`application/json`, e.toString)
               complete(StatusCodes.BadRequest, entity)

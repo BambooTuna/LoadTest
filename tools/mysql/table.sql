@@ -10,7 +10,7 @@ CREATE TABLE user
   `game_install_count`      int NOT NULL,
   PRIMARY KEY  `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-INSERT INTO user (`user_id`, `advertiser_id`, `game_install_count`) VALUES ("test_id", 1, 2);
+INSERT INTO user (`user_id`, `advertiser_id`, `game_install_count`) VALUES ("1", 1, 2);
 
 DROP TABLE IF EXISTS budget;
 CREATE TABLE budget
