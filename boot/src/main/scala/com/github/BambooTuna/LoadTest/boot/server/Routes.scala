@@ -110,8 +110,10 @@ object Routes {
       implicit system: ActorSystem,
       materializer: ActorMaterializer
   ): Router = {
+    val getUserInfoUseCase = GetUserInfoUseCase(userInfoRepositoryBalancer)
     val addUserInfoUseCase = AddUserInfoUseCase(userInfoRepositoryBalancer)
     Router(
+      route(POST, "user" / "get", GetUserInfoRoute(getUserInfoUseCase).route),
       route(POST, "user" / "add", AddUserInfoRoute(addUserInfoUseCase).route)
     )
   }
