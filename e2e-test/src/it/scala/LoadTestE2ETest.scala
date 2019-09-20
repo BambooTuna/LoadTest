@@ -132,6 +132,28 @@ class LoadTestE2ETest extends FreeSpecLike with Matchers with ScalaFutures {
 
   }
 
+  "get user info" - {
+
+    "200OK" in {
+      val f =
+        createGetUserInfoRequest(GetUserInfoRequest(
+          device_id = deviceId
+        ))
+      val response = f.futureValue
+      response.statusCode shouldBe StatusCodes.OK
+    }
+
+    "BadRequest when device-id is unknown" in {
+      val f =
+        createGetUserInfoRequest(GetUserInfoRequest(
+          device_id = "unknown device id"
+        ))
+      val response = f.futureValue
+      response.statusCode shouldBe StatusCodes.NoContent
+    }
+
+  }
+
 
 
   def createBidRequest(bidRequestRequest: BidRequestRequest): Future[Response] = {
@@ -158,6 +180,15 @@ class LoadTestE2ETest extends FreeSpecLike with Matchers with ScalaFutures {
       uri = createUri(path = "/budget/get"),
       headers = commonHeaderList,
       entity = HttpEntity(ContentTypes.`application/json`, getBudgetRequest.asJson.noSpaces))
+    Http().singleRequest(request).flatMap(convertHttpResponseToFutureString)
+  }
+
+  def createGetUserInfoRequest(getUserInfoRequest: GetUserInfoRequest): Future[Response] = {
+    val request = HttpRequest(
+      method = HttpMethods.GET,
+      uri = createUri(path = "/user/get"),
+      headers = commonHeaderList,
+      entity = HttpEntity(ContentTypes.`application/json`, getUserInfoRequest.asJson.noSpaces))
     Http().singleRequest(request).flatMap(convertHttpResponseToFutureString)
   }
 

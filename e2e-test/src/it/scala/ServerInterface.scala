@@ -27,4 +27,6 @@ case class ReduceBudgetFromWinNoticeRequest(
 
 case class GetBudgetRequest(advertiser_id: Int)
 
+case class GetUserInfoRequest(device_id: String)
+
 case class ErrorResponseJson(error_code: String, message: String)
