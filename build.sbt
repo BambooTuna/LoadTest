@@ -93,6 +93,22 @@ lazy val `gatling-runner` = (project in file("tools/gatling-runner"))
     `gatling-test` % "compile->gatling-it"
   )
 
+lazy val `e2e-test` = (project in file("e2e-test"))
+  .settings(commonSettings)
+  .settings(Defaults.itSettings: _*)
+  .configs(IntegrationTest)
+  .settings(
+    name := "e2e-test",
+    libraryDependencies ++= Seq(
+      Circe.core,
+      Circe.parser,
+      Circe.generic,
+      Akka.http,
+      Akka.stream,
+      ScalaTest.version % "it"
+    )
+  )
+
 lazy val root =
   (project in file("."))
-    .aggregate(boot, `gatling-test`, `gatling-runner`)
+    .aggregate(boot, `gatling-test`, `gatling-runner`, `e2e-test`)

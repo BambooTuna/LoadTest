@@ -32,39 +32,42 @@ case class AddUserInfoRoute(useCase: AddUserInfoUseCase)(implicit materializer: 
 
   def route: Route = extractActorSystem { implicit system =>
     extractRequestContext { _ =>
-      val time = java.time.Instant.now().toEpochMilli
-      successCounter.increment()
       entity(as[AddUserInfoRequestJson]) { json =>
-        val f =
-          useCase
-            .run(
-              AddUserInfoCommandRequest(
-                json.data.map { j =>
-                  UserInfo(
-                    UserDeviceId(j.device_id),
-                    AdvertiserId(j.advertiser_id),
-                    GameInstallCount(j.game_install_count)
-                  )
-                }
+        jsonParseHandle {
+          val f =
+            useCase
+              .run(
+                AddUserInfoCommandRequest(
+                  json.data.map { j =>
+                    UserInfo(
+                      UserDeviceId(j.device_id),
+                      AdvertiserId(j.advertiser_id),
+                      GameInstallCount(j.game_install_count)
+                    )
+                  }
+                )
               )
-            )
-            .runToFuture
-        onSuccess(f) {
-          case AddUserInfoCommandSucceeded(response) =>
-            val result =
-              AddUserInfoResponseJson(
-                response
-                  .map(r => DeviceIdJson(r.value))
-              )
-            val entity = HttpEntity(MediaTypes.`application/json`, result.asJson.noSpaces)
-            complete(StatusCodes.OK, entity)
-          case AddUserInfoCommandFailed(e) =>
-            val result = AddUserInfoResponseJson(error_messages = Seq(e))
-            val entity = HttpEntity(MediaTypes.`application/json`, result.asJson.noSpaces)
-            complete(StatusCodes.BadRequest, entity)
-          case e =>
-            val entity = HttpEntity(MediaTypes.`application/json`, e.toString)
-            complete(StatusCodes.BadRequest, entity)
+              .runToFuture
+          onSuccess(f) {
+            case AddUserInfoCommandSucceeded(response) =>
+              val result =
+                AddUserInfoResponseJson(
+                  response
+                    .map(r => DeviceIdJson(r.value))
+                )
+              val entity = HttpEntity(MediaTypes.`application/json`, result.asJson.noSpaces)
+              complete(StatusCodes.OK, entity)
+            case AddUserInfoCommandFailed(e) =>
+              val result = AddUserInfoResponseJson(error_messages = Seq(e))
+              val entity = HttpEntity(MediaTypes.`application/json`, result.asJson.noSpaces)
+              complete(StatusCodes.BadRequest, entity)
+            case e =>
+              val entity = HttpEntity(MediaTypes.`application/json`, e.toString)
+              complete(StatusCodes.BadRequest, entity)
+          }
+        } { _ =>
+          val entity = HttpEntity(MediaTypes.`application/json`, "json parse error!")
+          complete(StatusCodes.MisdirectedRequest, entity)
         }
       }
     }
